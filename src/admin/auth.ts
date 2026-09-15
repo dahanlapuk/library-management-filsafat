@@ -74,3 +74,45 @@ export const getCurrentAdmin = createServerFn({ method: 'GET' }).handler(
     return profile ?? null
   },
 )
+
+const signupSchema = z.object({
+  nama: z.string().min(1, 'Nama wajib diisi.'),
+  email: z.string().email('Email tidak valid.'),
+  password: z.string().min(8, 'Password minimal 8 karakter.'),
+})
+
+// Signup terbuka untuk siapa saja, tapi hasilnya PENDING (isApproved: false)
+// sampai superadmin approve lewat approveAdmin(). Admin baru TIDAK otomatis
+// login setelah signup — sesi dipaksa sign-out di akhir, supaya "belum
+// di-approve" beneran berarti "belum bisa masuk", bukan cuma status di DB.
+export const signupAdmin = createServerFn({ method: 'POST' })
+  .inputValidator(signupSchema)
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient()
+
+    const { data: authData, error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    })
+
+    if (error || !authData.user) {
+      throw new Error(error?.message ?? 'Gagal membuat akun.')
+    }
+
+    try {
+      await db.insert(adminProfiles).values({
+        id: authData.user.id,
+        nama: data.nama,
+        email: data.email,
+        isSuperadmin: false,
+        isApproved: false,
+      })
+    } finally {
+      // Paksa sign-out apa pun hasil signUp di atas (kalau Supabase project
+      // ini nggak wajibkan email confirmation, signUp bisa balikin sesi
+      // aktif otomatis — kita nggak mau admin yang belum approved kepakai).
+      await supabase.auth.signOut()
+    }
+
+    return { success: true }
+  })

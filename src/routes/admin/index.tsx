@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { AdminHeader } from '../../admin/AdminHeader'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboardPlaceholder,
@@ -6,9 +7,14 @@ export const Route = createFileRoute('/admin/')({
 
 function AdminDashboardPlaceholder() {
   return (
-    <div className="p-8">
-      <h1>Dashboard Admin</h1>
-      <p>Halaman ini akan dibangun di fase berikutnya.</p>
+    <div className="min-h-screen bg-[var(--bg-page)] p-5">
+      <div className="w-full max-w-[640px] mx-auto">
+        <AdminHeader />
+        <h1 className="text-2xl font-semibold">Dashboard Admin</h1>
+        <p className="text-[var(--gray-600)]">
+          Halaman ini akan dibangun di fase berikutnya.
+        </p>
+      </div>
     </div>
   )
 }
