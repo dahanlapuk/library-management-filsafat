@@ -26,6 +26,7 @@ export const adminProfiles = pgTable('admin_profiles', {
   role: text('role').notNull().default('admin'),
   title: text('title'),
   isSuperadmin: boolean('is_superadmin').notNull().default(false),
+  isApproved: boolean('is_approved').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
