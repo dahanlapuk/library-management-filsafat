@@ -22,6 +22,20 @@
       "when": 1789530557390,
       "tag": "0002_perpetual_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789595163347,
+      "tag": "0003_curvy_electro",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789595718016,
+      "tag": "0004_nappy_karma",
+      "breakpoints": true
     }
   ]
 }

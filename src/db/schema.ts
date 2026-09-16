@@ -9,9 +9,10 @@ import {
   date,
   uuid,
   unique,
+  uniqueIndex,
   jsonb,
 } from 'drizzle-orm/pg-core'
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 
 // ── ENUMS ────────────────────────────────────────────────────────
 export const memberRoleEnum = pgEnum('member_role', ['mahasiswa', 'dosen'])
@@ -116,7 +117,11 @@ export const members = pgTable('members', {
 // ── LOANS ────────────────────────────────────────────────────────
 export const loans = pgTable('loans', {
   id: serial('id').primaryKey(),
-  bookId: integer('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
+  // set null (bukan cascade) -- histori peminjaman HARUS tetap ada meski
+  // bukunya sudah dihapus (lihat diskusi CRUD buku Fase 2). bookJudulSnapshot
+  // diisi pas loan dibuat, supaya histori tetap terbaca walau bookId null.
+  bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
+  bookJudulSnapshot: text('book_judul_snapshot'),
   memberId: integer('member_id').notNull().references(() => members.id, { onDelete: 'restrict' }),
   tanggalPinjam: date('tanggal_pinjam').defaultNow().notNull(),
   // Untuk mahasiswa: diisi otomatis = jam tutup perpus hari itu. Untuk dosen: null/lebih panjang.
@@ -130,7 +135,9 @@ export const loans = pgTable('loans', {
 export const loanStockAllocations = pgTable('loan_stock_allocations', {
   id: serial('id').primaryKey(),
   loanId: integer('loan_id').notNull().references(() => loans.id, { onDelete: 'cascade' }),
-  bookId: integer('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
+  // set null, bukan cascade -- baris ini bagian dari histori loan (lewat
+  // loanId), jangan ikut lenyap kalau bukunya dihapus terpisah dari loan.
+  bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
   posisiId: integer('posisi_id').references(() => posisi.id, { onDelete: 'set null' }),
   qty: integer('qty').notNull().default(1),
   allocatedAt: timestamp('allocated_at').defaultNow(),
@@ -172,3 +179,44 @@ export const loansRelations = relations(loans, ({ one, many }) => ({
 export const membersRelations = relations(members, ({ many }) => ({
   loans: many(loans),
 }))
+// ── DELETE REQUESTS (pengajuan hapus buku) ────────────────────────
+// Admin biasa tidak boleh hapus buku langsung (lihat guard di
+// src/books/admin.ts) -- mereka cuma bisa MENGAJUKAN, superadmin yang
+// approve/reject. Approve memanggil ulang logic hapus yang sama persis
+// dengan deleteBook (bukan jalur terpisah), jadi tidak ada state
+// "approved tapi bukunya masih ada".
+export const deleteRequestStatusEnum = pgEnum('delete_request_status', [
+  'pending',
+  'approved',
+  'rejected',
+])
+
+export const deleteRequests = pgTable(
+  'delete_requests',
+  {
+    id: serial('id').primaryKey(),
+    // set null, bukan cascade -- baris pengajuan (alasan, siapa mengajukan,
+    // siapa approve/reject, kapan) HARUS tetap ada sebagai audit trail
+    // meski approve-nya berujung buku itu dihapus. bookJudulSnapshot
+    // diisi pas pengajuan dibuat, biar tetap terbaca walau bookId null.
+    bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
+    bookJudulSnapshot: text('book_judul_snapshot').notNull(),
+    alasan: text('alasan').notNull(),
+    status: deleteRequestStatusEnum('status').notNull().default('pending'),
+    requestedBy: uuid('requested_by').notNull().references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedAt: timestamp('reviewed_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [
+    // Satu buku cuma boleh punya SATU pengajuan hapus yang masih pending
+    // di satu waktu -- dicegah lewat partial unique index (WHERE status
+    // = 'pending'), bukan cek manual di server function, supaya aman
+    // dari race condition kalau dua admin submit nyaris bersamaan.
+    // Drizzle pg-core belum dukung partial index lewat builder biasa,
+    // jadi ditulis manual lewat sql`` di uniqueIndex.
+    uniqueIndex('delete_requests_one_pending_per_book')
+      .on(t.bookId)
+      .where(sql`${t.status} = 'pending'`),
+  ],
+)

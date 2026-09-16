@@ -56,12 +56,14 @@ function AdminDashboard() {
           )}
         </div>
 
-        <div className="bg-[var(--white)] border-2 border-[var(--gray-200)] p-6 text-center">
-          <p className="text-[var(--gray-600)]">
-            Fitur katalog buku dan peminjaman akan hadir di fase berikutnya
-            (Fase 1 &amp; 2 migrasi V2).
+        <Link
+          to="/admin/books"
+          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+        >
+          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+            Kelola Buku →
           </p>
-        </div>
+        </Link>
       </div>
     </div>
   )
