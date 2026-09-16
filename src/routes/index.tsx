@@ -10,7 +10,7 @@ import {
 
 export const Route = createFileRoute('/')({ component: PublicCatalogPage })
 
-const PAGE_SIZE = 20
+const PAGE_SIZE_OPTIONS = [20, 40, 80] as const
 
 type BookTag = { id: number; nama: string }
 
@@ -92,7 +92,7 @@ function BookCard({ book }: { book: BookRow }) {
           className={`shrink-0 text-xs font-medium px-2 py-0.5 ${
             book.isDipinjam
               ? 'bg-[var(--black)] text-[var(--white)]'
-              : 'border border-[var(--black)] text-[var(--text-primary)]'
+              : 'border-2 border-[var(--accent)] text-[var(--accent)]'
           }`}
         >
           {book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
@@ -165,6 +165,7 @@ function PublicCatalogPage() {
   const [status, setStatus] = useState<'dipinjam' | 'tersedia' | undefined>(
     undefined,
   )
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE_OPTIONS[0])
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -176,7 +177,7 @@ function PublicCatalogPage() {
 
   useEffect(() => {
     setPage(1)
-  }, [debouncedSearch, selectedKategoriId, status])
+  }, [debouncedSearch, selectedKategoriId, status, pageSize])
 
   const isSearching = debouncedSearch.length > 0
 
@@ -188,7 +189,7 @@ function PublicCatalogPage() {
   const { data: result, isLoading } = useQuery({
     queryKey: [
       'public-catalog',
-      { page, selectedKategoriId, status, isSearching, debouncedSearch },
+      { page, pageSize, selectedKategoriId, status, isSearching, debouncedSearch },
     ],
     queryFn: () =>
       isSearching
@@ -196,7 +197,7 @@ function PublicCatalogPage() {
             data: {
               q: debouncedSearch,
               page,
-              limit: PAGE_SIZE,
+              limit: pageSize,
               kategoriId: selectedKategoriId ?? undefined,
               status,
             },
@@ -204,7 +205,7 @@ function PublicCatalogPage() {
         : getBooks({
             data: {
               page,
-              limit: PAGE_SIZE,
+              limit: pageSize,
               kategoriId: selectedKategoriId ?? undefined,
               status,
             },
@@ -230,77 +231,80 @@ function PublicCatalogPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
-      <header className="border-b-2 border-[var(--black)] bg-[var(--white)] px-5 py-6">
-        <div className="max-w-[1100px] mx-auto flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <header className="border-b-4 border-[var(--black)] bg-[var(--white)] px-5 pt-10 pb-6">
+        <div className="max-w-[1100px] mx-auto flex flex-col items-center text-center gap-2">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
             Pustaka Filsafat
           </h1>
-          <p className="text-[var(--gray-600)]">
+          <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-[var(--gray-600)]">
             Katalog Perpustakaan Program Studi Ilmu Filsafat FIB UI
           </p>
         </div>
       </header>
 
       <main className="max-w-[1100px] mx-auto px-5 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <aside className="lg:w-[220px] shrink-0 flex flex-col gap-2">
-          <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-1">
-            Kategori
-          </h2>
-          <button
-            type="button"
-            onClick={() => setSelectedKategoriId(null)}
-            className={`text-left px-3 py-2 border-2 transition-colors ${
-              selectedKategoriId === null
-                ? 'border-[var(--black)] bg-[var(--gray-100)]'
-                : 'border-[var(--gray-200)]'
-            }`}
-          >
-            Semua Buku
-          </button>
+        <aside className="lg:w-[240px] shrink-0 flex flex-col gap-4">
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Cari judul, kode..."
+            className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          />
 
-          {(['bentuk', 'konten', 'lain'] as const).map((group) => {
-            const items = groupedCategories[group]
-            if (items.length === 0) return null
-            return (
-              <div key={group} className="flex flex-col gap-1 mt-2">
-                <span className="text-xs text-[var(--gray-600)]">
-                  {group === 'bentuk'
-                    ? 'Bentuk'
-                    : group === 'konten'
-                      ? 'Konten'
-                      : 'Lainnya'}
-                </span>
-                {items.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedKategoriId(cat.id)}
-                    className={`text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
-                      selectedKategoriId === cat.id
-                        ? 'border-[var(--black)] bg-[var(--gray-100)]'
-                        : 'border-[var(--gray-200)]'
-                    }`}
-                  >
-                    <span>{cat.nama}</span>
-                    <span className="text-xs text-[var(--gray-600)]">
-                      {cat.bookCount}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )
-          })}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-1">
+              Kategori
+            </h2>
+            <button
+              type="button"
+              onClick={() => setSelectedKategoriId(null)}
+              className={`text-left px-3 py-2 border-2 transition-colors ${
+                selectedKategoriId === null
+                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                  : 'border-[var(--gray-200)]'
+              }`}
+            >
+              Semua Buku
+            </button>
+
+            {(['bentuk', 'konten', 'lain'] as const).map((group) => {
+              const items = groupedCategories[group]
+              if (items.length === 0) return null
+              return (
+                <div key={group} className="flex flex-col gap-1 mt-2">
+                  <span className="text-xs text-[var(--gray-600)]">
+                    {group === 'bentuk'
+                      ? 'Bentuk'
+                      : group === 'konten'
+                        ? 'Konten'
+                        : 'Lainnya'}
+                  </span>
+                  {items.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedKategoriId(cat.id)}
+                      className={`text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
+                        selectedKategoriId === cat.id
+                          ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                          : 'border-[var(--gray-200)]'
+                      }`}
+                    >
+                      <span>{cat.nama}</span>
+                      <span className="text-xs text-[var(--gray-600)]">
+                        {cat.bookCount}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
         </aside>
 
         <section className="flex-1 flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="search"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Cari judul, kode, atau kategori..."
-              className="flex-1 p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
-            />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex gap-2">
               {statusOptions.map((opt) => (
                 <button
@@ -316,6 +320,22 @@ function PublicCatalogPage() {
                   {opt.label}
                 </button>
               ))}
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-[var(--gray-600)]">
+              <label htmlFor="page-size">Tampilkan</label>
+              <select
+                id="page-size"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="border-2 border-[var(--gray-200)] px-2 py-1 focus:outline-none focus:border-[var(--black)]"
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
