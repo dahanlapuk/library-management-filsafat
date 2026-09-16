@@ -9,6 +9,7 @@ import {
   date,
   uuid,
   unique,
+  jsonb,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -43,6 +44,13 @@ export const posisi = pgTable('posisi', {
   kode: text('kode').notNull().unique(), // 'A1', 'B3', dst
   rak: text('rak').notNull(),
   deskripsi: text('deskripsi'),
+  // Kolom tambahan dari V1 (ditemukan lewat introspeksi live DB, bukan ada
+  // di schema.sql yang usang) -- semua keisi penuh di data V1, wajib
+  // dipertahankan.
+  rakNo: integer('rak_no'),
+  baris: text('baris'),
+  kolomNo: integer('kolom_no'),
+  letak: text('letak'),
 })
 
 // ── BOOKS ────────────────────────────────────────────────────────
@@ -60,6 +68,12 @@ export const books = pgTable('books', {
   checkedBy: text('checked_by'),
   createdBy: uuid('created_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
   updatedBy: uuid('updated_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+  // Snapshot nama admin dari V1 -- createdBy/updatedBy (FK di atas) di-NULL
+  // untuk data migrasi karena ID admin integer V1 tidak bisa dipetakan ke
+  // UUID Supabase Auth V2. Kolom ini menyimpan nama aslinya sebagai jejak
+  // historis, meski tidak bisa di-link ke akun admin V2 manapun.
+  legacyCreatedByNama: text('legacy_created_by_nama'),
+  legacyUpdatedByNama: text('legacy_updated_by_nama'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
@@ -121,6 +135,23 @@ export const loanStockAllocations = pgTable('loan_stock_allocations', {
   qty: integer('qty').notNull().default(1),
   allocatedAt: timestamp('allocated_at').defaultNow(),
   returnedAt: timestamp('returned_at'),
+})
+
+// ── ACTIVITY LOGS (data historis dari V1, migrasi Fase 1) ────────
+// Tabel ini menyimpan histori dari V1 apa adanya. Logic activity-log V2
+// yang BARU (dengan identitas aktor dari sesi tervalidasi, bukan trust
+// client seperti V1) dibangun terpisah di Fase 3 -- tabel ini sementara
+// murni untuk arsip data lama.
+export const activityLogs = pgTable('activity_logs', {
+  id: serial('id').primaryKey(),
+  adminId: uuid('admin_id').references(() => adminProfiles.id, { onDelete: 'set null' }),
+  adminNama: text('admin_nama').notNull().default('System'),
+  action: text('action').notNull(),
+  entityType: text('entity_type'),
+  entityId: integer('entity_id'),
+  entityName: text('entity_name'),
+  details: jsonb('details'),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
 // ── RELATIONS (buat query type-safe pakai db.query.*) ────────────
