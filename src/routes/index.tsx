@@ -432,51 +432,53 @@ function PublicCatalogPage() {
               className="w-full text-xs p-1.5 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
             />
 
-            <button
-              type="button"
-              onClick={() => setSelectedKategoriId(null)}
-              className={`text-left px-3 py-2 border-2 transition-colors ${
-                selectedKategoriId === null
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
-                  : 'border-[var(--gray-200)]'
-              }`}
-            >
-              Semua Buku
-            </button>
-
-            {visibleCategories.map((cat) => (
+            <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
               <button
-                key={cat.id}
                 type="button"
-                onClick={() => setSelectedKategoriId(cat.id)}
-                className={`text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
-                  selectedKategoriId === cat.id
+                onClick={() => setSelectedKategoriId(null)}
+                className={`text-left px-3 py-2 border-2 transition-colors ${
+                  selectedKategoriId === null
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
                     : 'border-[var(--gray-200)]'
                 }`}
               >
-                <span>{cat.nama}</span>
-                <span className="text-xs text-[var(--gray-600)]">
-                  {cat.bookCount}
-                </span>
+                Semua Buku
               </button>
-            ))}
 
-            {!isFilteringCategories && hiddenCategoryCount > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowAllCategories((v) => !v)}
-                className="text-left px-3 py-2 text-sm text-[var(--gray-600)] underline underline-offset-2"
-              >
-                {showAllCategories ? 'Sembunyikan' : `Lainnya (${hiddenCategoryCount})`}
-              </button>
-            )}
+              {visibleCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedKategoriId(cat.id)}
+                  className={`text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
+                    selectedKategoriId === cat.id
+                      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                      : 'border-[var(--gray-200)]'
+                  }`}
+                >
+                  <span>{cat.nama}</span>
+                  <span className="text-xs text-[var(--gray-600)]">
+                    {cat.bookCount}
+                  </span>
+                </button>
+              ))}
 
-            {isFilteringCategories && filteredCategories.length === 0 && (
-              <p className="text-xs text-[var(--gray-600)] px-1">
-                Tidak ada kategori yang cocok.
-              </p>
-            )}
+              {!isFilteringCategories && hiddenCategoryCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllCategories((v) => !v)}
+                  className="text-left px-3 py-2 text-sm text-[var(--gray-600)] underline underline-offset-2"
+                >
+                  {showAllCategories ? 'Sembunyikan' : `Lainnya (${hiddenCategoryCount})`}
+                </button>
+              )}
+
+              {isFilteringCategories && filteredCategories.length === 0 && (
+                <p className="text-xs text-[var(--gray-600)] px-1">
+                  Tidak ada kategori yang cocok.
+                </p>
+              )}
+            </div>
           </div>
         </aside>
 
