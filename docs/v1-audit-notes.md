@@ -63,3 +63,33 @@ Ini boolean "ada minimal 1 pinjaman aktif" — SALAH untuk buku multi-copy
 konsisten dengan logic qty yang benar di `canCreateLoan`
 (`src/loans/allocation.ts`). Perlu diperbaiki di V2 supaya pengecekan
 ketersediaan konsisten pakai qty, bukan boolean ada/tidak-ada.
+
+## Keputusan Desain: Privasi Data Peminjam di API Katalog Publik (Fase 1)
+
+Sumber: `handlers/books.go` (V1) vs `src/books/catalog.ts` (V2).
+
+**Temuan di V1:** Endpoint publik katalog buku (tanpa autentikasi apa pun)
+mengembalikan `nama_peminjam` secara langsung untuk buku yang sedang
+dipinjam. Artinya siapa pun yang membuka API publik — tanpa login, tanpa
+rate limit khusus — bisa tahu persis nama orang yang sedang meminjam buku
+apa. Ini bukan bug fungsional (fitur ini "bekerja sesuai desain"), tapi
+merupakan kebocoran privasi data pribadi yang tidak disengaja: tidak ada
+consent, tidak ada kebutuhan bisnis yang mengharuskan nama peminjam
+terlihat publik — status ketersediaan (dipinjam/tidak) sudah cukup untuk
+tujuan katalog.
+
+**Keputusan di V2 (sudah dieksekusi, bukan rencana):** `getBooks` dan
+`getBook` di `src/books/catalog.ts` HANYA mengembalikan boolean
+`isDipinjam`, tidak pernah mengembalikan identitas peminjam dalam bentuk
+apa pun ke endpoint publik. Nama peminjam tetap tersimpan di tabel
+`loans`/`members` untuk keperluan internal admin, tapi tidak pernah
+di-expose lewat server function yang bisa diakses tanpa login.
+
+**Kenapa dicatat di sini (bukan cuma di commit message):** Ini contoh
+konkret di mana V2 SENGAJA menyimpang dari behavior V1 apa adanya, bukan
+karena V1 salah secara fungsional, tapi karena V1 punya cacat privasi yang
+baru kelihatan setelah audit langsung terhadap payload API publik —
+penting untuk didokumentasikan sebagai preseden kalau nanti ada fitur lain
+(mis. activity log, member archive) yang berpotensi expose data pribadi
+serupa lewat endpoint publik, supaya polanya konsisten dicek dari awal,
+bukan ditambal belakangan.
