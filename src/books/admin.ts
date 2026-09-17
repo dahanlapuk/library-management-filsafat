@@ -8,6 +8,8 @@ import {
   bookStockLocations,
   posisi,
   deleteRequests,
+  categories,
+  categoryRequests,
   adminProfiles,
 } from '../db/schema'
 import { requireApprovedAdmin, requireSuperadmin } from '../admin/guards'
@@ -382,4 +384,156 @@ export const getBookForEdit = createServerFn({ method: 'GET' })
       categoryIds: categoryRows.map((c) => c.categoryId),
       posisiId: stockRow?.posisiId ?? null,
     }
+  })
+
+// ── CATEGORY REQUESTS (pengajuan kategori baru) ───────────────────
+// Sama pola dengan delete-request: admin biasa MENGAJUKAN, superadmin
+// approve/reject. Approve memanggil INSERT ke categories beneran di
+// dalam transaksi yang sama, bukan jalur terpisah -- supaya tidak ada
+// state "approved tapi kategorinya belum ada".
+
+const requestCategorySchema = z.object({
+  nama: z.string().trim().min(1, 'Nama kategori wajib diisi.'),
+  alasan: z.string().trim().optional(),
+})
+
+// POST /admin/category-requests setara.
+export const requestCategory = createServerFn({ method: 'POST' })
+  .inputValidator(requestCategorySchema)
+  .handler(async ({ data }) => {
+    const admin = await requireApprovedAdmin()
+
+    // Cek dulu kalau kategori dengan nama itu udah ada beneran -- gak
+    // perlu diajukan lagi kalau memang sudah tersedia.
+    const [existing] = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.nama, data.nama))
+      .limit(1)
+    if (existing) {
+      throw new Error('Kategori dengan nama ini sudah ada.')
+    }
+
+    try {
+      const [request] = await db
+        .insert(categoryRequests)
+        .values({
+          nama: data.nama,
+          alasan: data.alasan || undefined,
+          requestedBy: admin.id,
+        })
+        .returning({ id: categoryRequests.id })
+      return { id: request.id }
+    } catch (err) {
+      // Partial unique index (category_requests_one_pending_per_nama)
+      // menolak insert kalau nama ini sudah punya pengajuan pending.
+      if (
+        err &&
+        typeof err === 'object' &&
+        'code' in err &&
+        (err as { code?: string }).code === '23505'
+      ) {
+        throw new Error('Kategori ini sudah pernah diajukan dan masih menunggu persetujuan.')
+      }
+      throw err
+    }
+  })
+
+// GET /admin/category-requests setara.
+export const getPendingCategoryRequests = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    await requireSuperadmin()
+
+    return db
+      .select({
+        id: categoryRequests.id,
+        nama: categoryRequests.nama,
+        alasan: categoryRequests.alasan,
+        createdAt: categoryRequests.createdAt,
+        requestedByNama: adminProfiles.nama,
+      })
+      .from(categoryRequests)
+      .innerJoin(adminProfiles, eq(categoryRequests.requestedBy, adminProfiles.id))
+      .where(eq(categoryRequests.status, 'pending'))
+      .orderBy(categoryRequests.createdAt)
+  },
+)
+
+const reviewCategoryRequestSchema = z.object({ id: z.number().int() })
+
+// POST /admin/category-requests/:id/approve setara -- approve =
+// beneran insert ke categories, dalam transaksi yang sama dengan
+// update status pengajuan.
+export const approveCategoryRequest = createServerFn({ method: 'POST' })
+  .inputValidator(reviewCategoryRequestSchema)
+  .handler(async ({ data }) => {
+    const admin = await requireSuperadmin()
+
+    return db.transaction(async (tx) => {
+      const [request] = await tx
+        .select({
+          id: categoryRequests.id,
+          nama: categoryRequests.nama,
+          status: categoryRequests.status,
+        })
+        .from(categoryRequests)
+        .where(eq(categoryRequests.id, data.id))
+        .limit(1)
+
+      if (!request) {
+        throw new Error('Pengajuan tidak ditemukan.')
+      }
+      if (request.status !== 'pending') {
+        throw new Error('Pengajuan ini sudah diproses sebelumnya.')
+      }
+
+      let newCategory: { id: number }
+      try {
+        ;[newCategory] = await tx
+          .insert(categories)
+          .values({ nama: request.nama })
+          .returning({ id: categories.id })
+      } catch (err) {
+        if (
+          err &&
+          typeof err === 'object' &&
+          'code' in err &&
+          (err as { code?: string }).code === '23505'
+        ) {
+          throw new Error('Kategori dengan nama ini sudah ada (mungkin dibuat lewat jalur lain).')
+        }
+        throw err
+      }
+
+      await tx
+        .update(categoryRequests)
+        .set({
+          status: 'approved',
+          reviewedBy: admin.id,
+          reviewedAt: new Date(),
+          createdCategoryId: newCategory.id,
+        })
+        .where(eq(categoryRequests.id, data.id))
+
+      return { categoryId: newCategory.id }
+    })
+  })
+
+// POST /admin/category-requests/:id/reject setara.
+export const rejectCategoryRequest = createServerFn({ method: 'POST' })
+  .inputValidator(reviewCategoryRequestSchema)
+  .handler(async ({ data }) => {
+    const admin = await requireSuperadmin()
+
+    const updated = await db
+      .update(categoryRequests)
+      .set({ status: 'rejected', reviewedBy: admin.id, reviewedAt: new Date() })
+      .where(and(eq(categoryRequests.id, data.id), eq(categoryRequests.status, 'pending')))
+      .returning({ id: categoryRequests.id })
+
+    if (updated.length === 0) {
+      throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
+    }
+
+    return { id: data.id }
   })

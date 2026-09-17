@@ -3,7 +3,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { getCurrentAdmin } from '../../../admin/auth'
 import { getBooks, searchBooks, getCategories } from '../../../books/catalog'
-import { deleteBook, requestBookDeletion, getPendingDeleteRequests } from '../../../books/admin'
+import {
+  deleteBook,
+  requestBookDeletion,
+  getPendingDeleteRequests,
+  getPendingCategoryRequests,
+} from '../../../books/admin'
 import { AdminHeader } from '../../../admin/AdminHeader'
 
 export const Route = createFileRoute('/admin/books/')({
@@ -41,6 +46,12 @@ function AdminBooksPage() {
   const { data: pendingDeleteRequests = [] } = useQuery({
     queryKey: ['pending-delete-requests'],
     queryFn: () => getPendingDeleteRequests(),
+    enabled: !!currentAdmin?.isSuperadmin,
+  })
+
+  const { data: pendingCategoryRequests = [] } = useQuery({
+    queryKey: ['pending-category-requests'],
+    queryFn: () => getPendingCategoryRequests(),
     enabled: !!currentAdmin?.isSuperadmin,
   })
 
@@ -114,6 +125,19 @@ function AdminBooksPage() {
             Kelola Buku
           </h1>
           <div className="flex items-center gap-3">
+            {currentAdmin?.isSuperadmin && (
+              <Link
+                to="/admin/books/category-requests"
+                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative"
+              >
+                Pengajuan Kategori
+                {pendingCategoryRequests.length > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
+                    {pendingCategoryRequests.length}
+                  </span>
+                )}
+              </Link>
+            )}
             {currentAdmin?.isSuperadmin && (
               <Link
                 to="/admin/books/delete-requests"

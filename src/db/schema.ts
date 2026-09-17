@@ -220,3 +220,40 @@ export const deleteRequests = pgTable(
       .where(sql`${t.status} = 'pending'`),
   ],
 )
+
+// ── CATEGORY REQUESTS (pengajuan kategori baru) ───────────────────
+// Sama pola dengan delete_requests: admin biasa tidak bisa langsung
+// nambah kategori (lihat guard requireApprovedAdmin di requestCategory
+// di admin.ts), cuma bisa MENGAJUKAN nama kategori baru. Superadmin
+// approve/reject. Approve = insert beneran ke categories dalam
+// transaksi yang sama (bukan jalur terpisah), supaya tidak ada state
+// "approved tapi kategorinya belum ada".
+export const categoryRequestStatusEnum = pgEnum('category_request_status', [
+  'pending',
+  'approved',
+  'rejected',
+])
+
+export const categoryRequests = pgTable(
+  'category_requests',
+  {
+    id: serial('id').primaryKey(),
+    nama: text('nama').notNull(),
+    alasan: text('alasan'),
+    status: categoryRequestStatusEnum('status').notNull().default('pending'),
+    requestedBy: uuid('requested_by').notNull().references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedAt: timestamp('reviewed_at'),
+    // Diisi pas approve, nyambung ke kategori yang beneran dibuat --
+    // buat jejak/traceability, bukan buat query rutin.
+    createdCategoryId: integer('created_category_id').references(() => categories.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [
+    // Cegah pengajuan nama yang sama dobel selagi masih pending --
+    // partial unique index, pola sama seperti delete_requests.
+    uniqueIndex('category_requests_one_pending_per_nama')
+      .on(t.nama)
+      .where(sql`${t.status} = 'pending'`),
+  ],
+)

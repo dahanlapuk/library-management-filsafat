@@ -36,6 +36,13 @@
       "when": 1789595718016,
       "tag": "0004_nappy_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789631247115,
+      "tag": "0005_smart_bloodaxe",
+      "breakpoints": true
     }
   ]
 }

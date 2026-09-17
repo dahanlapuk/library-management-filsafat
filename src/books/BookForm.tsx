@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getCategories } from './catalog'
-import { getPosisiList } from './admin'
+import { getPosisiList, requestCategory } from './admin'
 
 export interface BookFormValues {
   kode: string
@@ -46,6 +46,15 @@ export function BookForm({
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  // Form kecil buat ajukan kategori baru -- inline, gak perlu modal
+  // terpisah karena cuma dua field (nama + alasan opsional).
+  const [showCategoryRequest, setShowCategoryRequest] = useState(false)
+  const [categoryRequestNama, setCategoryRequestNama] = useState('')
+  const [categoryRequestAlasan, setCategoryRequestAlasan] = useState('')
+  const [categoryRequestError, setCategoryRequestError] = useState('')
+  const [categoryRequestSuccess, setCategoryRequestSuccess] = useState('')
+  const [submittingCategoryRequest, setSubmittingCategoryRequest] = useState(false)
+
   const { data: categories = [], isLoading: loadingCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => getCategories(),
@@ -55,6 +64,35 @@ export function BookForm({
     queryKey: ['posisi-list'],
     queryFn: () => getPosisiList(),
   })
+
+  async function handleSubmitCategoryRequest() {
+    if (!categoryRequestNama.trim()) {
+      setCategoryRequestError('Nama kategori wajib diisi.')
+      return
+    }
+    setCategoryRequestError('')
+    setSubmittingCategoryRequest(true)
+    try {
+      await requestCategory({
+        data: {
+          nama: categoryRequestNama.trim(),
+          alasan: categoryRequestAlasan.trim() || undefined,
+        },
+      })
+      setCategoryRequestSuccess(
+        `Kategori "${categoryRequestNama.trim()}" diajukan, menunggu persetujuan superadmin.`,
+      )
+      setCategoryRequestNama('')
+      setCategoryRequestAlasan('')
+      setShowCategoryRequest(false)
+    } catch (err) {
+      setCategoryRequestError(
+        err instanceof Error ? err.message : 'Gagal mengajukan kategori.',
+      )
+    } finally {
+      setSubmittingCategoryRequest(false)
+    }
+  }
 
   function toggleCategory(id: number) {
     setValues((v) => ({
@@ -245,6 +283,60 @@ export function BookForm({
         <p className="text-xs text-[var(--gray-600)]">
           Kategori pertama yang dicentang jadi kategori utama buku.
         </p>
+
+        {categoryRequestSuccess && (
+          <p className="text-xs text-[var(--accent)]">{categoryRequestSuccess}</p>
+        )}
+
+        {!showCategoryRequest ? (
+          <button
+            type="button"
+            onClick={() => setShowCategoryRequest(true)}
+            className="text-left text-xs text-[var(--text-primary)] underline underline-offset-2 w-fit"
+          >
+            + Ajukan kategori baru
+          </button>
+        ) : (
+          <div className="flex flex-col gap-2 border-2 border-[var(--gray-200)] p-3">
+            {categoryRequestError && (
+              <p className="text-xs text-[#c00]">{categoryRequestError}</p>
+            )}
+            <input
+              type="text"
+              value={categoryRequestNama}
+              onChange={(e) => setCategoryRequestNama(e.target.value)}
+              placeholder="Nama kategori baru"
+              className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            />
+            <input
+              type="text"
+              value={categoryRequestAlasan}
+              onChange={(e) => setCategoryRequestAlasan(e.target.value)}
+              placeholder="Alasan (opsional)"
+              className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSubmitCategoryRequest}
+                disabled={submittingCategoryRequest}
+                className="px-3 py-2 bg-[var(--black)] text-[var(--white)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
+              >
+                {submittingCategoryRequest ? 'Mengajukan...' : 'Ajukan'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCategoryRequest(false)
+                  setCategoryRequestError('')
+                }}
+                className="px-3 py-2 border-2 border-[var(--gray-200)] text-sm font-medium uppercase tracking-wide"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <button
