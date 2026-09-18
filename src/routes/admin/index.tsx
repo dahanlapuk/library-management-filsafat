@@ -83,6 +83,15 @@ function AdminDashboard() {
               Data Anggota →
             </p>
           </Link>
+
+          <Link
+            to="/admin/inventory"
+            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+          >
+            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+              Inventory Check →
+            </p>
+          </Link>
         </div>
       </div>
     </div>

@@ -71,6 +71,11 @@ export const books = pgTable('books', {
   keterangan: text('keterangan'),
   lastChecked: timestamp('last_checked'),
   checkedBy: text('checked_by'),
+  // Catatan opsional saat inventory check -- diisi kalau ada
+  // ketidaksesuaian (tidak ditemukan di rak manapun, ternyata sedang
+  // dipinjam informal, dll). Ditimpa/dikosongkan tiap kali dicek ulang,
+  // BUKAN histori penuh (audit trail lengkap masih Fase 3).
+  lastCheckCatatan: text('last_check_catatan'),
   createdBy: uuid('created_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
   updatedBy: uuid('updated_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
   // Snapshot nama admin dari V1 -- createdBy/updatedBy (FK di atas) di-NULL

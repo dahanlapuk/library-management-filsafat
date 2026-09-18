@@ -1,0 +1,1 @@
+ALTER TABLE "books" ADD COLUMN "last_check_catatan" text;

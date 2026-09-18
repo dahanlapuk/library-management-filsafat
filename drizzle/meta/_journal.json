@@ -57,6 +57,13 @@
       "when": 1789696152717,
       "tag": "0007_ordinary_carmella_unuscione",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789710931587,
+      "tag": "0008_milky_wild_pack",
+      "breakpoints": true
     }
   ]
 }
