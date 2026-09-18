@@ -16,6 +16,10 @@ import { relations, sql } from 'drizzle-orm'
 
 // ── ENUMS ────────────────────────────────────────────────────────
 export const memberRoleEnum = pgEnum('member_role', ['mahasiswa', 'dosen'])
+// Jenjang cuma relevan buat mahasiswa (S1/S2/S3) -- null buat dosen. Dipakai
+// buat filter di halaman admin members (jenjang S1/S2/S3, atau "Dosen" yang
+// sebenarnya query-nya role='dosen', bukan filter kolom ini).
+export const memberJenjangEnum = pgEnum('member_jenjang', ['S1', 'S2', 'S3'])
 export const categoryGroupingEnum = pgEnum('category_grouping', ['bentuk', 'konten', 'lain'])
 
 // ── ADMIN (identitas terhubung ke Supabase Auth) ────────────────
@@ -108,6 +112,10 @@ export const members = pgTable('members', {
   id: serial('id').primaryKey(),
   nama: text('nama').notNull(),
   role: memberRoleEnum('role').notNull(),
+  // jenjang & angkatan cuma diisi buat role='mahasiswa' -- null buat dosen.
+  // Dipakai buat search & filter di halaman admin members.
+  jenjang: memberJenjangEnum('jenjang'),
+  angkatan: integer('angkatan'),
   whatsapp: text('whatsapp'),
   email: text('email'),
   authUserId: uuid('auth_user_id'), // FK ke auth.users, diisi nanti kalau perlu
@@ -129,6 +137,15 @@ export const loans = pgTable('loans', {
   tanggalKembali: date('tanggal_kembali'), // null = masih dipinjam
   catatan: text('catatan'),
   dicatatOleh: uuid('dicatat_oleh').references(() => adminProfiles.id, { onDelete: 'set null' }),
+  // Chat WhatsApp pickup: opsional & independen, TIDAK nge-gate alur
+  // pengembalian, bisa diklik/resend kapan saja -- cuma catatan kapan
+  // terakhir dikirim.
+  pickupNotifiedAt: timestamp('pickup_notified_at'),
+  // Dua tahap alur reminder pengembalian: returnReminderStartedAt diisi
+  // begitu admin klik "Konfirmasi Pengembalian" (belum kirim WA apa pun),
+  // returnNotifiedAt diisi setelah admin benar-benar kirim pesan reminder.
+  returnReminderStartedAt: timestamp('return_reminder_started_at'),
+  returnNotifiedAt: timestamp('return_notified_at'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
@@ -257,3 +274,54 @@ export const categoryRequests = pgTable(
       .where(sql`${t.status} = 'pending'`),
   ],
 )
+
+// ── LOAN REQUESTS (pengajuan peminjaman dari mahasiswa/dosen) ─────
+// Diisi PUBLIK lewat modal detail buku di katalog (tanpa login) --
+// bukan admin yang input. Petugas approve/reject manual di admin panel
+// setelah peminjam konfirmasi tatap muka (lihat alur di pengumuman
+// resmi). TIDAK pakai partial-unique-per-book seperti delete/category
+// request, karena satu buku (qty > 1) boleh punya beberapa pengajuan
+// pending sekaligus dari peminjam berbeda.
+//
+// Approve = transaksi: cek canCreateLoan (reuse src/loans/allocation.ts
+// apa adanya) -> insert members baru dari snapshot data form ini ->
+// insert loans (dueAt: mahasiswa = jam tutup hari itu, dosen = +14 hari)
+// -> insert loan_stock_allocations (posisi dari allocateFromLargestStock)
+// -> update status jadi approved + isi createdMemberId/createdLoanId.
+export const loanRequestStatusEnum = pgEnum('loan_request_status', [
+  'pending',
+  'approved',
+  'rejected',
+])
+
+export const loanRequests = pgTable('loan_requests', {
+  id: serial('id').primaryKey(),
+  // set null, bukan cascade -- baris pengajuan (siapa minjem, kapan,
+  // disetujui siapa) HARUS tetap ada sebagai audit trail meski bukunya
+  // nanti dihapus. bookJudulSnapshot diisi pas pengajuan dibuat, biar
+  // tetap terbaca walau bookId null.
+  bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
+  bookJudulSnapshot: text('book_judul_snapshot').notNull(),
+  namaPeminjam: text('nama_peminjam').notNull(),
+  role: memberRoleEnum('role').notNull(),
+  // jenjang & angkatan cuma diisi kalau role='mahasiswa' -- dipilih
+  // sendiri sama peminjam di form publik, diverifikasi manual sama
+  // petugas pas konfirmasi tatap muka (bukan validasi sistem).
+  jenjang: memberJenjangEnum('jenjang'),
+  angkatan: integer('angkatan'),
+  whatsapp: text('whatsapp').notNull(),
+  email: text('email'),
+  keperluan: text('keperluan'),
+  status: loanRequestStatusEnum('status').notNull().default('pending'),
+  reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+  reviewedAt: timestamp('reviewed_at'),
+  // Diisi pas approve -- traceability ke member & loan yang beneran
+  // dibuat, pola sama seperti createdCategoryId di category_requests.
+  createdMemberId: integer('created_member_id').references(() => members.id, { onDelete: 'set null' }),
+  createdLoanId: integer('created_loan_id').references(() => loans.id, { onDelete: 'set null' }),
+  // Diisi pas admin reject -- alasan wajib ditulis admin (bukan dari
+  // peminjam), ditampilkan di pesan WhatsApp reject yang bisa diedit.
+  rejectionAlasan: text('rejection_alasan'),
+  rejectionNotifiedAt: timestamp('rejection_notified_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+})

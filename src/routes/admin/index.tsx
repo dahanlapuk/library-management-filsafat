@@ -56,14 +56,34 @@ function AdminDashboard() {
           )}
         </div>
 
-        <Link
-          to="/admin/books"
-          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
-        >
-          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
-            Kelola Buku →
-          </p>
-        </Link>
+        <div className="flex flex-col gap-4">
+          <Link
+            to="/admin/books"
+            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+          >
+            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+              Kelola Buku →
+            </p>
+          </Link>
+
+          <Link
+            to="/admin/loans/requests"
+            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+          >
+            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+              Pengajuan Peminjaman →
+            </p>
+          </Link>
+
+          <Link
+            to="/admin/members"
+            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+          >
+            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+              Data Anggota →
+            </p>
+          </Link>
+        </div>
       </div>
     </div>
   )

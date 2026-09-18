@@ -13,11 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
 import { Route as AdminBooksIndexRouteImport } from './routes/admin/books/index'
 import { Route as AdminBooksCategoryRequestsRouteImport } from './routes/admin/books/category-requests'
 import { Route as AdminBooksDeleteRequestsRouteImport } from './routes/admin/books/delete-requests'
 import { Route as AdminBooksNewRouteImport } from './routes/admin/books/new'
+import { Route as AdminLoansRequestsRouteImport } from './routes/admin/loans/requests'
 import { Route as AdminBooksBookIdEditRouteImport } from './routes/admin/books/$bookId.edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -38,6 +40,11 @@ const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/admin/members',
+  path: '/admin/members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSignupRoute = AdminSignupRouteImport.update({
@@ -67,6 +74,11 @@ const AdminBooksNewRoute = AdminBooksNewRouteImport.update({
   path: '/admin/books/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoansRequestsRoute = AdminLoansRequestsRouteImport.update({
+  id: '/admin/loans/requests',
+  path: '/admin/loans/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBooksBookIdEditRoute = AdminBooksBookIdEditRouteImport.update({
   id: '/admin/books/$bookId/edit',
   path: '/admin/books/$bookId/edit',
@@ -77,11 +89,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
   '/admin/books/delete-requests': typeof AdminBooksDeleteRequestsRoute
   '/admin/books/new': typeof AdminBooksNewRoute
+  '/admin/loans/requests': typeof AdminLoansRequestsRoute
   '/admin/books/': typeof AdminBooksIndexRoute
   '/admin/books/$bookId/edit': typeof AdminBooksBookIdEditRoute
 }
@@ -89,11 +103,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
   '/admin/books/delete-requests': typeof AdminBooksDeleteRequestsRoute
   '/admin/books/new': typeof AdminBooksNewRoute
+  '/admin/loans/requests': typeof AdminLoansRequestsRoute
   '/admin/books': typeof AdminBooksIndexRoute
   '/admin/books/$bookId/edit': typeof AdminBooksBookIdEditRoute
 }
@@ -102,11 +118,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/members': typeof AdminMembersRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
   '/admin/books/delete-requests': typeof AdminBooksDeleteRequestsRoute
   '/admin/books/new': typeof AdminBooksNewRoute
+  '/admin/loans/requests': typeof AdminLoansRequestsRoute
   '/admin/books/': typeof AdminBooksIndexRoute
   '/admin/books/$bookId/edit': typeof AdminBooksBookIdEditRoute
 }
@@ -116,11 +134,13 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/approvals'
     | '/admin/login'
+    | '/admin/members'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
     | '/admin/books/delete-requests'
     | '/admin/books/new'
+    | '/admin/loans/requests'
     | '/admin/books/'
     | '/admin/books/$bookId/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -128,11 +148,13 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/approvals'
     | '/admin/login'
+    | '/admin/members'
     | '/admin/signup'
     | '/admin'
     | '/admin/books/category-requests'
     | '/admin/books/delete-requests'
     | '/admin/books/new'
+    | '/admin/loans/requests'
     | '/admin/books'
     | '/admin/books/$bookId/edit'
   id:
@@ -140,11 +162,13 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/approvals'
     | '/admin/login'
+    | '/admin/members'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
     | '/admin/books/delete-requests'
     | '/admin/books/new'
+    | '/admin/loans/requests'
     | '/admin/books/'
     | '/admin/books/$bookId/edit'
   fileRoutesById: FileRoutesById
@@ -153,11 +177,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMembersRoute: typeof AdminMembersRoute
   AdminSignupRoute: typeof AdminSignupRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBooksCategoryRequestsRoute: typeof AdminBooksCategoryRequestsRoute
   AdminBooksDeleteRequestsRoute: typeof AdminBooksDeleteRequestsRoute
   AdminBooksNewRoute: typeof AdminBooksNewRoute
+  AdminLoansRequestsRoute: typeof AdminLoansRequestsRoute
   AdminBooksIndexRoute: typeof AdminBooksIndexRoute
   AdminBooksBookIdEditRoute: typeof AdminBooksBookIdEditRoute
 }
@@ -190,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/admin/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/signup': {
@@ -227,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBooksNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/loans/requests': {
+      id: '/admin/loans/requests'
+      path: '/admin/loans/requests'
+      fullPath: '/admin/loans/requests'
+      preLoaderRoute: typeof AdminLoansRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/books/$bookId/edit': {
       id: '/admin/books/$bookId/edit'
       path: '/admin/books/$bookId/edit'
@@ -241,14 +281,25 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMembersRoute: AdminMembersRoute,
   AdminSignupRoute: AdminSignupRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBooksCategoryRequestsRoute: AdminBooksCategoryRequestsRoute,
   AdminBooksDeleteRequestsRoute: AdminBooksDeleteRequestsRoute,
   AdminBooksNewRoute: AdminBooksNewRoute,
+  AdminLoansRequestsRoute: AdminLoansRequestsRoute,
   AdminBooksIndexRoute: AdminBooksIndexRoute,
   AdminBooksBookIdEditRoute: AdminBooksBookIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
