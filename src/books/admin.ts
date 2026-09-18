@@ -40,7 +40,8 @@ const bookInputSchema = z.object({
 
 // Type transaksi Drizzle -- dipakai biar helper di bawah bisa dipanggil
 // dari dalam db.transaction() tanpa `any`.
-type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+import type { PgTransaction } from 'drizzle-orm/pg-core'
+type Tx = PgTransaction<any, any, any>
 
 // Dipakai create & update -- tulis ulang book_categories dan
 // book_stock_locations dari nol tiap kali disimpan, bukan diffing baris
