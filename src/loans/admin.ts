@@ -12,6 +12,7 @@ import {
   adminProfiles,
 } from '../db/schema'
 import { requireApprovedAdmin } from '../admin/guards'
+import { logActivity } from '../admin/activity-log'
 import { allocateFromLargestStock, canCreateLoan } from './allocation'
 
 // Durasi pinjam dosen -- konstanta kode (bukan di DB/settings table) biar
@@ -212,6 +213,14 @@ export const approveLoanRequest = createServerFn({ method: 'POST' })
         })
         .where(eq(loanRequests.id, data.id))
 
+      await logActivity(tx, admin, {
+        action: 'APPROVE_LOAN_REQUEST',
+        entityType: 'LOAN_REQUEST',
+        entityId: data.id,
+        entityName: request.bookJudulSnapshot,
+        details: { loanId: loan.id, memberId: member.id, role: request.role },
+      })
+
       return { loanId: loan.id, memberId: member.id }
     })
   })
@@ -225,22 +234,35 @@ export const rejectLoanRequest = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireApprovedAdmin()
 
-    const updated = await db
-      .update(loanRequests)
-      .set({
-        status: 'rejected',
-        reviewedBy: admin.id,
-        reviewedAt: new Date(),
-        rejectionAlasan: data.alasan,
+    return db.transaction(async (tx) => {
+      const updated = await tx
+        .update(loanRequests)
+        .set({
+          status: 'rejected',
+          reviewedBy: admin.id,
+          reviewedAt: new Date(),
+          rejectionAlasan: data.alasan,
+        })
+        .where(and(eq(loanRequests.id, data.id), eq(loanRequests.status, 'pending')))
+        .returning({
+          id: loanRequests.id,
+          bookJudul: loanRequests.bookJudulSnapshot,
+        })
+
+      if (updated.length === 0) {
+        throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
+      }
+
+      await logActivity(tx, admin, {
+        action: 'REJECT_LOAN_REQUEST',
+        entityType: 'LOAN_REQUEST',
+        entityId: data.id,
+        entityName: updated[0].bookJudul,
+        details: { alasan: data.alasan },
       })
-      .where(and(eq(loanRequests.id, data.id), eq(loanRequests.status, 'pending')))
-      .returning({ id: loanRequests.id })
 
-    if (updated.length === 0) {
-      throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
-    }
-
-    return { id: data.id }
+      return { id: data.id }
+    })
   })
 
 const markRejectionNotifiedSchema = z.object({ id: z.number().int() })
@@ -274,11 +296,16 @@ const returnLoanSchema = z.object({ id: z.number().int() })
 export const returnLoan = createServerFn({ method: 'POST' })
   .inputValidator(returnLoanSchema)
   .handler(async ({ data }) => {
-    await requireApprovedAdmin()
+    const admin = await requireApprovedAdmin()
 
     return db.transaction(async (tx) => {
       const [loan] = await tx
-        .select({ id: loans.id, tanggalKembali: loans.tanggalKembali })
+        .select({
+          id: loans.id,
+          tanggalKembali: loans.tanggalKembali,
+          bookJudul: loans.bookJudulSnapshot,
+          memberId: loans.memberId,
+        })
         .from(loans)
         .where(eq(loans.id, data.id))
         .limit(1)
@@ -299,6 +326,14 @@ export const returnLoan = createServerFn({ method: 'POST' })
         .update(loanStockAllocations)
         .set({ returnedAt: new Date() })
         .where(and(eq(loanStockAllocations.loanId, data.id), isNull(loanStockAllocations.returnedAt)))
+
+      await logActivity(tx, admin, {
+        action: 'RETURN_LOAN',
+        entityType: 'LOAN',
+        entityId: data.id,
+        entityName: loan.bookJudul,
+        details: { memberId: loan.memberId },
+      })
 
       return { id: data.id }
     })

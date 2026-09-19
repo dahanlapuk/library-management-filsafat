@@ -4,6 +4,7 @@ import { eq, asc, isNull, sql } from 'drizzle-orm'
 import { db } from '../db'
 import { books, bookStockLocations, posisi } from '../db/schema'
 import { requireApprovedAdmin } from '../admin/guards'
+import { logActivity } from '../admin/activity-log'
 
 // ── INVENTORY CHECK — cek fisik rak & koreksi qty/posisi ──────────
 // Tanpa approval workflow -- koreksi langsung tersimpan begitu admin
@@ -137,6 +138,23 @@ export const submitInventoryCheck = createServerFn({ method: 'POST' })
     const admin = await requireApprovedAdmin()
 
     return db.transaction(async (tx) => {
+      const [before] = await tx
+        .select({ judul: books.judul, qty: books.qty, posisiId: books.posisiId })
+        .from(books)
+        .where(eq(books.id, data.bookId))
+        .limit(1)
+      if (!before) {
+        throw new Error('Buku tidak ditemukan.')
+      }
+
+      // Sama seperti updateBook: posisi "sebelum" dari book_stock_locations.
+      const [stockBefore] = await tx
+        .select({ posisiId: bookStockLocations.posisiId })
+        .from(bookStockLocations)
+        .where(eq(bookStockLocations.bookId, data.bookId))
+        .limit(1)
+      const posisiBefore = stockBefore?.posisiId ?? before.posisiId
+
       const updated = await tx
         .update(books)
         .set({
@@ -162,6 +180,27 @@ export const submitInventoryCheck = createServerFn({ method: 'POST' })
           bookId: data.bookId,
           posisiId: data.newPosisiId,
           qty: data.actualQty,
+        })
+      }
+
+      await logActivity(tx, admin, {
+        action: 'INVENTORY_CHECK',
+        entityType: 'BOOK',
+        entityId: data.bookId,
+        entityName: before.judul,
+        details: {
+          qty: { dari: before.qty, ke: data.actualQty },
+          catatan: data.catatan?.length ? data.catatan : null,
+        },
+      })
+
+      if (posisiBefore !== data.newPosisiId) {
+        await logActivity(tx, admin, {
+          action: 'POSITION_CHANGE',
+          entityType: 'BOOK',
+          entityId: data.bookId,
+          entityName: before.judul,
+          details: { dari: posisiBefore, ke: data.newPosisiId },
         })
       }
 

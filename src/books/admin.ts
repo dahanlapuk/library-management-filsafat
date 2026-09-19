@@ -13,6 +13,7 @@ import {
   adminProfiles,
 } from '../db/schema'
 import { requireApprovedAdmin, requireSuperadmin } from '../admin/guards'
+import { logActivity } from '../admin/activity-log'
 
 // ── CRUD buku — Fase 2, admin only ───────────────────────────────
 // Versi SEDERHANA: 1 posisi rak per buku (bukan multi-lokasi array),
@@ -101,6 +102,19 @@ export const createBook = createServerFn({ method: 'POST' })
         data.qty,
       )
 
+      await logActivity(tx, admin, {
+        action: 'CREATE',
+        entityType: 'BOOK',
+        entityId: book.id,
+        entityName: data.judul,
+        details: {
+          kode: data.kode ?? null,
+          qty: data.qty,
+          posisiId: data.posisiId,
+          categoryIds: data.categoryIds,
+        },
+      })
+
       return { id: book.id }
     })
   })
@@ -114,6 +128,66 @@ export const updateBook = createServerFn({ method: 'POST' })
     const admin = await requireApprovedAdmin()
 
     return db.transaction(async (tx) => {
+      const [before] = await tx
+        .select({
+          kode: books.kode,
+          judul: books.judul,
+          penulis: books.penulis,
+          tahun: books.tahun,
+          keterangan: books.keterangan,
+          qty: books.qty,
+          posisiId: books.posisiId,
+        })
+        .from(books)
+        .where(eq(books.id, data.id))
+        .limit(1)
+      if (!before) {
+        throw new Error('Buku tidak ditemukan.')
+      }
+
+      // Posisi "sebelum" diambil dari book_stock_locations (sumber yang
+      // dipakai form edit), bukan books.posisi_id -- ada buku V1 yang
+      // books.posisi_id-nya NULL padahal posisinya ada di tabel stok.
+      const [stockBefore] = await tx
+        .select({ posisiId: bookStockLocations.posisiId })
+        .from(bookStockLocations)
+        .where(eq(bookStockLocations.bookId, data.id))
+        .limit(1)
+      const beforeView = {
+        ...before,
+        posisiId: stockBefore?.posisiId ?? before.posisiId,
+      }
+
+      // Bahan log: field yang berubah (dari -> ke). Field undefined di input
+      // tidak disentuh .set() Drizzle, jadi dilewati.
+      const changes: Record<string, { dari: unknown; ke: unknown }> = {}
+      for (const f of [
+        'kode',
+        'judul',
+        'penulis',
+        'tahun',
+        'keterangan',
+        'qty',
+        'posisiId',
+      ] as const) {
+        const ke = data[f]
+        if (ke === undefined) continue
+        const dari = beforeView[f] ?? null
+        if (dari !== ke) changes[f] = { dari, ke }
+      }
+      const oldCategoryIds = (
+        await tx
+          .select({ id: bookCategories.categoryId })
+          .from(bookCategories)
+          .where(eq(bookCategories.bookId, data.id))
+      )
+        .map((r) => r.id)
+        .sort((a, b) => a - b)
+      const newCategoryIds = [...data.categoryIds].sort((a, b) => a - b)
+      if (oldCategoryIds.join(',') !== newCategoryIds.join(',')) {
+        changes.categoryIds = { dari: oldCategoryIds, ke: newCategoryIds }
+      }
+
       const updated = await tx
         .update(books)
         .set({
@@ -143,6 +217,24 @@ export const updateBook = createServerFn({ method: 'POST' })
         data.qty,
       )
 
+      await logActivity(tx, admin, {
+        action: 'UPDATE',
+        entityType: 'BOOK',
+        entityId: data.id,
+        entityName: data.judul,
+        details: { changes },
+      })
+
+      if (changes.posisiId) {
+        await logActivity(tx, admin, {
+          action: 'POSITION_CHANGE',
+          entityType: 'BOOK',
+          entityId: data.id,
+          entityName: data.judul,
+          details: changes.posisiId,
+        })
+      }
+
       return { id: data.id }
     })
   })
@@ -161,18 +253,36 @@ const deleteBookSchema = z.object({ id: z.number().int() })
 export const deleteBook = createServerFn({ method: 'POST' })
   .inputValidator(deleteBookSchema)
   .handler(async ({ data }) => {
-    await requireSuperadmin()
+    const admin = await requireSuperadmin()
 
-    const deleted = await db
-      .delete(books)
-      .where(eq(books.id, data.id))
-      .returning({ id: books.id })
+    return db.transaction(async (tx) => {
+      const [book] = await tx
+        .select({ kode: books.kode, judul: books.judul })
+        .from(books)
+        .where(eq(books.id, data.id))
+        .limit(1)
+      if (!book) {
+        throw new Error('Buku tidak ditemukan.')
+      }
 
-    if (deleted.length === 0) {
-      throw new Error('Buku tidak ditemukan.')
-    }
+      const deleted = await tx
+        .delete(books)
+        .where(eq(books.id, data.id))
+        .returning({ id: books.id })
+      if (deleted.length === 0) {
+        throw new Error('Buku tidak ditemukan.')
+      }
 
-    return { id: data.id }
+      await logActivity(tx, admin, {
+        action: 'DELETE',
+        entityType: 'BOOK',
+        entityId: data.id,
+        entityName: book.judul,
+        details: { kode: book.kode ?? null },
+      })
+
+      return { id: data.id }
+    })
   })
 
 // GET /posisi setara -- list posisi rak buat dropdown form CRUD.
@@ -209,40 +319,51 @@ export const requestBookDeletion = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireApprovedAdmin()
 
-    const [book] = await db
-      .select({ judul: books.judul })
-      .from(books)
-      .where(eq(books.id, data.bookId))
-      .limit(1)
-    if (!book) {
-      throw new Error('Buku tidak ditemukan.')
-    }
-
-    try {
-      const [request] = await db
-        .insert(deleteRequests)
-        .values({
-          bookId: data.bookId,
-          bookJudulSnapshot: book.judul,
-          alasan: data.alasan,
-          requestedBy: admin.id,
-        })
-        .returning({ id: deleteRequests.id })
-      return { id: request.id }
-    } catch (err) {
-      // Partial unique index (delete_requests_one_pending_per_book) di
-      // DB yang menolak insert kalau buku ini sudah punya pengajuan
-      // pending -- Postgres error code 23505 = unique_violation.
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code?: string }).code === '23505'
-      ) {
-        throw new Error('Buku ini sudah punya pengajuan hapus yang menunggu persetujuan.')
+    return db.transaction(async (tx) => {
+      const [book] = await tx
+        .select({ judul: books.judul })
+        .from(books)
+        .where(eq(books.id, data.bookId))
+        .limit(1)
+      if (!book) {
+        throw new Error('Buku tidak ditemukan.')
       }
-      throw err
-    }
+
+      try {
+        const [request] = await tx
+          .insert(deleteRequests)
+          .values({
+            bookId: data.bookId,
+            bookJudulSnapshot: book.judul,
+            alasan: data.alasan,
+            requestedBy: admin.id,
+          })
+          .returning({ id: deleteRequests.id })
+
+        await logActivity(tx, admin, {
+          action: 'DELETE_REQUEST',
+          entityType: 'BOOK',
+          entityId: data.bookId,
+          entityName: book.judul,
+          details: { requestId: request.id, alasan: data.alasan },
+        })
+
+        return { id: request.id }
+      } catch (err) {
+        // Partial unique index (delete_requests_one_pending_per_book) di
+        // DB yang menolak insert kalau buku ini sudah punya pengajuan
+        // pending -- Postgres error code 23505 = unique_violation.
+        if (
+          err &&
+          typeof err === 'object' &&
+          'code' in err &&
+          (err as { code?: string }).code === '23505'
+        ) {
+          throw new Error('Buku ini sudah punya pengajuan hapus yang menunggu persetujuan.')
+        }
+        throw err
+      }
+    })
   })
 
 // GET /admin/delete-requests setara -- daftar pengajuan pending, dengan
@@ -283,7 +404,12 @@ export const approveDeleteRequest = createServerFn({ method: 'POST' })
 
     return db.transaction(async (tx) => {
       const [request] = await tx
-        .select({ id: deleteRequests.id, bookId: deleteRequests.bookId, status: deleteRequests.status })
+        .select({
+          id: deleteRequests.id,
+          bookId: deleteRequests.bookId,
+          bookJudul: deleteRequests.bookJudulSnapshot,
+          status: deleteRequests.status,
+        })
         .from(deleteRequests)
         .where(eq(deleteRequests.id, data.id))
         .limit(1)
@@ -315,6 +441,14 @@ export const approveDeleteRequest = createServerFn({ method: 'POST' })
         throw new Error('Buku yang diajukan sudah tidak ada (mungkin sudah dihapus sebelumnya).')
       }
 
+      await logActivity(tx, admin, {
+        action: 'DELETE',
+        entityType: 'BOOK',
+        entityId: request.bookId,
+        entityName: request.bookJudul,
+        details: { requestId: data.id },
+      })
+
       return { bookId: request.bookId }
     })
   })
@@ -326,17 +460,31 @@ export const rejectDeleteRequest = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireSuperadmin()
 
-    const updated = await db
-      .update(deleteRequests)
-      .set({ status: 'rejected', reviewedBy: admin.id, reviewedAt: new Date() })
-      .where(and(eq(deleteRequests.id, data.id), eq(deleteRequests.status, 'pending')))
-      .returning({ id: deleteRequests.id })
+    return db.transaction(async (tx) => {
+      const updated = await tx
+        .update(deleteRequests)
+        .set({ status: 'rejected', reviewedBy: admin.id, reviewedAt: new Date() })
+        .where(and(eq(deleteRequests.id, data.id), eq(deleteRequests.status, 'pending')))
+        .returning({
+          id: deleteRequests.id,
+          bookId: deleteRequests.bookId,
+          bookJudul: deleteRequests.bookJudulSnapshot,
+        })
 
-    if (updated.length === 0) {
-      throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
-    }
+      if (updated.length === 0) {
+        throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
+      }
 
-    return { id: data.id }
+      await logActivity(tx, admin, {
+        action: 'REJECT_DELETE_REQUEST',
+        entityType: 'BOOK',
+        entityId: updated[0].bookId,
+        entityName: updated[0].bookJudul,
+        details: { requestId: data.id },
+      })
+
+      return { id: data.id }
+    })
   })
 
 // GET /admin/books/:id (versi lengkap untuk form edit) -- beda dari
@@ -404,40 +552,51 @@ export const requestCategory = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireApprovedAdmin()
 
-    // Cek dulu kalau kategori dengan nama itu udah ada beneran -- gak
-    // perlu diajukan lagi kalau memang sudah tersedia.
-    const [existing] = await db
-      .select({ id: categories.id })
-      .from(categories)
-      .where(eq(categories.nama, data.nama))
-      .limit(1)
-    if (existing) {
-      throw new Error('Kategori dengan nama ini sudah ada.')
-    }
-
-    try {
-      const [request] = await db
-        .insert(categoryRequests)
-        .values({
-          nama: data.nama,
-          alasan: data.alasan || undefined,
-          requestedBy: admin.id,
-        })
-        .returning({ id: categoryRequests.id })
-      return { id: request.id }
-    } catch (err) {
-      // Partial unique index (category_requests_one_pending_per_nama)
-      // menolak insert kalau nama ini sudah punya pengajuan pending.
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code?: string }).code === '23505'
-      ) {
-        throw new Error('Kategori ini sudah pernah diajukan dan masih menunggu persetujuan.')
+    return db.transaction(async (tx) => {
+      // Cek dulu kalau kategori dengan nama itu udah ada beneran -- gak
+      // perlu diajukan lagi kalau memang sudah tersedia.
+      const [existing] = await tx
+        .select({ id: categories.id })
+        .from(categories)
+        .where(eq(categories.nama, data.nama))
+        .limit(1)
+      if (existing) {
+        throw new Error('Kategori dengan nama ini sudah ada.')
       }
-      throw err
-    }
+
+      try {
+        const [request] = await tx
+          .insert(categoryRequests)
+          .values({
+            nama: data.nama,
+            alasan: data.alasan || undefined,
+            requestedBy: admin.id,
+          })
+          .returning({ id: categoryRequests.id })
+
+        await logActivity(tx, admin, {
+          action: 'CATEGORY_REQUEST',
+          entityType: 'CATEGORY_REQUEST',
+          entityId: request.id,
+          entityName: data.nama,
+          details: { alasan: data.alasan || null },
+        })
+
+        return { id: request.id }
+      } catch (err) {
+        // Partial unique index (category_requests_one_pending_per_nama)
+        // menolak insert kalau nama ini sudah punya pengajuan pending.
+        if (
+          err &&
+          typeof err === 'object' &&
+          'code' in err &&
+          (err as { code?: string }).code === '23505'
+        ) {
+          throw new Error('Kategori ini sudah pernah diajukan dan masih menunggu persetujuan.')
+        }
+        throw err
+      }
+    })
   })
 
 // GET /admin/category-requests setara.
@@ -516,6 +675,14 @@ export const approveCategoryRequest = createServerFn({ method: 'POST' })
         })
         .where(eq(categoryRequests.id, data.id))
 
+      await logActivity(tx, admin, {
+        action: 'APPROVE_CATEGORY_REQUEST',
+        entityType: 'CATEGORY_REQUEST',
+        entityId: data.id,
+        entityName: request.nama,
+        details: { categoryId: newCategory.id },
+      })
+
       return { categoryId: newCategory.id }
     })
   })
@@ -526,15 +693,25 @@ export const rejectCategoryRequest = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireSuperadmin()
 
-    const updated = await db
-      .update(categoryRequests)
-      .set({ status: 'rejected', reviewedBy: admin.id, reviewedAt: new Date() })
-      .where(and(eq(categoryRequests.id, data.id), eq(categoryRequests.status, 'pending')))
-      .returning({ id: categoryRequests.id })
+    return db.transaction(async (tx) => {
+      const updated = await tx
+        .update(categoryRequests)
+        .set({ status: 'rejected', reviewedBy: admin.id, reviewedAt: new Date() })
+        .where(and(eq(categoryRequests.id, data.id), eq(categoryRequests.status, 'pending')))
+        .returning({ id: categoryRequests.id, nama: categoryRequests.nama })
 
-    if (updated.length === 0) {
-      throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
-    }
+      if (updated.length === 0) {
+        throw new Error('Pengajuan tidak ditemukan atau sudah diproses sebelumnya.')
+      }
 
-    return { id: data.id }
+      await logActivity(tx, admin, {
+        action: 'REJECT_CATEGORY_REQUEST',
+        entityType: 'CATEGORY_REQUEST',
+        entityId: data.id,
+        entityName: updated[0].nama,
+        details: { alasan: null },
+      })
+
+      return { id: data.id }
+    })
   })

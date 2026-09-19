@@ -4,6 +4,7 @@ import { eq, count } from 'drizzle-orm'
 import { db } from '../db'
 import { adminProfiles } from '../db/schema'
 import { requireSuperadmin } from './guards'
+import { logActivity } from './activity-log'
 import { getCurrentAdmin } from './auth'
 
 export const getPendingAdmins = createServerFn({ method: 'GET' }).handler(
@@ -30,14 +31,30 @@ const approveAdminSchema = z.object({
 export const approveAdmin = createServerFn({ method: 'POST' })
   .inputValidator(approveAdminSchema)
   .handler(async ({ data }) => {
-    await requireSuperadmin() // guard wajib baris pertama
+    const admin = await requireSuperadmin() // guard wajib baris pertama
 
-    await db
-      .update(adminProfiles)
-      .set({ isApproved: true })
-      .where(eq(adminProfiles.id, data.adminId))
+    return db.transaction(async (tx) => {
+      const updated = await tx
+        .update(adminProfiles)
+        .set({ isApproved: true })
+        .where(eq(adminProfiles.id, data.adminId))
+        .returning({ id: adminProfiles.id, nama: adminProfiles.nama })
 
-    return { success: true }
+      if (updated.length === 0) {
+        throw new Error('Admin tidak ditemukan.')
+      }
+
+      // entity_id integer tidak muat uuid -> uuid target masuk details,
+      // nama target masuk entity_name.
+      await logActivity(tx, admin, {
+        action: 'APPROVE_ADMIN',
+        entityType: 'ADMIN',
+        entityName: updated[0].nama,
+        details: { targetAdminId: updated[0].id },
+      })
+
+      return { success: true }
+    })
   })
 
 export const getAdminStats = createServerFn({ method: 'GET' }).handler(
