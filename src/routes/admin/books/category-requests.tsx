@@ -60,7 +60,7 @@ function CategoryRequestsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-[900px] mx-auto">
+      <div className="w-full max-w-6xl mx-auto">
         <AdminHeader />
 
         <div className="flex items-center justify-between mb-6">

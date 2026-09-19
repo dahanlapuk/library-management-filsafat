@@ -117,18 +117,18 @@ function AdminBooksPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-[900px] mx-auto">
+      <div className="w-full max-w-6xl mx-auto">
         <AdminHeader />
 
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
             Kelola Buku
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             {currentAdmin?.isSuperadmin && (
               <Link
                 to="/admin/books/category-requests"
-                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative"
+                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
               >
                 Pengajuan Kategori
                 {pendingCategoryRequests.length > 0 && (
@@ -141,7 +141,7 @@ function AdminBooksPage() {
             {currentAdmin?.isSuperadmin && (
               <Link
                 to="/admin/books/delete-requests"
-                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative"
+                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
               >
                 Pengajuan Hapus
                 {pendingDeleteRequests.length > 0 && (
@@ -153,7 +153,7 @@ function AdminBooksPage() {
             )}
             <Link
               to="/admin/books/new"
-              className="px-4 py-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm"
+              className="px-4 py-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm whitespace-nowrap"
             >
               + Tambah Buku
             </Link>

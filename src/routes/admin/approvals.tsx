@@ -49,7 +49,7 @@ function AdminApprovalsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-[640px] mx-auto">
+      <div className="w-full max-w-6xl mx-auto">
         <AdminHeader />
         <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-6">
           Persetujuan Admin Baru

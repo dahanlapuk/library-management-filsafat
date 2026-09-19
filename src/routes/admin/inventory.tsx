@@ -88,15 +88,15 @@ function InventoryCheckPage() {
     <div className="min-h-screen bg-[var(--bg-page)] p-5">
       <div className="w-full max-w-6xl mx-auto">
         <AdminHeader />
-        <div className="flex gap-6">
-        <aside className="w-64 shrink-0">
+        <div className="flex flex-col md:flex-row gap-6">
+        <aside className="w-full md:w-64 shrink-0">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
             Posisi Rak
           </h2>
           {posisiProgressQuery.isLoading && (
             <p className="text-sm text-[var(--gray-600)]">Memuat...</p>
           )}
-          <ul className="max-h-[70vh] space-y-1 overflow-y-auto">
+          <ul className="max-h-64 md:max-h-[70vh] space-y-1 overflow-y-auto">
             {posisiProgressList.map((p) => {
               const belum = p.totalBuku - p.sudahDicek
               const isUnpositioned = p.id === null
