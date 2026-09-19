@@ -147,14 +147,6 @@ export const submitInventoryCheck = createServerFn({ method: 'POST' })
         throw new Error('Buku tidak ditemukan.')
       }
 
-      // Sama seperti updateBook: posisi "sebelum" dari book_stock_locations.
-      const [stockBefore] = await tx
-        .select({ posisiId: bookStockLocations.posisiId })
-        .from(bookStockLocations)
-        .where(eq(bookStockLocations.bookId, data.bookId))
-        .limit(1)
-      const posisiBefore = stockBefore?.posisiId ?? before.posisiId
-
       const updated = await tx
         .update(books)
         .set({
@@ -194,13 +186,13 @@ export const submitInventoryCheck = createServerFn({ method: 'POST' })
         },
       })
 
-      if (posisiBefore !== data.newPosisiId) {
+      if (before.posisiId !== data.newPosisiId) {
         await logActivity(tx, admin, {
           action: 'POSITION_CHANGE',
           entityType: 'BOOK',
           entityId: data.bookId,
           entityName: before.judul,
-          details: { dari: posisiBefore, ke: data.newPosisiId },
+          details: { dari: before.posisiId, ke: data.newPosisiId },
         })
       }
 

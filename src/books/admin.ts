@@ -145,19 +145,6 @@ export const updateBook = createServerFn({ method: 'POST' })
         throw new Error('Buku tidak ditemukan.')
       }
 
-      // Posisi "sebelum" diambil dari book_stock_locations (sumber yang
-      // dipakai form edit), bukan books.posisi_id -- ada buku V1 yang
-      // books.posisi_id-nya NULL padahal posisinya ada di tabel stok.
-      const [stockBefore] = await tx
-        .select({ posisiId: bookStockLocations.posisiId })
-        .from(bookStockLocations)
-        .where(eq(bookStockLocations.bookId, data.id))
-        .limit(1)
-      const beforeView = {
-        ...before,
-        posisiId: stockBefore?.posisiId ?? before.posisiId,
-      }
-
       // Bahan log: field yang berubah (dari -> ke). Field undefined di input
       // tidak disentuh .set() Drizzle, jadi dilewati.
       const changes: Record<string, { dari: unknown; ke: unknown }> = {}
@@ -172,7 +159,7 @@ export const updateBook = createServerFn({ method: 'POST' })
       ] as const) {
         const ke = data[f]
         if (ke === undefined) continue
-        const dari = beforeView[f] ?? null
+        const dari = before[f] ?? null
         if (dari !== ke) changes[f] = { dari, ke }
       }
       const oldCategoryIds = (
