@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { getSupabaseServerClient } from '../lib/supabase/server'
 import { db } from '../db'
 import { adminProfiles } from '../db/schema'
@@ -58,12 +58,34 @@ export const logout = createServerFn({ method: 'POST' }).handler(async () => {
   return { success: true }
 })
 
+// Batas umur sesi admin, dihitung dari waktu LOGIN (auth.sessions.created_at),
+// bukan dari aktivitas terakhir. Paket Supabase gratis tidak punya setelan
+// time-box sesi, jadi ditegakkan di sini.
+const ADMIN_SESSION_MAX_MS = 8 * 60 * 60 * 1000
+
+// Sesi valid = barisnya masih ada di auth.sessions (belum di-revoke) DAN
+// dibuat kurang dari 8 jam lalu.
+async function isSessionWithinLimit(sessionId: string) {
+  const res = await db.execute(
+    sql`select created_at from auth.sessions where id = ${sessionId}::uuid`,
+  )
+  const row = res.rows[0] as { created_at: Date } | undefined
+  if (!row) return false
+  return Date.now() - new Date(row.created_at).getTime() < ADMIN_SESSION_MAX_MS
+}
+
 export const getCurrentAdmin = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase.auth.getClaims()
     if (error || !data?.claims) {
+      return null
+    }
+
+    const sessionId = data.claims.session_id
+    if (!sessionId || !(await isSessionWithinLimit(sessionId))) {
+      await supabase.auth.signOut({ scope: 'local' })
       return null
     }
 

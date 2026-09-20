@@ -1,9 +1,14 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Link, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getAdminList, login } from '../../admin/auth'
+import { getAdminList, getCurrentAdmin, login } from '../../admin/auth'
 
 export const Route = createFileRoute('/admin/login')({
+  // Sudah login (sesi valid) → langsung ke dashboard.
+  beforeLoad: async () => {
+    const admin = await getCurrentAdmin()
+    if (admin?.isApproved) throw redirect({ to: '/admin' })
+  },
   component: AdminLoginPage,
 })
 
@@ -15,7 +20,12 @@ function AdminLoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const { data: adminList = [], isLoading: loadingAdmins } = useQuery({
+  const {
+    data: adminList = [],
+    isPending: loadingAdmins,
+    error: adminListError,
+    refetch,
+  } = useQuery({
     queryKey: ['admin-list'],
     queryFn: () => getAdminList(),
   })
@@ -61,6 +71,15 @@ function AdminLoginPage() {
           {error && (
             <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
               {error}
+            </div>
+          )}
+
+          {adminListError && (
+            <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+              Gagal memuat daftar admin.{' '}
+              <button type="button" onClick={() => refetch()} className="underline">
+                Coba lagi
+              </button>
             </div>
           )}
 

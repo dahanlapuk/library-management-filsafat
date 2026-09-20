@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
@@ -28,71 +29,77 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
-  id: '/admin/approvals',
-  path: '/admin/approvals',
-  getParentRoute: () => rootRouteImport,
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminInventoryRoute = AdminInventoryRouteImport.update({
-  id: '/admin/inventory',
-  path: '/admin/inventory',
-  getParentRoute: () => rootRouteImport,
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminMembersRoute = AdminMembersRouteImport.update({
-  id: '/admin/members',
-  path: '/admin/members',
-  getParentRoute: () => rootRouteImport,
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminSignupRoute = AdminSignupRouteImport.update({
-  id: '/admin/signup',
-  path: '/admin/signup',
-  getParentRoute: () => rootRouteImport,
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBooksIndexRoute = AdminBooksIndexRouteImport.update({
-  id: '/admin/books/',
-  path: '/admin/books/',
-  getParentRoute: () => rootRouteImport,
+  id: '/books/',
+  path: '/books/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBooksCategoryRequestsRoute =
   AdminBooksCategoryRequestsRouteImport.update({
-    id: '/admin/books/category-requests',
-    path: '/admin/books/category-requests',
-    getParentRoute: () => rootRouteImport,
+    id: '/books/category-requests',
+    path: '/books/category-requests',
+    getParentRoute: () => AdminRoute,
   } as any)
 const AdminBooksDeleteRequestsRoute =
   AdminBooksDeleteRequestsRouteImport.update({
-    id: '/admin/books/delete-requests',
-    path: '/admin/books/delete-requests',
-    getParentRoute: () => rootRouteImport,
+    id: '/books/delete-requests',
+    path: '/books/delete-requests',
+    getParentRoute: () => AdminRoute,
   } as any)
 const AdminBooksNewRoute = AdminBooksNewRouteImport.update({
-  id: '/admin/books/new',
-  path: '/admin/books/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/books/new',
+  path: '/books/new',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoansRequestsRoute = AdminLoansRequestsRouteImport.update({
-  id: '/admin/loans/requests',
-  path: '/admin/loans/requests',
-  getParentRoute: () => rootRouteImport,
+  id: '/loans/requests',
+  path: '/loans/requests',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBooksBookIdEditRoute = AdminBooksBookIdEditRouteImport.update({
-  id: '/admin/books/$bookId/edit',
-  path: '/admin/books/$bookId/edit',
-  getParentRoute: () => rootRouteImport,
+  id: '/books/$bookId/edit',
+  path: '/books/$bookId/edit',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -141,6 +149,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/admin/approvals'
     | '/admin/inventory'
     | '/admin/login'
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/admin/approvals'
     | '/admin/inventory'
     | '/admin/login'
@@ -187,6 +197,113 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/approvals': {
+      id: '/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/signup': {
+      id: '/admin/signup'
+      path: '/signup'
+      fullPath: '/admin/signup'
+      preLoaderRoute: typeof AdminSignupRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/books/': {
+      id: '/admin/books/'
+      path: '/books'
+      fullPath: '/admin/books/'
+      preLoaderRoute: typeof AdminBooksIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/books/category-requests': {
+      id: '/admin/books/category-requests'
+      path: '/books/category-requests'
+      fullPath: '/admin/books/category-requests'
+      preLoaderRoute: typeof AdminBooksCategoryRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/books/delete-requests': {
+      id: '/admin/books/delete-requests'
+      path: '/books/delete-requests'
+      fullPath: '/admin/books/delete-requests'
+      preLoaderRoute: typeof AdminBooksDeleteRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/books/new': {
+      id: '/admin/books/new'
+      path: '/books/new'
+      fullPath: '/admin/books/new'
+      preLoaderRoute: typeof AdminBooksNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/loans/requests': {
+      id: '/admin/loans/requests'
+      path: '/loans/requests'
+      fullPath: '/admin/loans/requests'
+      preLoaderRoute: typeof AdminLoansRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/books/$bookId/edit': {
+      id: '/admin/books/$bookId/edit'
+      path: '/books/$bookId/edit'
+      fullPath: '/admin/books/$bookId/edit'
+      preLoaderRoute: typeof AdminBooksBookIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+  }
+}
+
+interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -201,104 +318,7 @@ export interface RootRouteChildren {
   AdminBooksBookIdEditRoute: typeof AdminBooksBookIdEditRoute
 }
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/approvals': {
-      id: '/admin/approvals'
-      path: '/admin/approvals'
-      fullPath: '/admin/approvals'
-      preLoaderRoute: typeof AdminApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/inventory': {
-      id: '/admin/inventory'
-      path: '/admin/inventory'
-      fullPath: '/admin/inventory'
-      preLoaderRoute: typeof AdminInventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/members': {
-      id: '/admin/members'
-      path: '/admin/members'
-      fullPath: '/admin/members'
-      preLoaderRoute: typeof AdminMembersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/signup': {
-      id: '/admin/signup'
-      path: '/admin/signup'
-      fullPath: '/admin/signup'
-      preLoaderRoute: typeof AdminSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/books/': {
-      id: '/admin/books/'
-      path: '/admin/books'
-      fullPath: '/admin/books/'
-      preLoaderRoute: typeof AdminBooksIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/books/category-requests': {
-      id: '/admin/books/category-requests'
-      path: '/admin/books/category-requests'
-      fullPath: '/admin/books/category-requests'
-      preLoaderRoute: typeof AdminBooksCategoryRequestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/books/delete-requests': {
-      id: '/admin/books/delete-requests'
-      path: '/admin/books/delete-requests'
-      fullPath: '/admin/books/delete-requests'
-      preLoaderRoute: typeof AdminBooksDeleteRequestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/books/new': {
-      id: '/admin/books/new'
-      path: '/admin/books/new'
-      fullPath: '/admin/books/new'
-      preLoaderRoute: typeof AdminBooksNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/loans/requests': {
-      id: '/admin/loans/requests'
-      path: '/admin/loans/requests'
-      fullPath: '/admin/loans/requests'
-      preLoaderRoute: typeof AdminLoansRequestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/books/$bookId/edit': {
-      id: '/admin/books/$bookId/edit'
-      path: '/admin/books/$bookId/edit'
-      fullPath: '/admin/books/$bookId/edit'
-      preLoaderRoute: typeof AdminBooksBookIdEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
-}
-
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
@@ -311,6 +331,13 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoansRequestsRoute: AdminLoansRequestsRoute,
   AdminBooksIndexRoute: AdminBooksIndexRoute,
   AdminBooksBookIdEditRoute: AdminBooksBookIdEditRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
