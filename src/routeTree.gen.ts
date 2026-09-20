@@ -16,6 +16,7 @@ import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
+import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
 import { Route as AdminBooksIndexRouteImport } from './routes/admin/books/index'
 import { Route as AdminBooksCategoryRequestsRouteImport } from './routes/admin/books/category-requests'
@@ -57,6 +58,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminMembersRoute = AdminMembersRouteImport.update({
   id: '/members',
   path: '/members',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSignupRoute = AdminSignupRouteImport.update({
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/members'
+    | '/admin/profile'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/members'
+    | '/admin/profile'
     | '/admin/signup'
     | '/admin'
     | '/admin/books/category-requests'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/members'
+    | '/admin/profile'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMembersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/signup': {
       id: '/admin/signup'
       path: '/signup'
@@ -308,6 +327,7 @@ interface AdminRouteChildren {
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMembersRoute: typeof AdminMembersRoute
+  AdminProfileRoute: typeof AdminProfileRoute
   AdminSignupRoute: typeof AdminSignupRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBooksCategoryRequestsRoute: typeof AdminBooksCategoryRequestsRoute
@@ -323,6 +343,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMembersRoute: AdminMembersRoute,
+  AdminProfileRoute: AdminProfileRoute,
   AdminSignupRoute: AdminSignupRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBooksCategoryRequestsRoute: AdminBooksCategoryRequestsRoute,

@@ -151,7 +151,9 @@ export function AdminHeader() {
         </div>
 
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-[var(--gray-200)]">{currentAdmin?.nama ?? '...'}</span>
+          <Link to="/admin/profile" className="text-[var(--gray-200)] underline">
+            {currentAdmin?.nama ?? '...'}
+          </Link>
           {isSuperadmin && (
             <span className="inline-block bg-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--black)]">
               Superadmin
