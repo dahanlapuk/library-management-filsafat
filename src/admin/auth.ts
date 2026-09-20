@@ -1,9 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { getSupabaseServerClient } from '../lib/supabase/server'
 import { db } from '../db'
-import { adminProfiles } from '../db/schema'
+import { activityLogs, adminProfiles } from '../db/schema'
+import { logActivity } from './activity-log'
 
 // Dipanggil dari halaman login untuk menampilkan daftar admin yang bisa dipilih.
 // Sengaja TIDAK mengembalikan email/password — hanya info yang aman ditampilkan publik.
@@ -21,6 +22,40 @@ export const getAdminList = createServerFn({ method: 'GET' }).handler(
     return admins
   },
 )
+
+// Aktor LOGIN_FAILED = profil target dari adminId (BELUM terverifikasi, ditandai
+// di details). Maks. 3 baris per admin per menit supaya tidak bisa dipakai
+// membanjiri tabel. Sengaja menelan error: kegagalan log tidak boleh menutupi
+// pesan "Password salah" (pengecualian dari konvensi "log gagal = aksi batal").
+async function logLoginFailed(
+  profile: { id: string; nama: string },
+  kode: string | null,
+) {
+  try {
+    const [row] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(activityLogs)
+      .where(
+        and(
+          eq(activityLogs.adminId, profile.id),
+          eq(activityLogs.action, 'LOGIN_FAILED'),
+          sql`${activityLogs.createdAt} > now() - interval '1 minute'`,
+        ),
+      )
+    if ((row?.n ?? 0) >= 3) return
+
+    await db.transaction(async (tx) => {
+      await logActivity(tx, profile, {
+        action: 'LOGIN_FAILED',
+        entityType: 'ADMIN',
+        entityName: profile.nama,
+        details: { terverifikasi: false, kode },
+      })
+    })
+  } catch (e) {
+    console.error('Gagal mencatat LOGIN_FAILED', e)
+  }
+}
 
 const loginSchema = z.object({
   adminId: z.string().uuid(),
@@ -46,15 +81,51 @@ export const login = createServerFn({ method: 'POST' })
     })
 
     if (error || !authData.user) {
+      await logLoginFailed(
+        { id: profile.id, nama: profile.nama },
+        error?.code ?? null,
+      )
       throw new Error('Password salah.')
+    }
+
+    // Konvensi berlaku: kalau log LOGIN gagal ditulis, login dibatalkan.
+    try {
+      await db.transaction(async (tx) => {
+        await logActivity(
+          tx,
+          { id: profile.id, nama: profile.nama },
+          { action: 'LOGIN', entityType: 'ADMIN', entityName: profile.nama },
+        )
+      })
+    } catch (e) {
+      console.error('Gagal mencatat LOGIN', e)
+      await supabase.auth.signOut({ scope: 'local' })
+      throw new Error('Login gagal dicatat. Coba lagi.')
     }
 
     return { profile }
   })
 
+// Logout HARUS selalu berhasil: kalau log gagal, error cuma dicatat (pengecualian
+// dari konvensi "log gagal = aksi batal"). scope 'local' = hanya sesi ini,
+// bukan semua perangkat admin itu (default 'global').
 export const logout = createServerFn({ method: 'POST' }).handler(async () => {
+  const admin = await getCurrentAdmin()
+  if (admin) {
+    try {
+      await db.transaction(async (tx) => {
+        await logActivity(
+          tx,
+          { id: admin.id, nama: admin.nama },
+          { action: 'LOGOUT', entityType: 'ADMIN', entityName: admin.nama },
+        )
+      })
+    } catch (e) {
+      console.error('Gagal mencatat LOGOUT', e)
+    }
+  }
   const supabase = getSupabaseServerClient()
-  await supabase.auth.signOut()
+  await supabase.auth.signOut({ scope: 'local' })
   return { success: true }
 })
 
@@ -121,13 +192,26 @@ export const signupAdmin = createServerFn({ method: 'POST' })
       throw new Error(error?.message ?? 'Gagal membuat akun.')
     }
 
+    const newUserId = authData.user.id
     try {
-      await db.insert(adminProfiles).values({
-        id: authData.user.id,
-        nama: data.nama,
-        email: data.email,
-        isSuperadmin: false,
-        isApproved: false,
+      await db.transaction(async (tx) => {
+        await tx.insert(adminProfiles).values({
+          id: newUserId,
+          nama: data.nama,
+          email: data.email,
+          isSuperadmin: false,
+          isApproved: false,
+        })
+        await logActivity(
+          tx,
+          { id: newUserId, nama: data.nama },
+          {
+            action: 'SIGNUP_ADMIN',
+            entityType: 'ADMIN',
+            entityName: data.nama,
+            details: { menungguApproval: true },
+          },
+        )
       })
     } finally {
       // Paksa sign-out apa pun hasil signUp di atas (kalau Supabase project
