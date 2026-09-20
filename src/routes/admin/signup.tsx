@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signupAdmin } from '../../admin/auth'
+import { errorMessage } from '../../lib/error-message'
 
 export const Route = createFileRoute('/admin/signup')({
   component: AdminSignupPage,
@@ -29,7 +30,7 @@ function AdminSignupPage() {
       await signupAdmin({ data: { nama, email, password } })
       setSubmitted(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup gagal.')
+      setError(errorMessage(err, 'Signup gagal.'))
     } finally {
       setLoading(false)
     }
