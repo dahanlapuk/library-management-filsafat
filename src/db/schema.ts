@@ -33,6 +33,7 @@ export const adminProfiles = pgTable('admin_profiles', {
   title: text('title'),
   isSuperadmin: boolean('is_superadmin').notNull().default(false),
   isApproved: boolean('is_approved').notNull().default(false),
+  noWhatsapp: text('no_whatsapp'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
