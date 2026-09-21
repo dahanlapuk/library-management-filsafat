@@ -72,9 +72,17 @@ export function AdminHeader() {
     <div className="mb-6 bg-[var(--black)]">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex flex-wrap items-center gap-5">
-          <span className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--white)]">
-            Pustaka <span className="text-[var(--accent)]">Filsafat</span>
-          </span>
+          <Link
+            to="/admin"
+            title="Perpustakaan Departemen Filsafat"
+            className="flex shrink-0 items-center"
+          >
+            <img
+              src="/favicon.svg"
+              alt="Perpustakaan Departemen Filsafat"
+              className="h-8 w-8 rounded"
+            />
+          </Link>
 
           <nav ref={navRef} className="flex flex-wrap items-center gap-4">
             <Link
