@@ -57,6 +57,18 @@ async function logLoginFailed(
   }
 }
 
+// Pesan login per kode error Supabase. Selain dua kode ini tetap "Password salah."
+function loginErrorMessage(code: string | null | undefined): string {
+  switch (code) {
+    case 'email_not_confirmed':
+      return 'Email belum dikonfirmasi. Cek kotak masuk (dan folder spam) untuk link konfirmasi.'
+    case 'over_request_rate_limit':
+      return 'Terlalu banyak percobaan login. Tunggu beberapa menit lalu coba lagi.'
+    default:
+      return 'Password salah.'
+  }
+}
+
 const loginSchema = z.object({
   adminId: z.string().uuid(),
   password: z.string().min(1),
@@ -85,7 +97,7 @@ export const login = createServerFn({ method: 'POST' })
         { id: profile.id, nama: profile.nama },
         error?.code ?? null,
       )
-      throw new Error('Password salah.')
+      throw new Error(loginErrorMessage(error?.code))
     }
 
     // Konvensi berlaku: kalau log LOGIN gagal ditulis, login dibatalkan.
