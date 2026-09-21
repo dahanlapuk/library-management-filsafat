@@ -15,7 +15,14 @@ export function getSupabaseServerClient() {
         },
         setAll(cookies) {
           cookies.forEach((cookie) => {
-            setCookie(cookie.name, cookie.value)
+            // Argumen ketiga (options) dari @supabase/ssr WAJIB diteruskan,
+            // kalau tidak httpOnly/secure/sameSite hilang begitu saja
+            // (ketauan pas cek DevTools di produksi Vercel: flag kosong semua).
+            setCookie(cookie.name, cookie.value, {
+              ...cookie.options,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+            })
           })
         },
       },
