@@ -27,6 +27,7 @@ const NAV_GROUPS: NavGroup[] = [
     links: [
       { to: '/admin/inventory', label: 'Inventory Check' },
       { to: '/admin/approvals', label: 'Approval Admin', superadminOnly: true },
+      { to: '/admin/activity', label: 'Activity Log', superadminOnly: true },
     ],
   },
 ]
