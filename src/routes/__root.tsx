@@ -1,3 +1,4 @@
+import { Footer } from '../components/Footer'
 import { NotFound } from '../components/NotFound'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
@@ -46,7 +47,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <div className="flex min-h-screen flex-col">
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </div>
         </QueryClientProvider>
         <TanStackDevtools
           config={{
