@@ -1,6 +1,7 @@
 import { Footer } from '../components/Footer'
 import { NotFound } from '../components/NotFound'
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, redirect } from '@tanstack/react-router'
+import { isMaintenanceMode } from '../lib/maintenance'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -10,6 +11,11 @@ import appCss from '../styles.css?url'
 const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
+  beforeLoad: async ({ location }) => {
+    if (location.pathname === '/maintenance') return
+    const active = await isMaintenanceMode()
+    if (active) throw redirect({ to: '/maintenance' })
+  },
   notFoundComponent: NotFound,
   head: () => ({
     meta: [
