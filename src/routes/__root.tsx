@@ -1,3 +1,4 @@
+import { NotFound } from '../components/NotFound'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -8,6 +9,7 @@ import appCss from '../styles.css?url'
 const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
+  notFoundComponent: NotFound,
   head: () => ({
     meta: [
       {
