@@ -61,7 +61,7 @@ function AdminLoginPage() {
             PUSTAKA FILSAFAT
           </h1>
           <p className="text-[var(--gray-600)]">
-            Sistem Perpustakaan Prodi Filsafat FIB UI
+            Sistem Biblioteka Prodi Filsafat FIB UI
           </p>
         </div>
 

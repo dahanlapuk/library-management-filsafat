@@ -21,7 +21,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Perpustakaan Departemen Filsafat FIB UI',
+        title: 'Biblioteka Departemen Filsafat FIB UI',
       },
     ],
     links: [

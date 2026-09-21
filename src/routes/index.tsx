@@ -658,7 +658,7 @@ function PublicCatalogPage() {
       <header className="border-b-4 border-[var(--black)] bg-[var(--white)] px-5 pt-10 pb-6">
         <div className="max-w-[1100px] mx-auto flex flex-col items-center text-center gap-2">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-[0.08em] uppercase text-[var(--text-primary)]">
-            Perpustakaan Departemen Filsafat
+            Biblioteka Departemen Filsafat UI
           </h1>
           <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-[var(--gray-600)]">
             Katalog koleksi · FIB UI
@@ -820,15 +820,6 @@ function PublicCatalogPage() {
           )}
         </section>
       </main>
-
-      <footer className="border-t-2 border-[var(--black)] bg-[var(--white)] px-5 py-5 text-center">
-        <Link
-          to="/admin/login"
-          className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
-        >
-          Masuk sebagai Admin →
-        </Link>
-      </footer>
 
       {selectedBookId !== undefined && (
         <BookDetailModal bookId={selectedBookId} onClose={closeModal} />

@@ -13,7 +13,7 @@ export function Footer() {
             Perpustakaan Departemen <span className="text-[var(--accent)]">Filsafat</span>
           </p>
           <p className="mt-2 text-xs opacity-70">
-            Koleksi buku Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya,
+            Koleksi Buku Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya,
             Universitas Indonesia.
           </p>
         </div>

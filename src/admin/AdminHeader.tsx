@@ -74,12 +74,12 @@ export function AdminHeader() {
         <div className="flex flex-wrap items-center gap-5">
           <Link
             to="/admin"
-            title="Perpustakaan Departemen Filsafat"
+            title="Biblioteka Departemen Filsafat UI"
             className="flex shrink-0 items-center"
           >
             <img
               src="/favicon.svg"
-              alt="Perpustakaan Departemen Filsafat"
+              alt="Biblioteka Departemen Filsafat UI"
               className="h-8 w-8 rounded"
             />
           </Link>
