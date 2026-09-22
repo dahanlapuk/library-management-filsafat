@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { eq, asc, isNull, sql } from 'drizzle-orm'
+import { eq, asc, isNull, sql, ilike, or } from 'drizzle-orm'
 import { db } from '../db'
 import { books, bookStockLocations, posisi } from '../db/schema'
 import { requireApprovedAdmin } from '../admin/guards'
@@ -115,6 +115,37 @@ export const getBooksForInventoryCheck = createServerFn({ method: 'GET' })
           : eq(books.posisiId, data.posisiId),
       )
       .orderBy(sql`${books.lastChecked} is not null`, asc(books.judul))
+  })
+
+const searchBooksSchema = z.object({ q: z.string().trim().min(1) })
+
+// GET /admin/inventory/search setara -- cari buku LINTAS SEMUA RAK
+// sekaligus (judul atau kode), bukan cuma dalam satu rak yang lagi
+// dipilih di sidebar. Ikut balikin posisi ASLI buku itu (posisiId +
+// posisiKode) karena hasil bisa datang dari rak mana pun -- UI perlu
+// tau itu buku "sebetulnya" ada di rak mana sebelum dikoreksi.
+export const searchBooksForInventoryCheck = createServerFn({ method: 'GET' })
+  .inputValidator(searchBooksSchema)
+  .handler(async ({ data }) => {
+    await requireApprovedAdmin()
+
+    return db
+      .select({
+        id: books.id,
+        kode: books.kode,
+        judul: books.judul,
+        qty: books.qty,
+        lastChecked: books.lastChecked,
+        checkedBy: books.checkedBy,
+        lastCheckCatatan: books.lastCheckCatatan,
+        posisiId: books.posisiId,
+        posisiKode: posisi.kode,
+      })
+      .from(books)
+      .leftJoin(posisi, eq(books.posisiId, posisi.id))
+      .where(or(ilike(books.judul, `%${data.q}%`), ilike(books.kode, `%${data.q}%`)))
+      .orderBy(asc(books.judul))
+      .limit(50)
   })
 
 const submitCheckSchema = z.object({

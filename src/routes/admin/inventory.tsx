@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AdminHeader } from '../../admin/AdminHeader'
 import { getPosisiList } from '../../books/admin'
 import {
   getPosisiWithProgress,
   getBooksForInventoryCheck,
+  searchBooksForInventoryCheck,
   submitInventoryCheck,
 } from '../../books/inventory'
 
@@ -30,10 +31,37 @@ function formatTanggal(value: string | Date | null) {
 // catatan opsional. Direset begitu simpan sukses.
 type Draft = { qty: number; posisiId: number | null; catatan: string }
 
+// Tipe gabungan buat baris buku yang dirender -- posisiId/posisiKode
+// cuma ADA kalau datang dari hasil search (lihat searchBooksForInventoryCheck),
+// makanya opsional di sini. Ini yang bikin narrowing di JSX jadi
+// straightforward, ketimbang andalkan `in` di tengah render.
+type InventoryBookRow = {
+  id: number
+  kode: string | null
+  judul: string
+  qty: number
+  lastChecked: string | Date | null
+  checkedBy: string | null
+  lastCheckCatatan: string | null
+  posisiId?: number | null
+  posisiKode?: string | null
+}
+
 function InventoryCheckPage() {
   const queryClient = useQueryClient()
   const [selection, setSelection] = useState<Selection>('none')
   const [drafts, setDrafts] = useState<Record<number, Draft>>({})
+
+  // Search lintas SEMUA rak -- independen dari pilihan rak di sidebar,
+  // buat kasus "lagi nyari buku spesifik ini ada di mana" ketimbang
+  // "lagi ngecek rak ini isinya apa aja".
+  const [searchInput, setSearchInput] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchInput.trim()), 350)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+  const isSearching = debouncedSearch.length > 0
 
   const posisiProgressQuery = useQuery({
     queryKey: ['inventory', 'posisi'],
@@ -54,6 +82,12 @@ function InventoryCheckPage() {
     enabled: selection !== 'none',
   })
 
+  const searchQuery = useQuery({
+    queryKey: ['inventory', 'search', debouncedSearch],
+    queryFn: () => searchBooksForInventoryCheck({ data: { q: debouncedSearch } }),
+    enabled: isSearching,
+  })
+
   const checkMutation = useMutation({
     mutationFn: submitInventoryCheck,
     onSuccess: (_result, variables) => {
@@ -69,15 +103,26 @@ function InventoryCheckPage() {
 
   const posisiProgressList = posisiProgressQuery.data ?? []
   const posisiList = posisiListQuery.data ?? []
-  const bookList = booksQuery.data ?? []
+  const bookList: InventoryBookRow[] = booksQuery.data ?? []
+  const searchResults: InventoryBookRow[] = searchQuery.data ?? []
 
-  function getDraft(book: { id: number; qty: number }): Draft {
+  const displayList: InventoryBookRow[] = isSearching ? searchResults : bookList
+  const isLoadingList = isSearching ? searchQuery.isLoading : booksQuery.isLoading
+  const showList = isSearching || selection !== 'none'
+
+  // `posisiId` cuma ada di hasil search (bisa datang dari rak mana pun,
+  // jadi default-nya harus posisi ASLI buku itu). Buku dari list per-rak
+  // biasa tidak punya field ini -- default-nya tetap ikut rak yang lagi
+  // dipilih di sidebar, sama seperti sebelumnya.
+  function getDraft(book: InventoryBookRow): Draft {
     if (drafts[book.id]) return drafts[book.id]
-    return {
-      qty: book.qty,
-      posisiId: selection === 'unpositioned' ? null : (selection as number),
-      catatan: '',
-    }
+    const defaultPosisiId =
+      book.posisiId !== undefined
+        ? book.posisiId
+        : selection === 'unpositioned'
+          ? null
+          : (selection as number)
+    return { qty: book.qty, posisiId: defaultPosisiId, catatan: '' }
   }
 
   function setDraft(bookId: number, patch: Partial<Draft>, base: Draft) {
@@ -143,23 +188,41 @@ function InventoryCheckPage() {
             Inventory Check
           </h1>
 
-          {selection === 'none' && (
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Cari judul atau kode buku (lintas semua rak)..."
+            className="mb-4 w-full border border-[var(--gray-200)] px-3 py-2 text-sm"
+          />
+
+          {!showList && (
             <p className="text-sm text-[var(--gray-600)]">
-              Pilih rak (atau "Belum Ditempatkan") di sidebar untuk mulai checklist.
+              Pilih rak (atau "Belum Ditempatkan") di sidebar, atau cari nama/kode buku
+              di atas untuk mulai checklist.
             </p>
           )}
 
-          {selection !== 'none' && (
+          {showList && (
             <>
-              {booksQuery.isLoading && (
+              {isSearching && (
+                <p className="mb-2 text-xs text-[var(--gray-600)]">
+                  Hasil cari lintas semua rak -- posisi tujuan default mengikuti
+                  posisi tercatat buku itu sekarang, bukan rak yang dipilih di
+                  sidebar.
+                </p>
+              )}
+              {isLoadingList && (
                 <p className="text-sm text-[var(--gray-600)]">Memuat buku...</p>
               )}
-              {!booksQuery.isLoading && bookList.length === 0 && (
-                <p className="text-sm text-[var(--gray-600)]">Tidak ada buku di sini.</p>
+              {!isLoadingList && displayList.length === 0 && (
+                <p className="text-sm text-[var(--gray-600)]">
+                  {isSearching ? 'Tidak ada buku yang cocok.' : 'Tidak ada buku di sini.'}
+                </p>
               )}
 
               <ul className="space-y-3">
-                {bookList.map((book) => {
+                {displayList.map((book) => {
                   const draft = getDraft(book)
                   const belumPernahDicek = book.lastChecked === null
                   const isSaving =
@@ -174,6 +237,14 @@ function InventoryCheckPage() {
                           <p className="text-xs text-[var(--gray-600)]">
                             {book.kode ?? '(tanpa kode)'}
                           </p>
+                          {isSearching && (
+                            <p className="mt-1 text-xs text-[var(--gray-600)]">
+                              Rak sekarang:{' '}
+                              <span className="font-medium text-[var(--text-primary)]">
+                                {book.posisiKode ?? 'Belum Ditempatkan'}
+                              </span>
+                            </p>
+                          )}
                           {belumPernahDicek ? (
                             <span className="mt-1 inline-block border border-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--accent)]">
                               Belum pernah dicek
