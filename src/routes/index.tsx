@@ -11,6 +11,8 @@ import {
 } from '../books/catalog'
 import { submitLoanRequest } from '../loans/public'
 
+type BookDetail = Awaited<ReturnType<typeof getBook>>
+
 export const Route = createFileRoute('/')({
   component: PublicCatalogPage,
   validateSearch: (search: Record<string, unknown>): { book?: number } => {
@@ -22,6 +24,48 @@ export const Route = createFileRoute('/')({
           ? raw
           : undefined
     return { book: num !== undefined && Number.isFinite(num) ? num : undefined }
+  },
+  loaderDeps: ({ search }) => ({ book: search.book }),
+  // SSR detail buku untuk title/meta per-buku (SEO) -- modal-nya sendiri
+  // tetap client-side seperti semula, ini cuma nyuntik data awal + head
+  // tag lewat search param yang sama, tanpa route/halaman terpisah.
+  loader: async ({ deps }): Promise<{ book: BookDetail | null }> => {
+    if (deps.book === undefined) return { book: null }
+    try {
+      const book = await getBook({ data: { id: deps.book } })
+      return { book }
+    } catch {
+      // Buku tidak ketemu / id ngawur -- jangan gagalkan seluruh route,
+      // biarkan modal client-side yang nampilin pesan "tidak ditemukan".
+      return { book: null }
+    }
+  },
+  head: ({ loaderData }) => {
+    const book = loaderData?.book
+    if (!book) {
+      return {
+        meta: [
+          { title: 'Biblioteka Departemen Filsafat UI' },
+          {
+            name: 'description',
+            content: 'Katalog koleksi Perpustakaan Departemen Filsafat FIB UI.',
+          },
+        ],
+      }
+    }
+    const detail = [book.penulis, book.tahun ? String(book.tahun) : null, book.kode]
+      .filter(Boolean)
+      .join(' · ')
+    return {
+      meta: [
+        { title: `${book.judul} — Biblioteka Departemen Filsafat UI` },
+        {
+          name: 'description',
+          content:
+            detail || `Detail buku ${book.judul} di katalog Biblioteka Departemen Filsafat UI.`,
+        },
+      ],
+    }
   },
 })
 
@@ -412,9 +456,11 @@ function BookCard({ book }: { book: BookRow }) {
 // yang sama), tanpa perlu route/halaman terpisah.
 function BookDetailModal({
   bookId,
+  initialBook,
   onClose,
 }: {
   bookId: number
+  initialBook?: BookDetail
   onClose: () => void
 }) {
   const {
@@ -425,6 +471,7 @@ function BookDetailModal({
   } = useQuery({
     queryKey: ['book-detail', bookId],
     queryFn: () => getBook({ data: { id: bookId } }),
+    initialData: initialBook,
     retry: false,
   })
 
@@ -559,6 +606,7 @@ function PublicCatalogPage() {
   const navigate = useNavigate()
   const search = Route.useSearch()
   const selectedBookId = search.book
+  const loaderData = Route.useLoaderData()
 
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -822,7 +870,13 @@ function PublicCatalogPage() {
       </main>
 
       {selectedBookId !== undefined && (
-        <BookDetailModal bookId={selectedBookId} onClose={closeModal} />
+        <BookDetailModal
+          bookId={selectedBookId}
+          initialBook={
+            loaderData?.book?.id === selectedBookId ? loaderData.book : undefined
+          }
+          onClose={closeModal}
+        />
       )}
     </div>
   )
