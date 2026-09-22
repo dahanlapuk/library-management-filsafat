@@ -2,6 +2,7 @@ import { Footer } from '../components/Footer'
 import { NotFound } from '../components/NotFound'
 import { HeadContent, Scripts, createRootRoute, redirect } from '@tanstack/react-router'
 import { isMaintenanceMode } from '../lib/maintenance'
+import { getCanonicalRedirectHost } from '../lib/canonical-domain'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -12,6 +13,17 @@ const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
+    // Domain lama (*.vercel.app default) -- 301 permanen ke domain custom,
+    // supaya sinyal SEO ikut pindah dan tidak ada duplicate content antara
+    // dua domain yang nampilin konten sama persis.
+    const canonicalHost = await getCanonicalRedirectHost()
+    if (canonicalHost) {
+      throw redirect({
+        href: `https://${canonicalHost}${location.href}`,
+        statusCode: 301,
+      })
+    }
+
     const active = await isMaintenanceMode()
     if (location.pathname === '/maintenance') {
       if (!active) throw redirect({ to: '/' })
