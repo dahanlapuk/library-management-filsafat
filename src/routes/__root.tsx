@@ -12,8 +12,11 @@ const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
-    if (location.pathname === '/maintenance') return
     const active = await isMaintenanceMode()
+    if (location.pathname === '/maintenance') {
+      if (!active) throw redirect({ to: '/' })
+      return
+    }
     if (active) throw redirect({ to: '/maintenance' })
   },
   notFoundComponent: NotFound,
