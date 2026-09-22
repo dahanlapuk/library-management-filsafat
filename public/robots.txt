@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /maintenance
+Disallow: /login
+
+Sitemap: https://biblioteka.filsafatui.app/sitemap.xml
