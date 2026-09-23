@@ -17,6 +17,7 @@ function EditBookPage() {
     data: book,
     isLoading,
     error: loadError,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ['book-for-edit', id],
     queryFn: () => getBookForEdit({ data: { id } }),
@@ -67,6 +68,7 @@ function EditBookPage() {
             </p>
           ) : (
             <BookForm
+              key={dataUpdatedAt}
               initialValues={{
                 kode: book.kode ?? '',
                 judul: book.judul,
