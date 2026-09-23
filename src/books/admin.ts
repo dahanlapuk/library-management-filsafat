@@ -340,12 +340,13 @@ export const requestBookDeletion = createServerFn({ method: 'POST' })
         // Partial unique index (delete_requests_one_pending_per_book) di
         // DB yang menolak insert kalau buku ini sudah punya pengajuan
         // pending -- Postgres error code 23505 = unique_violation.
-        if (
-          err &&
-          typeof err === 'object' &&
-          'code' in err &&
-          (err as { code?: string }).code === '23505'
-        ) {
+        // Drizzle >=0.32-an membungkus error driver asli jadi
+        // DrizzleQueryError -- kode Postgres (mis. 23505) nyempil di
+        // err.cause.code, bukan err.code langsung. Cek keduanya.
+        const pgCode =
+          (err as { code?: string } | undefined)?.code ??
+          (err as { cause?: { code?: string } } | undefined)?.cause?.code
+        if (pgCode === '23505') {
           throw new Error('Buku ini sudah punya pengajuan hapus yang menunggu persetujuan.')
         }
         throw err
