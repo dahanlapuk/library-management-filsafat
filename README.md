@@ -1,208 +1,86 @@
-Welcome to your new TanStack Start app!
+# Biblioteka Departemen Filsafat UI
 
-# Getting Started
+Sistem manajemen perpustakaan untuk Program Studi Ilmu Filsafat, Fakultas Ilmu Budaya, Universitas Indonesia. Live di **[biblioteka.filsafatui.app](https://biblioteka.filsafatui.app)**.
 
-To run this application:
+Ini adalah **V2** — migrasi total dari sistem lama (Vue + Go + Neon) ke arsitektur baru, dikerjakan dengan pola *strangler* (bertahap per fitur, tanpa mengganggu operasional intern selama pembangunan).
+
+## Fitur
+
+- Katalog buku publik (baca, cari, filter kategori) tanpa perlu login
+- Peminjaman: mahasiswa (baca di tempat / pinjam sampai tutup hari itu) dan dosen (bawa pulang, 14 hari)
+- Alokasi stok per-lokasi rak, dengan aturan alokasi dari posisi bersisa stok terbesar
+- Manajemen buku, kategori, posisi rak oleh admin
+- Permintaan hapus buku & permintaan kategori baru, dengan alur persetujuan
+- Inventory check (koreksi stok langsung, tanpa approval workflow)
+- Login admin dengan sesi terbatas 8 jam, approval admin baru oleh superadmin
+- Activity log lengkap (siapa melakukan apa, kapan) dengan identitas aktor dari sesi tervalidasi — bukan dari input client
+- Halaman profil admin (ubah nama, WhatsApp, password)
+
+## Stack
+
+| Bagian | Teknologi |
+|---|---|
+| Framework | [TanStack Start](https://tanstack.com/start) (React 19, TanStack Router + Query, server functions) — satu aplikasi untuk frontend & backend |
+| ORM / migrasi | [Drizzle ORM](https://orm.drizzle.team/) |
+| Database | [Supabase](https://supabase.com/) (Postgres + Auth) |
+| Auth | Supabase Auth — khusus identitas admin/staf, bukan untuk peminjam |
+| Hosting | [Vercel](https://vercel.com/) (via Nitro, deploy-anywhere) |
+| Testing | [Vitest](https://vitest.dev/) |
+
+Arsitektur kode: modular monolith, satu folder per domain (`books/`, `loans/`, `members/`, `admin/`).
+
+## Kenapa migrasi dari V1?
+
+Sistem lama (masih bisa dilihat di [pustaka-filsafat-web](https://github.com/dahanlapuk/pustaka-filsafat-web), sudah tidak aktif dan redirect otomatis ke sini) punya beberapa masalah mendasar yang jadi alasan utama V2 dibangun:
+
+- **Otorisasi nyaris tidak ditegakkan di server** — identitas aktor untuk activity log dipercaya dari data yang dikirim client, bukan dari sesi tervalidasi. Ini dibenahi total di V2: setiap aksi admin mencatat log di transaksi yang sama, dengan aktor selalu dari sesi server, bukan request body.
+- **Alokasi stok per-posisi tidak konsisten ditegakkan** saat proses persetujuan peminjaman. V2 mem-port logic alokasi jadi pure function dengan characterization test.
+- **Skema database ad hoc** — sebagian kolom ditambah lewat `ALTER TABLE` manual yang tidak pernah masuk version control. V2 pakai Drizzle sehingga skema selalu versi-terkontrol dan type-safe.
+
+Detail audit lengkap V1 (kalau perlu referensi historis) ada di `docs/v1-audit-notes.md`.
+
+## Menjalankan secara lokal
 
 ```bash
+git clone https://github.com/dahanlapuk/library-management-filsafat.git
+cd library-management-filsafat
 npm install
+```
+
+Buat `.env` (jangan pakai `.env.local` — file itu bisa menang duluan saat load dan menimpa `.env` secara diam-diam):
+
+```
+DATABASE_URL=<connection string Supabase, session pooler>
+SUPABASE_URL=<Project URL Supabase, bukan endpoint /rest/v1/>
+SUPABASE_ANON_KEY=<anon key Supabase>
+```
+
+Jalankan migrasi & mulai dev server:
+
+```bash
+npm run db:generate   # generate migration dari schema.ts
+npm run db:migrate    # terapkan ke database
 npm run dev
 ```
 
-# Building For Production
-
-To build this application for production:
+Route baru wajib diikuti:
 
 ```bash
-npm run build
+npm run generate-routes
 ```
 
-## Styling
+## Deployment
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+Live di Vercel, terhubung otomatis ke branch `main`. Environment variable produksi (`DATABASE_URL` pakai **transaction pooler** Supabase, port `6543` — beda dari `.env` lokal yang pakai session pooler) diatur lewat Vercel Project Settings, bukan file.
 
-### Removing Tailwind CSS
+## Prosedur darurat
 
-If you prefer not to use Tailwind CSS:
+**Lupa password admin:** belum ada alur reset mandiri (menyusul setelah plumbing email custom SMTP selesai). Untuk sekarang, superadmin/pengelola sistem bisa reset lewat **Supabase Dashboard → Authentication → Users** — cari akun berdasarkan email, gunakan opsi reset password dari sana. Pastikan akses dashboard Supabase dipegang oleh lebih dari satu orang tepercaya, supaya tidak ada single point of failure kalau satu orang tidak bisa dihubungi.
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
+## Kontribusi
 
-## Linting & Formatting
+Proyek ini dikelola dan dikembangkan oleh satu developer (mahasiswa Filsafat UI, bukan tim engineering formal). Prioritas desain: *maintainability* dan kesederhanaan jangka panjang di atas fitur yang canggih tapi rumit dirawat.
 
+## Lisensi & kredit
 
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
-
-```bash
-npm run lint
-npm run format
-npm run check
-```
-
-
-## Deploy with Nitro
-
-This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
-
-```bash
-npm run build
-node dist/server/index.mjs
-```
-
-The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
-
-For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Dibangun oleh [Hexadev Technologies](https://www.linkedin.com/in/itbamuhammad/) untuk Program Studi Ilmu Filsafat FIB UI.
