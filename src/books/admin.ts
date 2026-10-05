@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../db'
+import { posisiUrut } from '../db/sort'
 import {
   books,
   bookCategories,
@@ -283,7 +284,7 @@ export const getPosisiList = createServerFn({ method: 'GET' }).handler(
     return db
       .select({ id: posisi.id, kode: posisi.kode, rak: posisi.rak })
       .from(posisi)
-      .orderBy(posisi.kode)
+      .orderBy(...posisiUrut)
   },
 )
 

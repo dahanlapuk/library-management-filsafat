@@ -1,7 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { eq, asc, isNull, sql, ilike, or } from 'drizzle-orm'
+import { eq, isNull, sql, ilike, or } from 'drizzle-orm'
 import { db } from '../db'
+import { judulUrut, posisiUrut } from '../db/sort'
 import { books, bookStockLocations, posisi } from '../db/schema'
 import { requireApprovedAdmin } from '../admin/guards'
 import { logActivity } from '../admin/activity-log'
@@ -25,10 +26,9 @@ import { logActivity } from '../admin/activity-log'
 
 const UNPOSITIONED_LABEL = 'Belum Ditempatkan'
 
-// GET /admin/inventory setara -- list semua rak + bucket "Belum
-// Ditempatkan" + progress checklist. Bucket unpositioned SELALU di
-// posisi pertama (prioritas tertinggi), sisanya diurut rak dengan
-// buku belum-dicek TERBANYAK di atas.
+// List semua rak + bucket "Belum Ditempatkan" + progress checklist.
+// Bucket unpositioned selalu pertama, sisanya menurut urutan fisik
+// rak (posisiUrut). Mode urut-jumlah dikerjakan di klien.
 export const getPosisiWithProgress = createServerFn({ method: 'GET' }).handler(
   async () => {
     await requireApprovedAdmin()
@@ -46,6 +46,7 @@ export const getPosisiWithProgress = createServerFn({ method: 'GET' }).handler(
       .from(posisi)
       .leftJoin(books, eq(books.posisiId, posisi.id))
       .groupBy(posisi.id, posisi.kode, posisi.rak)
+      .orderBy(...posisiUrut)
 
     const [unpositioned] = await db
       .select({
@@ -57,14 +58,7 @@ export const getPosisiWithProgress = createServerFn({ method: 'GET' }).handler(
       .from(books)
       .where(isNull(books.posisiId))
 
-    const sortedRak = rakRows
-      .filter((p) => p.totalBuku > 0)
-      .sort((a, b) => {
-        const belumA = a.totalBuku - a.sudahDicek
-        const belumB = b.totalBuku - b.sudahDicek
-        if (belumB !== belumA) return belumB - belumA
-        return a.kode.localeCompare(b.kode)
-      })
+    const rakTerisi = rakRows.filter((p) => p.totalBuku > 0)
 
     const result: Array<{
       id: number | null
@@ -84,7 +78,7 @@ export const getPosisiWithProgress = createServerFn({ method: 'GET' }).handler(
       })
     }
 
-    result.push(...sortedRak)
+    result.push(...rakTerisi)
     return result
   },
 )
@@ -114,7 +108,7 @@ export const getBooksForInventoryCheck = createServerFn({ method: 'GET' })
           ? isNull(books.posisiId)
           : eq(books.posisiId, data.posisiId),
       )
-      .orderBy(sql`${books.lastChecked} is not null`, asc(books.judul))
+      .orderBy(sql`${books.lastChecked} is not null`, judulUrut)
   })
 
 const searchBooksSchema = z.object({ q: z.string().trim().min(1) })
@@ -144,7 +138,7 @@ export const searchBooksForInventoryCheck = createServerFn({ method: 'GET' })
       .from(books)
       .leftJoin(posisi, eq(books.posisiId, posisi.id))
       .where(or(ilike(books.judul, `%${data.q}%`), ilike(books.kode, `%${data.q}%`)))
-      .orderBy(asc(books.judul))
+      .orderBy(judulUrut)
       .limit(50)
   })
 

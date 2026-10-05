@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { eq, ilike, or, and, sql, asc, desc, inArray, count } from 'drizzle-orm'
 import { db } from '../db'
+import { judulUrut } from '../db/sort'
 import {
   books,
   categories,
@@ -120,7 +121,7 @@ export const getBooks = createServerFn({ method: 'GET' })
       .leftJoin(categories, eq(books.kategoriId, categories.id))
       .leftJoin(posisi, eq(books.posisiId, posisi.id))
       .where(whereClause)
-      .orderBy(asc(books.judul))
+      .orderBy(judulUrut)
       .limit(limit)
       .offset(offset)
 
@@ -202,7 +203,7 @@ export const searchBooks = createServerFn({ method: 'GET' })
       .leftJoin(categories, eq(books.kategoriId, categories.id))
       .leftJoin(posisi, eq(books.posisiId, posisi.id))
       .where(whereClause)
-      .orderBy(asc(books.judul))
+      .orderBy(judulUrut)
       .limit(limit)
       .offset(offset)
 

@@ -51,6 +51,7 @@ function InventoryCheckPage() {
   const queryClient = useQueryClient()
   const [selection, setSelection] = useState<Selection>('none')
   const [drafts, setDrafts] = useState<Record<number, Draft>>({})
+  const [urutan, setUrutan] = useState<'rak' | 'jumlah'>('rak')
 
   // Search lintas SEMUA rak -- independen dari pilihan rak di sidebar,
   // buat kasus "lagi nyari buku spesifik ini ada di mana" ketimbang
@@ -101,7 +102,18 @@ function InventoryCheckPage() {
     },
   })
 
-  const posisiProgressList = posisiProgressQuery.data ?? []
+  const posisiProgress = posisiProgressQuery.data ?? []
+  // Mode 'jumlah': belum-dicek terbanyak di atas. Sort stabil, jadi yang
+  // seri tetap urut rak.
+  const posisiProgressList =
+    urutan === 'rak'
+      ? posisiProgress
+      : [
+          ...posisiProgress.filter((p) => p.id === null),
+          ...posisiProgress
+            .filter((p) => p.id !== null)
+            .sort((a, b) => b.totalBuku - b.sudahDicek - (a.totalBuku - a.sudahDicek)),
+        ]
   const posisiList = posisiListQuery.data ?? []
   const bookList: InventoryBookRow[] = booksQuery.data ?? []
   const searchResults: InventoryBookRow[] = searchQuery.data ?? []
@@ -135,9 +147,31 @@ function InventoryCheckPage() {
         <AdminHeader />
         <div className="flex flex-col md:flex-row gap-6">
         <aside className="w-full md:w-64 shrink-0">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
             Posisi Rak
           </h2>
+          <div className="mb-3 flex gap-1 text-xs">
+            {(
+              [
+                ['rak', 'Urutan rak'],
+                ['jumlah', 'Jumlah'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={urutan === value}
+                onClick={() => setUrutan(value)}
+                className={`border px-2 py-1 ${
+                  urutan === value
+                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] font-semibold'
+                    : 'border-[var(--gray-200)] text-[var(--gray-600)]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           {posisiProgressQuery.isLoading && (
             <p className="text-sm text-[var(--gray-600)]">Memuat...</p>
           )}
