@@ -19,6 +19,7 @@ import { Route as AdminActivityRouteImport } from './routes/admin/activity'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
@@ -79,6 +80,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMaintenanceRoute = AdminMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMembersRoute = AdminMembersRouteImport.update({
   id: '/members',
   path: '/members',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/signup': typeof AdminSignupRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/inventory'
     | '/admin/login'
+    | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
     | '/admin/signup'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/inventory'
     | '/admin/login'
+    | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
     | '/admin/signup'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/inventory'
     | '/admin/login'
+    | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
     | '/admin/signup'
@@ -335,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/maintenance': {
+      id: '/admin/maintenance'
+      path: '/maintenance'
+      fullPath: '/admin/maintenance'
+      preLoaderRoute: typeof AdminMaintenanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/members': {
       id: '/admin/members'
       path: '/members'
@@ -406,6 +425,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminMembersRoute: typeof AdminMembersRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminSignupRoute: typeof AdminSignupRoute
@@ -423,6 +443,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminMembersRoute: AdminMembersRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminSignupRoute: AdminSignupRoute,

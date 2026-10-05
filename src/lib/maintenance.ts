@@ -1,9 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
+import { readMaintenanceMode } from './maintenance-state'
 
-// Server function biar env var MAINTENANCE_MODE dibaca di server,
-// bukan ke-bundle ke client.
-export const isMaintenanceMode = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    return process.env.MAINTENANCE_MODE === 'true'
-  },
+// Server function supaya status dibaca di server (env var dan database
+// tidak ikut ke bundle klien).
+export const getMaintenanceMode = createServerFn({ method: 'GET' }).handler(
+  async () => readMaintenanceMode(),
 )

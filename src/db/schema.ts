@@ -331,3 +331,36 @@ export const loanRequests = pgTable('loan_requests', {
   rejectionNotifiedAt: timestamp('rejection_notified_at'),
   createdAt: timestamp('created_at').defaultNow(),
 })
+
+// ── MAINTENANCE REQUESTS (mode maintenance katalog-saja) ──────────
+// Admin biasa mengajukan, superadmin approve/reject/akhiri. Status
+// 'active' = katalog publik sedang ditutup (admin tetap bisa masuk).
+// Mode penuh tetap env var MAINTENANCE_MODE (saklar darurat).
+export const maintenanceRequestStatusEnum = pgEnum('maintenance_request_status', [
+  'pending',
+  'active',
+  'rejected',
+  'ended',
+])
+
+export const maintenanceRequests = pgTable(
+  'maintenance_requests',
+  {
+    id: serial('id').primaryKey(),
+    alasan: text('alasan').notNull(),
+    status: maintenanceRequestStatusEnum('status').notNull().default('pending'),
+    requestedBy: uuid('requested_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    reviewedAt: timestamp('reviewed_at'),
+    startedAt: timestamp('started_at'),
+    endedBy: uuid('ended_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    endedAt: timestamp('ended_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [
+    // Paling banyak SATU pending dan SATU active di satu waktu.
+    uniqueIndex('maintenance_requests_one_open_per_status')
+      .on(t.status)
+      .where(sql`${t.status} in ('pending', 'active')`),
+  ],
+).enableRLS()

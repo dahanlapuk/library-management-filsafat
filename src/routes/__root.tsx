@@ -1,7 +1,7 @@
 import { Footer } from '../components/Footer'
 import { NotFound } from '../components/NotFound'
 import { HeadContent, Scripts, createRootRoute, redirect } from '@tanstack/react-router'
-import { isMaintenanceMode } from '../lib/maintenance'
+import { getMaintenanceMode } from '../lib/maintenance'
 import { getCanonicalRedirectHost } from '../lib/canonical-domain'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -24,12 +24,17 @@ export const Route = createRootRoute({
       })
     }
 
-    const active = await isMaintenanceMode()
+    // Mode penuh menutup semua rute (admin juga). Mode katalog hanya
+    // menutup rute publik; /admin/* tetap terbuka supaya admin bisa kerja.
+    const mode = await getMaintenanceMode()
+    const blocked =
+      mode === 'full' ||
+      (mode === 'catalog' && !location.pathname.startsWith('/admin'))
     if (location.pathname === '/maintenance') {
-      if (!active) throw redirect({ to: '/' })
+      if (!blocked) throw redirect({ to: '/' })
       return
     }
-    if (active) throw redirect({ to: '/maintenance' })
+    if (blocked) throw redirect({ to: '/maintenance' })
   },
   notFoundComponent: NotFound,
   head: () => ({
