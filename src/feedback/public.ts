@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeader, getRequestHeaders } from '@tanstack/react-start/server'
+import { getRequestHeader } from '@tanstack/react-start/server'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { and, count, eq, gt, sql } from 'drizzle-orm'
@@ -36,11 +36,7 @@ export const submitFeedback = createServerFn({ method: 'POST' })
     const ip = forwarded?.split(',')[0]?.trim() || getRequestHeader('x-real-ip') || null
     const ipHash = createHash('sha256').update(`${salt}:${ip ?? 'unknown'}`).digest('hex')
 
-    if (!ip) {
-      const h = getRequestHeaders()
-      const names = h instanceof Headers ? [...h.keys()] : Object.keys(h)
-      console.warn('submitFeedback: IP klien tidak terbaca; header:', names.join(','))
-    }
+    if (!ip) console.warn('submitFeedback: IP klien tidak terbaca, memakai bucket unknown')
 
     const [{ n }] = await db
       .select({ n: count() })
