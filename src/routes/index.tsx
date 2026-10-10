@@ -655,6 +655,14 @@ function BookDetailModal({
             <LoanRequestSection
               book={{ id: book.id, judul: book.judul, isDipinjam: book.isDipinjam }}
             />
+
+            <Link
+              to="/feedback"
+              search={{ book: book.id, jenis: 'koreksi_buku' }}
+              className="text-xs text-[var(--gray-600)] underline hover:text-[var(--black)]"
+            >
+              Ada data buku yang keliru? Laporkan koreksi
+            </Link>
           </>
         )}
       </div>

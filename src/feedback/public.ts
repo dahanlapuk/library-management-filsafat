@@ -74,3 +74,14 @@ export const submitFeedback = createServerFn({ method: 'POST' })
 
     return { ok: true }
   })
+
+export const getFeedbackBook = createServerFn({ method: 'GET' })
+  .inputValidator(z.object({ id: z.number().int() }))
+  .handler(async ({ data }) => {
+    const [book] = await db
+      .select({ id: books.id, judul: books.judul })
+      .from(books)
+      .where(eq(books.id, data.id))
+      .limit(1)
+    return book ?? null
+  })

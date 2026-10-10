@@ -28,6 +28,9 @@ export function Footer() {
           <Link to="/informasi" className="hover:underline">
             Informasi Biblioteka Filsafat UI
           </Link>
+          <Link to="/feedback" className="hover:underline">
+            Kirim feedback
+          </Link>
           {!isAdminArea && (
             <Link to="/admin/login" className="hover:underline">
               Masuk sebagai admin
