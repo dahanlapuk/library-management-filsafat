@@ -11,20 +11,25 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as InformasiRouteImport } from './routes/informasi'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminActivityRouteImport } from './routes/admin/activity'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as AdminCategorizeRouteImport } from './routes/admin/categorize'
+import { Route as AdminForgotPasswordRouteImport } from './routes/admin/forgot-password'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
+import { Route as AdminResetPasswordRouteImport } from './routes/admin/reset-password'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
 import { Route as AdminBooksIndexRouteImport } from './routes/admin/books/index'
 import { Route as AdminBooksCategoryRequestsRouteImport } from './routes/admin/books/category-requests'
@@ -43,6 +48,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InformasiRoute = InformasiRouteImport.update({
   id: '/informasi',
   path: '/informasi',
@@ -56,6 +66,16 @@ const LoginRoute = LoginRouteImport.update({
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -88,6 +108,11 @@ const AdminCategorizeRoute = AdminCategorizeRouteImport.update({
   path: '/categorize',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInventoryRoute = AdminInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -111,6 +136,11 @@ const AdminMembersRoute = AdminMembersRouteImport.update({
 const AdminProfileRoute = AdminProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminResetPasswordRoute = AdminResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSignupRoute = AdminSignupRouteImport.update({
@@ -154,19 +184,24 @@ const AdminBooksBookIdEditRoute = AdminBooksBookIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -178,19 +213,24 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -204,19 +244,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/books/category-requests': typeof AdminBooksCategoryRequestsRoute
@@ -231,19 +276,24 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/forgot-password'
     | '/informasi'
     | '/login'
     | '/maintenance'
+    | '/signin'
+    | '/signup'
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/reset-password'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
@@ -255,19 +305,24 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/informasi'
     | '/login'
     | '/maintenance'
+    | '/signin'
+    | '/signup'
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/reset-password'
     | '/admin/signup'
     | '/admin'
     | '/admin/books/category-requests'
@@ -280,19 +335,24 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/forgot-password'
     | '/informasi'
     | '/login'
     | '/maintenance'
+    | '/signin'
+    | '/signup'
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/reset-password'
     | '/admin/signup'
     | '/admin/'
     | '/admin/books/category-requests'
@@ -306,9 +366,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   InformasiRoute: typeof InformasiRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -326,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/informasi': {
@@ -347,6 +417,20 @@ declare module '@tanstack/react-router' {
       path: '/maintenance'
       fullPath: '/maintenance'
       preLoaderRoute: typeof MaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -391,6 +475,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategorizeRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/forgot-password': {
+      id: '/admin/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/admin/forgot-password'
+      preLoaderRoute: typeof AdminForgotPasswordRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inventory': {
       id: '/admin/inventory'
       path: '/inventory'
@@ -424,6 +515,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/admin/profile'
       preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reset-password': {
+      id: '/admin/reset-password'
+      path: '/reset-password'
+      fullPath: '/admin/reset-password'
+      preLoaderRoute: typeof AdminResetPasswordRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/signup': {
@@ -483,11 +581,13 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCategorizeRoute: typeof AdminCategorizeRoute
+  AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminMembersRoute: typeof AdminMembersRoute
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminResetPasswordRoute: typeof AdminResetPasswordRoute
   AdminSignupRoute: typeof AdminSignupRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBooksCategoryRequestsRoute: typeof AdminBooksCategoryRequestsRoute
@@ -503,11 +603,13 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCategorizeRoute: AdminCategorizeRoute,
+  AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminMembersRoute: AdminMembersRoute,
   AdminProfileRoute: AdminProfileRoute,
+  AdminResetPasswordRoute: AdminResetPasswordRoute,
   AdminSignupRoute: AdminSignupRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBooksCategoryRequestsRoute: AdminBooksCategoryRequestsRoute,
@@ -523,9 +625,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   InformasiRoute: InformasiRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport

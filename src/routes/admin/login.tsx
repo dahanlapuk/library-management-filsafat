@@ -158,6 +158,12 @@ function AdminLoginPage() {
               >
                 {loading ? 'Memproses...' : 'Masuk'}
               </button>
+
+              <div className="text-center">
+                <Link to="/admin/forgot-password" className="text-sm underline text-[var(--gray-600)] hover:text-[var(--text-primary)]">
+                  Lupa password?
+                </Link>
+              </div>
             </form>
           )}
         </div>

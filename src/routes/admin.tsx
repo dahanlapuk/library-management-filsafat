@@ -2,7 +2,12 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCurrentAdmin } from '../admin/auth'
 
 // Halaman di bawah /admin yang boleh dibuka tanpa login.
-const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/signup']
+const PUBLIC_ADMIN_PATHS = [
+  '/admin/login',
+  '/admin/signup',
+  '/admin/forgot-password',
+  '/admin/reset-password',
+]
 
 // Layout untuk semua route /admin/*. Ini cuma lapisan UX (arahkan ke login
 // kalau sesi tidak valid). Penegakan sebenarnya tetap di guard server function.
