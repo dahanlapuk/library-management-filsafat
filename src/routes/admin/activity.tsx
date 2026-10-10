@@ -5,6 +5,7 @@ import { getCurrentAdmin } from '../../admin/auth'
 import { getActivityLogs } from '../../admin/activity-log'
 import { AdminHeader } from '../../admin/AdminHeader'
 import { errorMessage } from '../../lib/error-message'
+import { actionLabel } from '../../admin/action-labels'
 
 // Superadmin-only: guard di sini (bukan cuma di server function) supaya
 // admin biasa langsung diarahkan balik, bukan lihat halaman kosong/error.
@@ -62,7 +63,7 @@ function AdminActivityPage() {
             <option value="">Semua aksi</option>
             {data?.actions.map((a) => (
               <option key={a} value={a}>
-                {a}
+                {actionLabel(a)}
               </option>
             ))}
           </select>
@@ -101,7 +102,7 @@ function AdminActivityPage() {
                     <tr key={log.id}>
                       <td className={cellClass}>{log.createdAt ? formatWaktu(log.createdAt) : '-'}</td>
                       <td className={cellClass}>{log.adminNama}</td>
-                      <td className={cellClass}>{log.action}</td>
+                      <td className={cellClass}>{actionLabel(log.action)}</td>
                       <td className={cellClass}>
                         {log.entityType ?? '-'}
                         {log.entityName ? ` — ${log.entityName}` : ''}
