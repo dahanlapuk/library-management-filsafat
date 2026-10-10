@@ -30,6 +30,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/admin/inventory', label: 'Inventory Check' },
       { to: '/admin/maintenance', label: 'Maintenance' },
       { to: '/admin/requests', label: 'Request Fitur' },
+      { to: '/admin/feedback', label: 'Feedback Publik' },
       { to: '/admin/approvals', label: 'Approval Admin', superadminOnly: true },
       { to: '/admin/activity', label: 'Activity Log', superadminOnly: true },
     ],
