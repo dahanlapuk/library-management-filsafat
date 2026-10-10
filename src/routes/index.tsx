@@ -656,6 +656,7 @@ function PublicCatalogPage() {
 
   const [categoryFilter, setCategoryFilter] = useState('')
   const [showAllCategories, setShowAllCategories] = useState(false)
+  const [mobileCatOpen, setMobileCatOpen] = useState(false)
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -773,7 +774,18 @@ function PublicCatalogPage() {
           />
 
           <div className="flex flex-col gap-2">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+            <button
+              type="button"
+              onClick={() => setMobileCatOpen((v) => !v)}
+              aria-expanded={mobileCatOpen}
+              className="lg:hidden flex items-center justify-between gap-2 w-full text-left text-sm font-semibold text-[var(--text-primary)] px-3 py-2 border-2 border-[var(--gray-200)]"
+            >
+              <span>
+                Kategori: {categories.find((c) => c.id === selectedKategoriId)?.nama ?? 'Semua Buku'}
+              </span>
+              <span aria-hidden>{mobileCatOpen ? '▴' : '▾'}</span>
+            </button>
+            <h2 className="hidden lg:block text-sm font-semibold text-[var(--text-primary)]">
               Kategori
             </h2>
 
@@ -782,13 +794,16 @@ function PublicCatalogPage() {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               placeholder="Cari kategori..."
-              className="w-full text-xs p-1.5 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+              className={`w-full text-xs p-1.5 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] ${mobileCatOpen ? '' : 'hidden'} lg:block`}
             />
 
-            <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto pr-1">
+            <div className={`flex-col gap-2 lg:max-h-[420px] lg:overflow-y-auto pr-1 ${mobileCatOpen ? 'flex' : 'hidden lg:flex'}`}>
               <button
                 type="button"
-                onClick={() => setSelectedKategoriId(null)}
+                onClick={() => {
+                  setSelectedKategoriId(null)
+                  setMobileCatOpen(false)
+                }}
                 className={`text-left px-3 py-2 border-2 transition-colors ${
                   selectedKategoriId === null
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
@@ -821,7 +836,10 @@ function PublicCatalogPage() {
                     ))}
                   <button
                     type="button"
-                    onClick={() => setSelectedKategoriId(cat.id)}
+                    onClick={() => {
+                      setSelectedKategoriId(cat.id)
+                      setMobileCatOpen(false)
+                    }}
                     className={`flex-1 text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
                       selectedKategoriId === cat.id
                         ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
