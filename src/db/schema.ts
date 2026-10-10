@@ -360,3 +360,31 @@ export const maintenanceRequests = pgTable(
       .where(sql`${t.status} in ('pending', 'active')`),
   ],
 ).enableRLS()
+
+export const featureRequestStatusEnum = pgEnum('feature_request_status', [
+  'baru',
+  'dipertimbangkan',
+  'dikerjakan',
+  'selesai',
+  'ditolak',
+])
+
+export const featureRequestAreaEnum = pgEnum('feature_request_area', [
+  'dashboard',
+  'katalog',
+  'lainnya',
+])
+
+export const featureRequests = pgTable('feature_requests', {
+  id: serial('id').primaryKey(),
+  judul: text('judul').notNull(),
+  deskripsi: text('deskripsi').notNull(),
+  area: featureRequestAreaEnum('area').notNull().default('lainnya'),
+  status: featureRequestStatusEnum('status').notNull().default('baru'),
+  tanggapan: text('tanggapan'),
+  pengirimNama: text('pengirim_nama').notNull(),
+  createdBy: uuid('created_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+  respondedAt: timestamp('responded_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})

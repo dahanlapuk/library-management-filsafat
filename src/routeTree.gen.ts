@@ -30,6 +30,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
+import { Route as AdminRequestsRouteImport } from './routes/admin/requests'
 import { Route as AdminResetPasswordRouteImport } from './routes/admin/reset-password'
 import { Route as AdminSignupRouteImport } from './routes/admin/signup'
 import { Route as AdminBooksIndexRouteImport } from './routes/admin/books/index'
@@ -144,6 +145,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminResetPasswordRoute = AdminResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin': typeof AdminIndexRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/admin/reset-password': typeof AdminResetPasswordRoute
   '/admin/signup': typeof AdminSignupRoute
   '/admin/': typeof AdminIndexRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/requests'
     | '/admin/reset-password'
     | '/admin/signup'
     | '/admin/'
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/requests'
     | '/admin/reset-password'
     | '/admin/signup'
     | '/admin'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/admin/maintenance'
     | '/admin/members'
     | '/admin/profile'
+    | '/admin/requests'
     | '/admin/reset-password'
     | '/admin/signup'
     | '/admin/'
@@ -536,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reset-password': {
       id: '/admin/reset-password'
       path: '/reset-password'
@@ -607,6 +626,7 @@ interface AdminRouteChildren {
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminMembersRoute: typeof AdminMembersRoute
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
   AdminResetPasswordRoute: typeof AdminResetPasswordRoute
   AdminSignupRoute: typeof AdminSignupRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -630,6 +650,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminMembersRoute: AdminMembersRoute,
   AdminProfileRoute: AdminProfileRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
   AdminResetPasswordRoute: AdminResetPasswordRoute,
   AdminSignupRoute: AdminSignupRoute,
   AdminIndexRoute: AdminIndexRoute,
