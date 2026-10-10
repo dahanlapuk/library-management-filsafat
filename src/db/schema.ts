@@ -10,6 +10,8 @@ import {
   uuid,
   unique,
   uniqueIndex,
+  index,
+  primaryKey,
   jsonb,
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core'
@@ -387,4 +389,48 @@ export const featureRequests = pgTable('feature_requests', {
   respondedAt: timestamp('responded_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
+
+export const feedbackJenisEnum = pgEnum('feedback_jenis', ['saran', 'koreksi_buku', 'usul_buku'])
+
+export const feedbackStatusEnum = pgEnum('feedback_status', [
+  'baru',
+  'perlu_perhatian',
+  'diteruskan',
+  'selesai',
+  'ditolak',
+])
+
+export const feedback = pgTable(
+  'feedback',
+  {
+    id: serial('id').primaryKey(),
+    jenis: feedbackJenisEnum('jenis').notNull(),
+    pesan: text('pesan').notNull(),
+    kontak: text('kontak'),
+    bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
+    bookJudulSnapshot: text('book_judul_snapshot'),
+    status: feedbackStatusEnum('status').notNull().default('baru'),
+    ipHash: text('ip_hash').notNull(),
+    requestId: integer('request_id').references(() => featureRequests.id, { onDelete: 'set null' }),
+    handledBy: uuid('handled_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
+    handledAt: timestamp('handled_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => [index('feedback_ip_hash_created_at_idx').on(t.ipHash, t.createdAt)],
+).enableRLS()
+
+export const feedbackVotes = pgTable(
+  'feedback_votes',
+  {
+    feedbackId: integer('feedback_id')
+      .notNull()
+      .references(() => feedback.id, { onDelete: 'cascade' }),
+    adminId: uuid('admin_id')
+      .notNull()
+      .references(() => adminProfiles.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.feedbackId, t.adminId] })],
+).enableRLS()
