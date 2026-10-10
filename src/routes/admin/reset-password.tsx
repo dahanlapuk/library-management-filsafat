@@ -1,17 +1,27 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { completePasswordReset } from '../../admin/password-reset'
+import {
+  checkResetToken,
+  completePasswordReset,
+} from '../../admin/password-reset'
 import { errorMessage } from '../../lib/error-message'
 
 export const Route = createFileRoute('/admin/reset-password')({
   validateSearch: (search: Record<string, unknown>) => ({
     token_hash: typeof search.token_hash === 'string' ? search.token_hash : '',
   }),
+  loaderDeps: ({ search }) => ({ tokenHash: search.token_hash }),
+  loader: async ({ deps }) => ({
+    tokenValid: deps.tokenHash
+      ? await checkResetToken({ data: { tokenHash: deps.tokenHash } })
+      : false,
+  }),
   component: ResetPasswordPage,
 })
 
 function ResetPasswordPage() {
   const { token_hash: tokenHash } = Route.useSearch()
+  const { tokenValid } = Route.useLoaderData()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -61,11 +71,11 @@ function ResetPasswordPage() {
                 Ke halaman login
               </Link>
             </div>
-          ) : !tokenHash ? (
+          ) : !tokenValid ? (
             <div className="text-center flex flex-col gap-3">
               <h2 className="text-xl font-semibold">Tautan Tidak Valid</h2>
               <p className="text-[var(--gray-600)]">
-                Tautan ini tidak lengkap. Minta tautan baru dari halaman lupa password.
+                Tautan ini tidak valid atau sudah kedaluwarsa. Minta tautan baru dari halaman lupa password.
               </p>
               <Link to="/admin/forgot-password" className="text-sm underline text-[var(--text-primary)] mt-2">Minta tautan baru</Link>
             </div>

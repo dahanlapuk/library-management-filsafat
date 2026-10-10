@@ -139,3 +139,20 @@ export const completePasswordReset = createServerFn({ method: 'POST' })
 
     return { success: true }
   })
+
+// Hanya boolean, tanpa info akun. Lapisan UX supaya tautan yang sudah dipakai
+// atau kedaluwarsa langsung ditolak di layar; penentu akhir tetap verifyOtp.
+// Token dihapus Supabase setelah dipakai. Masa berlaku 1 jam = setelan
+// "Email OTP Expiration" (expires_at kosong di project ini); created_at = UTC.
+export const checkResetToken = createServerFn({ method: 'GET' })
+  .inputValidator(z.object({ tokenHash: z.string().min(1) }))
+  .handler(async ({ data }) => {
+    const res = await db.execute(
+      sql`select 1 from auth.one_time_tokens
+          where token_hash = ${data.tokenHash}
+            and token_type = 'recovery_token'
+            and created_at > (now() at time zone 'utc') - interval '1 hour'
+          limit 1`,
+    )
+    return res.rows.length > 0
+  })
