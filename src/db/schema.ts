@@ -242,7 +242,7 @@ export const deleteRequests = pgTable(
     bookJudulSnapshot: text('book_judul_snapshot').notNull(),
     alasan: text('alasan').notNull(),
     status: deleteRequestStatusEnum('status').notNull().default('pending'),
-    requestedBy: uuid('requested_by').notNull().references(() => adminProfiles.id, { onDelete: 'set null' }),
+    requestedBy: uuid('requested_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
     reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
     reviewedAt: timestamp('reviewed_at'),
     createdAt: timestamp('created_at').defaultNow(),
@@ -280,7 +280,7 @@ export const categoryRequests = pgTable(
     nama: text('nama').notNull(),
     alasan: text('alasan'),
     status: categoryRequestStatusEnum('status').notNull().default('pending'),
-    requestedBy: uuid('requested_by').notNull().references(() => adminProfiles.id, { onDelete: 'set null' }),
+    requestedBy: uuid('requested_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
     reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
     reviewedAt: timestamp('reviewed_at'),
     // Diisi pas approve, nyambung ke kategori yang beneran dibuat --

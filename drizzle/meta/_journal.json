@@ -92,6 +92,13 @@
       "when": 1791533073161,
       "tag": "0012_furry_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791636572651,
+      "tag": "0013_rapid_squadron_supreme",
+      "breakpoints": true
     }
   ]
 }
