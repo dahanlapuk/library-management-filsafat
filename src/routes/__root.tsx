@@ -47,8 +47,11 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Biblioteka Departemen Filsafat FIB UI',
+        title: 'Biblioteka Departemen Filsafat UI',
       },
+      { property: 'og:site_name', content: 'Biblioteka Departemen Filsafat UI' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:locale', content: 'id_ID' },
     ],
     links: [
       {
@@ -67,7 +70,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <HeadContent />
       </head>
@@ -75,7 +78,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <div className="flex min-h-screen flex-col">
           <div className="flex-1">{children}</div>
-          <Footer />
+          <div data-nosnippet><Footer /></div>
         </div>
         </QueryClientProvider>
         <TanStackDevtools

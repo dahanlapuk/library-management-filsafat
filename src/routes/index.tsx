@@ -44,11 +44,13 @@ export const Route = createFileRoute('/')({
     const book = loaderData?.book
     if (!book) {
       return {
+        links: [{ rel: 'canonical', href: 'https://biblioteka.filsafatui.app/' }],
         meta: [
           { title: 'Biblioteka Departemen Filsafat UI' },
           {
             name: 'description',
-            content: 'Katalog koleksi Perpustakaan Departemen Filsafat FIB UI.',
+            content:
+              'Katalog koleksi Perpustakaan Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya, Universitas Indonesia. Cari buku, jurnal, dan tugas akhir.',
           },
         ],
       }
@@ -57,6 +59,12 @@ export const Route = createFileRoute('/')({
       .filter(Boolean)
       .join(' · ')
     return {
+      links: [
+        {
+          rel: 'canonical',
+          href: `https://biblioteka.filsafatui.app/?book=${book.id}`,
+        },
+      ],
       meta: [
         { title: `${book.judul} — Biblioteka Departemen Filsafat UI` },
         {
