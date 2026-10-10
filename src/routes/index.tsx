@@ -95,7 +95,54 @@ type CategoryRow = {
   id: number
   nama: string
   grouping: 'bentuk' | 'konten' | 'lain' | null
+  kind: 'kategori' | 'tag'
+  parentId: number | null
+  urutan: number
   bookCount: number
+}
+
+type CategoryNode = {
+  cat: CategoryRow
+  depth: number
+  path: string
+  hasChildren: boolean
+}
+
+function buildCategoryRows(
+  categories: CategoryRow[],
+  isOpen: (id: number) => boolean,
+) {
+  const children = new Map<number | null, CategoryRow[]>()
+  for (const c of categories) {
+    if (c.kind !== 'kategori') continue
+    const list = children.get(c.parentId) ?? []
+    list.push(c)
+    children.set(c.parentId, list)
+  }
+  for (const list of children.values()) {
+    list.sort((a, b) => a.urutan - b.urutan || a.nama.localeCompare(b.nama))
+  }
+
+  const totals = new Map<number, number>()
+  const sum = (c: CategoryRow): number => {
+    const total =
+      c.bookCount + (children.get(c.id) ?? []).reduce((acc, k) => acc + sum(k), 0)
+    totals.set(c.id, total)
+    return total
+  }
+  for (const root of children.get(null) ?? []) sum(root)
+
+  const rows: CategoryNode[] = []
+  const walk = (parentId: number | null, depth: number, path: string[]) => {
+    for (const cat of children.get(parentId) ?? []) {
+      const next = [...path, cat.nama]
+      const kids = children.get(cat.id) ?? []
+      rows.push({ cat, depth, path: next.join(' › '), hasChildren: kids.length > 0 })
+      if (kids.length > 0 && isOpen(cat.id)) walk(cat.id, depth + 1, next)
+    }
+  }
+  walk(null, 0, [])
+  return { rows, totals }
 }
 
 const statusOptions: {
@@ -621,6 +668,7 @@ function PublicCatalogPage() {
 
   const [categoryFilter, setCategoryFilter] = useState('')
   const [showAllCategories, setShowAllCategories] = useState(false)
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -666,32 +714,44 @@ function PublicCatalogPage() {
           }),
   })
 
-  // Kategori diurutkan dari jumlah buku terbanyak. Grouping V1
-  // (bentuk/konten/lain) SENGAJA tidak dipakai untuk mengelompokkan --
-  // kolom itu 100% NULL di seluruh 87 kategori V1 (dikonfirmasi lewat
-  // introspeksi langsung saat migrasi), jadi header grup tidak akan
-  // pernah membedakan apa pun secara nyata. List flat + urutan by
-  // jumlah buku lebih jujur terhadap data yang benar-benar ada.
-  const sortedCategories = useMemo(
-    () => [...categories].sort((a, b) => b.bookCount - a.bookCount),
+  const { rows: allCategoryRows, totals: categoryTotals } = useMemo(
+    () => buildCategoryRows(categories, () => true),
     [categories],
+  )
+  const treeCategoryRows = useMemo(
+    () => buildCategoryRows(categories, (id) => expandedIds.has(id)).rows,
+    [categories, expandedIds],
   )
 
   const filteredCategories = useMemo(() => {
     const term = categoryFilter.trim().toLowerCase()
-    if (!term) return sortedCategories
-    return sortedCategories.filter((c) => c.nama.toLowerCase().includes(term))
-  }, [sortedCategories, categoryFilter])
+    return allCategoryRows.filter((r) => r.path.toLowerCase().includes(term))
+  }, [allCategoryRows, categoryFilter])
 
   const isFilteringCategories = categoryFilter.trim().length > 0
-  const visibleCategories =
-    isFilteringCategories || showAllCategories
-      ? filteredCategories
-      : filteredCategories.slice(0, TOP_CATEGORY_COUNT)
-  const hiddenCategoryCount = Math.max(
-    0,
-    filteredCategories.length - TOP_CATEGORY_COUNT,
-  )
+  const rootCategoryCount = treeCategoryRows.filter((r) => r.depth === 0).length
+  const visibleCategories = useMemo(() => {
+    if (isFilteringCategories) return filteredCategories
+    if (showAllCategories) return treeCategoryRows
+    const out: CategoryNode[] = []
+    let roots = 0
+    for (const row of treeCategoryRows) {
+      if (row.depth === 0) roots++
+      if (roots > TOP_CATEGORY_COUNT) break
+      out.push(row)
+    }
+    return out
+  }, [isFilteringCategories, showAllCategories, filteredCategories, treeCategoryRows])
+  const hiddenCategoryCount = Math.max(0, rootCategoryCount - TOP_CATEGORY_COUNT)
+
+  function toggleExpanded(id: number) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   const books: BookRow[] = result?.data ?? []
   const total = result?.total ?? 0
@@ -750,22 +810,42 @@ function PublicCatalogPage() {
                 Semua Buku
               </button>
 
-              {visibleCategories.map((cat) => (
-                <button
+              {visibleCategories.map(({ cat, depth, path, hasChildren }) => (
+                <div
                   key={cat.id}
-                  type="button"
-                  onClick={() => setSelectedKategoriId(cat.id)}
-                  className={`text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
-                    selectedKategoriId === cat.id
-                      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
-                      : 'border-[var(--gray-200)]'
-                  }`}
+                  className="flex items-stretch gap-1"
+                  style={{ marginLeft: isFilteringCategories ? 0 : depth * 16 }}
                 >
-                  <span>{cat.nama}</span>
-                  <span className="text-xs text-[var(--gray-600)]">
-                    {cat.bookCount}
-                  </span>
-                </button>
+                  {!isFilteringCategories &&
+                    (hasChildren ? (
+                      <button
+                        type="button"
+                        aria-label={
+                          expandedIds.has(cat.id) ? 'Tutup subkategori' : 'Buka subkategori'
+                        }
+                        onClick={() => toggleExpanded(cat.id)}
+                        className="w-7 shrink-0 border-2 border-[var(--gray-200)] text-xs text-[var(--gray-600)]"
+                      >
+                        {expandedIds.has(cat.id) ? '−' : '+'}
+                      </button>
+                    ) : (
+                      <span className="w-7 shrink-0" />
+                    ))}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedKategoriId(cat.id)}
+                    className={`flex-1 text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
+                      selectedKategoriId === cat.id
+                        ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                        : 'border-[var(--gray-200)]'
+                    }`}
+                  >
+                    <span>{isFilteringCategories ? path : cat.nama}</span>
+                    <span className="text-xs text-[var(--gray-600)]">
+                      {categoryTotals.get(cat.id) ?? cat.bookCount}
+                    </span>
+                  </button>
+                </div>
               ))}
 
               {!isFilteringCategories && hiddenCategoryCount > 0 && (

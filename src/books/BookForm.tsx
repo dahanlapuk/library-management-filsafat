@@ -35,6 +35,8 @@ interface BookFormProps {
   onSubmit: (values: BookFormValues) => Promise<void>
 }
 
+const SHOW_TAGS = false
+
 const inputClass =
   'w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]'
 
@@ -328,6 +330,7 @@ export function BookForm({
         )}
       </div>
 
+      {SHOW_TAGS && (
       <div className="flex flex-col gap-2">
         <label className="font-medium">Tag:</label>
         {loadingCategories ? (
@@ -353,6 +356,7 @@ export function BookForm({
           </div>
         )}
       </div>
+      )}
 
       <button
         type="submit"

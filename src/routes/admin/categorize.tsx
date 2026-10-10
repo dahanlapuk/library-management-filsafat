@@ -12,6 +12,7 @@ export const Route = createFileRoute('/admin/categorize')({
 type Mode = 'tanpa' | 'semua' | 'kategori' | 'tag'
 
 const MAX_SELECT = 200
+const SHOW_TAG_ACTIONS = false
 
 function CategorizePage() {
   const queryClient = useQueryClient()
@@ -327,6 +328,7 @@ function CategorizePage() {
               </button>
             </div>
 
+            {SHOW_TAG_ACTIONS && (
             <div className="flex items-center gap-2">
               <select
                 value={tagTarget}
@@ -357,6 +359,7 @@ function CategorizePage() {
                 − Tag
               </button>
             </div>
+            )}
           </div>
         )}
       </div>
