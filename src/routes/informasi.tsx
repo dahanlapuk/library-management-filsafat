@@ -18,11 +18,11 @@ export const Route = createFileRoute('/informasi')({
   loader: () => ({ hari: hariIniJakarta() }),
   head: () => ({
     meta: [
-      { title: 'Informasi Biblioteka (Perpustakaan) Filsafat UI — Lokasi, Jam Buka, Cara Pinjam' },
+      { title: 'Informasi Biblioteka (Perpustakaan) Filsafat UI' },
       {
         name: 'description',
         content:
-          'Lokasi, jam operasional, alur peminjaman, dan tata tertib Biblioteka (perpustakaan) Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya, Universitas Indonesia.',
+          'Lokasi, jam buka, cara pinjam, dan tata tertib Biblioteka (perpustakaan) Filsafat UI, FIB Universitas Indonesia.',
       },
     ],
     links: [{ rel: 'canonical', href: `${SITE_URL}/informasi` }],
@@ -53,7 +53,7 @@ function InformasiPage() {
             ← Kembali ke katalog
           </Link>
           <h1 className="text-3xl font-bold uppercase tracking-[0.08em] sm:text-4xl">
-            Informasi Biblioteka
+            Informasi Biblioteka Filsafat UI
           </h1>
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--gray-600)]">
             Perpustakaan Departemen Filsafat UI

@@ -63,11 +63,11 @@ export const Route = createFileRoute('/')({
           },
         ],
         meta: [
-          { title: 'Biblioteka (Perpustakaan) Departemen Filsafat UI — Katalog Buku' },
+          { title: 'Biblioteka (Perpustakaan) Filsafat UI — Katalog Buku' },
           {
             name: 'description',
             content:
-              'Katalog daring Biblioteka (perpustakaan) Departemen Filsafat FIB UI: cari buku, jurnal, dan skripsi, lalu ajukan peminjaman.',
+              'Katalog daring Biblioteka (perpustakaan) Filsafat UI: cari buku, jurnal, dan skripsi, lalu ajukan pinjam.',
           },
         ],
       }

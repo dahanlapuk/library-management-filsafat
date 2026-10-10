@@ -57,11 +57,11 @@ function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-page)] p-5">
       <div className="w-full max-w-[480px]">
         <div className="text-center mb-6">
-          <h1 className="text-[2rem] font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-            PUSTAKA FILSAFAT
+          <h1 className="text-[1.5rem] leading-tight font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
+            BIBLIOTEKA FILSAFAT UI
           </h1>
           <p className="text-[var(--gray-600)]">
-            Sistem Biblioteka Prodi Filsafat FIB UI
+            Sistem Pengelolaan Katalog dan Peminjaman
           </p>
         </div>
 

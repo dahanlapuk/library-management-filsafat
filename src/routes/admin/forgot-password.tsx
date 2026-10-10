@@ -48,7 +48,7 @@ function ForgotPasswordPage() {
       <div className="w-full max-w-[480px]">
         <div className="text-center mb-6">
           <h1 className="text-[1.5rem] leading-tight font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-            BIBLIOTEKA DEPARTEMEN FILSAFAT UI
+            BIBLIOTEKA FILSAFAT UI
           </h1>
           <p className="text-[var(--gray-600)]">Lupa Password Admin</p>
         </div>

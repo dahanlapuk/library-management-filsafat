@@ -10,7 +10,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:flex-row sm:justify-between">
         <div className="max-w-sm">
           <p className="text-sm font-bold uppercase tracking-[0.15em]">
-            Perpustakaan Departemen <span className="text-[var(--accent)]">Filsafat</span>
+            Biblioteka Departemen <span className="text-[var(--accent)]">Filsafat</span> UI
           </p>
           <p className="mt-2 text-xs opacity-70">
             Koleksi Buku Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya,
@@ -26,7 +26,7 @@ export function Footer() {
             Katalog buku
           </Link>
           <Link to="/informasi" className="hover:underline">
-            Informasi Biblioteka
+            Informasi Biblioteka Filsafat UI
           </Link>
           {!isAdminArea && (
             <Link to="/admin/login" className="hover:underline">
@@ -39,11 +39,11 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4 text-xs sm:flex-row sm:items-center sm:justify-between">
           <span className="opacity-70">
-            © {year} Perpustakaan Departemen Filsafat FIB UI
+            © {year} Biblioteka Departemen Filsafat UI
           </span>
           <span>
             Created by{' '}
-            <a href="https://www.linkedin.com/in/itbamuhammad/"
+            <a href="https://itbamuhammad.me"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-[var(--accent)] hover:underline"
