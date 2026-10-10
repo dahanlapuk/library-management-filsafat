@@ -1,0 +1,1 @@
+ALTER TABLE "admin_profiles" ADD COLUMN "is_developer" boolean DEFAULT false NOT NULL;
