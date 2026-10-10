@@ -81,7 +81,7 @@ export function AdminHeader() {
             className="flex shrink-0 items-center"
           >
             <img
-              src="/favicon.svg"
+              src="/icon-192.png"
               alt="Biblioteka Departemen Filsafat UI"
               className="h-8 w-8 rounded"
             />
