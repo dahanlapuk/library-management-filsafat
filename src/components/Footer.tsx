@@ -25,6 +25,9 @@ export function Footer() {
           <Link to="/" className="hover:underline">
             Katalog buku
           </Link>
+          <Link to="/informasi" className="hover:underline">
+            Informasi Biblioteka
+          </Link>
           {!isAdminArea && (
             <Link to="/admin/login" className="hover:underline">
               Masuk sebagai admin

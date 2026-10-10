@@ -33,6 +33,10 @@ export const Route = createFileRoute('/sitemap.xml')({
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${SITE_URL}/informasi</loc>
+    <changefreq>yearly</changefreq>
+  </url>
 ${bookUrls}
 </urlset>`
 

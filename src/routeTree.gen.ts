@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as InformasiRouteImport } from './routes/informasi'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InformasiRoute = InformasiRouteImport.update({
+  id: '/informasi',
+  path: '/informasi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -148,6 +154,7 @@ const AdminBooksBookIdEditRoute = AdminBooksBookIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/informasi': typeof InformasiRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/informasi'
     | '/login'
     | '/maintenance'
     | '/sitemap.xml'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/informasi'
     | '/login'
     | '/maintenance'
     | '/sitemap.xml'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/informasi'
     | '/login'
     | '/maintenance'
     | '/sitemap.xml'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  InformasiRoute: typeof InformasiRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/informasi': {
+      id: '/informasi'
+      path: '/informasi'
+      fullPath: '/informasi'
+      preLoaderRoute: typeof InformasiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -503,6 +523,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  InformasiRoute: InformasiRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

@@ -45,12 +45,29 @@ export const Route = createFileRoute('/')({
     if (!book) {
       return {
         links: [{ rel: 'canonical', href: 'https://biblioteka.filsafatui.app/' }],
+        scripts: [
+          {
+            type: 'application/ld+json',
+            children: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Biblioteka Departemen Filsafat UI',
+              alternateName: [
+                'Perpustakaan Filsafat UI',
+                'Perpustakaan Departemen Filsafat UI',
+                'Pustaka Filsafat UI',
+                'Biblioteka Filsafat UI',
+              ],
+              url: 'https://biblioteka.filsafatui.app/',
+            }),
+          },
+        ],
         meta: [
-          { title: 'Biblioteka Departemen Filsafat UI' },
+          { title: 'Biblioteka (Perpustakaan) Departemen Filsafat UI — Katalog Buku' },
           {
             name: 'description',
             content:
-              'Katalog koleksi Perpustakaan Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya, Universitas Indonesia. Cari buku, jurnal, dan tugas akhir.',
+              'Katalog daring Biblioteka (perpustakaan) Departemen Filsafat FIB UI: cari buku, jurnal, dan skripsi, lalu ajukan peminjaman.',
           },
         ],
       }
