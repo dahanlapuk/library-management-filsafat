@@ -27,7 +27,6 @@ function AdminBooksPage() {
   const [requestingId, setRequestingId] = useState<number | null>(null)
   const [error, setError] = useState('')
 
-  // Debounce 350ms -- sama seperti pola search di katalog publik.
   useEffect(() => {
     const t = setTimeout(() => {
       setSearch(rawSearch)
@@ -41,9 +40,7 @@ function AdminBooksPage() {
     queryFn: () => getCurrentAdmin(),
   })
 
-  // Cuma dipanggil kalau superadmin -- server function ini sendiri
-  // dijaga requireSuperadmin, query di-skip untuk admin biasa supaya
-  // tidak dapat error mentah di UI (pola sama seperti approvals.tsx).
+  // Hanya superadmin: server function-nya dijaga requireSuperadmin.
   const { data: pendingDeleteRequests = [] } = useQuery({
     queryKey: ['pending-delete-requests'],
     queryFn: () => getPendingDeleteRequests(),
@@ -60,6 +57,8 @@ function AdminBooksPage() {
     queryKey: ['categories'],
     queryFn: () => getCategories(),
   })
+
+  const kategoriLabel = new Map(kategoriOptions(categories).map((o) => [o.id, o.label]))
 
   const isSearching = search.trim().length > 0
 
@@ -90,15 +89,11 @@ function AdminBooksPage() {
     }
   }
 
-  // Admin biasa (bukan superadmin) tidak boleh hapus langsung -- cuma
-  // bisa mengajukan. window.prompt dipakai buat alasan, konsisten
-  // dengan pola window.confirm yang sudah ada di sini, tanpa perlu
-  // bikin komponen modal baru untuk aksi sekecil ini.
   async function handleRequestDelete(id: number, judul: string) {
     const alasan = window.prompt(
       `Alasan pengajuan hapus buku "${judul}" (minimal 5 karakter):`,
     )
-    if (alasan === null) return // dibatalkan
+    if (alasan === null) return
     if (alasan.trim().length < 5) {
       setError('Alasan minimal 5 karakter.')
       return
@@ -211,7 +206,7 @@ function AdminBooksPage() {
                       {book.judul}
                     </span>
                     <span className="text-sm text-[var(--gray-600)]">
-                      {book.kode || '(tanpa kode)'} · {book.kategoriNama ?? '-'} ·
+                      {book.kode || '(tanpa kode)'} · {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ?? book.kategoriNama ?? '-'} ·
                       qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'} ·{' '}
                       {book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
                     </span>

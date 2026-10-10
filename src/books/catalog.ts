@@ -11,48 +11,64 @@ import {
   bookStockLocations,
 } from '../db/schema'
 
-// ── Katalog buku — Fase 1, READ-ONLY, akses publik (tanpa login) ────────
-// Edit/create/delete buku menyusul lewat admin dashboard (server functions
-// terpisah, dilindungi requireApprovedAdmin/requireSuperadmin).
-//
-// Behavior sengaja meniru V1 (handlers/books.go, handlers/categories.go,
-// handlers/inventory_split.go) untuk parity: pagination, filter kategori/
-// tag/posisi/status, sort judul ASC. Dua penyesuaian sadar dari V1:
-//   1. Status pinjam cuma boolean (isDipinjam) -- TIDAK expose nama
-//      peminjam ke publik (beda dari V1 yang menampilkan nama_peminjam).
-//      Hanya admin yang tahu siapa peminjamnya (lewat modul loans nanti).
-//   2. isDipinjam dihitung pakai EXISTS subquery, bukan LEFT JOIN ke
-//      `loans` seperti V1 -- LEFT JOIN tanpa agregasi bisa menghasilkan
-//      baris duplikat kalau buku multi-copy (qty > 1) punya lebih dari
-//      satu pinjaman aktif bersamaan. Ini bug fix di jalur baca saja,
-//      tidak menyentuh data.
+// Katalog publik (tanpa login). isDipinjam sengaja boolean: nama peminjam tidak
+// pernah diekspos. Dihitung dengan EXISTS supaya buku multi-copy tidak menggandakan baris.
 
 const isDipinjamExpr = sql<boolean>`EXISTS (
   SELECT 1 FROM loans l
   WHERE l.book_id = ${books.id} AND l.tanggal_kembali IS NULL
 )`
 
-// Ambil tags (many-to-many via book_categories) untuk sekumpulan buku
-// sekaligus, lalu digabung di JS -- lebih sederhana & gampang dirawat
-// dibanding json_agg LATERAL join ala V1, tanpa kehilangan fungsinya.
+const PATH_TTL_MS = 30_000
+let pathCache: { map: Map<number, string>; expires: number } | null = null
+
+async function getCategoryPaths() {
+  if (pathCache && pathCache.expires > Date.now()) return pathCache.map
+
+  const rows = await db
+    .select({ id: categories.id, nama: categories.nama, parentId: categories.parentId })
+    .from(categories)
+  const byId = new Map(rows.map((r) => [r.id, r]))
+
+  const map = new Map<number, string>()
+  for (const row of rows) {
+    const parts: string[] = []
+    let cur: typeof row | undefined = row
+    while (cur) {
+      parts.unshift(cur.nama)
+      cur = cur.parentId === null ? undefined : byId.get(cur.parentId)
+    }
+    map.set(row.id, parts.join(' › '))
+  }
+  pathCache = { map, expires: Date.now() + PATH_TTL_MS }
+  return map
+}
+
 async function getTagsForBooks(bookIds: number[]) {
   const map = new Map<number, { id: number; nama: string }[]>()
   if (bookIds.length === 0) return map
 
-  const rows = await db
-    .select({
-      bookId: bookCategories.bookId,
-      id: categories.id,
-      nama: categories.nama,
-    })
-    .from(bookCategories)
-    .innerJoin(categories, eq(bookCategories.categoryId, categories.id))
-    .where(inArray(bookCategories.bookId, bookIds))
-    .orderBy(asc(categories.nama))
+  const [rows, paths] = await Promise.all([
+    db
+      .select({
+        bookId: bookCategories.bookId,
+        id: categories.id,
+        nama: categories.nama,
+        kind: categories.kind,
+      })
+      .from(bookCategories)
+      .innerJoin(categories, eq(bookCategories.categoryId, categories.id))
+      .where(inArray(bookCategories.bookId, bookIds))
+      .orderBy(asc(categories.nama)),
+    getCategoryPaths(),
+  ])
 
   for (const row of rows) {
     const arr = map.get(row.bookId) ?? []
-    arr.push({ id: row.id, nama: row.nama })
+    arr.push({
+      id: row.id,
+      nama: row.kind === 'kategori' ? (paths.get(row.id) ?? row.nama) : row.nama,
+    })
     map.set(row.bookId, arr)
   }
   return map
@@ -87,7 +103,6 @@ function inKategoriSubtree(kategoriId: number) {
   )`
 }
 
-// GET /books setara -- list buku dengan pagination + filter.
 export const getBooks = createServerFn({ method: 'GET' })
   .inputValidator(bookFilterSchema)
   .handler(async ({ data }) => {
@@ -147,16 +162,14 @@ export const getBooks = createServerFn({ method: 'GET' })
   })
 
 const searchBooksSchema = bookFilterSchema
-  .omit({ posisiId: true }) // V1 SearchBooks tidak dukung filter posisiId, cuma kategoriId/tagId/status
+  .omit({ posisiId: true })
   .extend({ q: z.string() })
 
-// GET /books/search setara -- ILIKE di judul/kode/keterangan/nama kategori/nama tag.
 export const searchBooks = createServerFn({ method: 'GET' })
   .inputValidator(searchBooksSchema)
   .handler(async ({ data }) => {
     const { q, page, limit, kategoriId, tagId, status } = data
 
-    // Parity dengan V1: query kosong balikin hasil kosong, bukan semua buku.
     if (!q.trim()) {
       return { data: [], total: 0, page: 1, limit, totalPages: 0 }
     }
@@ -230,7 +243,6 @@ export const searchBooks = createServerFn({ method: 'GET' })
 
 const getBookSchema = z.object({ id: z.number().int() })
 
-// GET /books/:id setara -- detail satu buku.
 export const getBook = createServerFn({ method: 'GET' })
   .inputValidator(getBookSchema)
   .handler(async ({ data }) => {
@@ -315,7 +327,6 @@ export const getBookStockBreakdown = createServerFn({ method: 'GET' })
     }
   })
 
-// GET /categories setara -- list kategori + grouping + jumlah buku.
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async () => {
     return db

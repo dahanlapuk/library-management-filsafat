@@ -408,11 +408,7 @@ function LoanRequestSection({
   )
 }
 
-// Card ini sendiri sebuah Link (search param ?book=id) -- klik di mana
-// pun di kartu membuka modal detail, tanpa navigasi ke halaman baru.
 function BookCard({ book }: { book: BookRow }) {
-  // Kategori utama ditaruh paling depan di antara tag, bukan urutan
-  // insersi asal dari server.
   const orderedTags =
     book.kategoriId != null
       ? [...book.tags].sort((a, b) =>
@@ -427,7 +423,6 @@ function BookCard({ book }: { book: BookRow }) {
       className="text-left border-2 border-[var(--black)] bg-[var(--white)] flex flex-col h-full hover:bg-[var(--gray-100)] transition-colors overflow-hidden"
     >
       <div className="flex-1 flex flex-col p-4">
-        {/* Grup atas: judul + penulis, tinggi natural, beda-beda per buku. */}
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
             <span className="font-semibold text-[var(--text-primary)] leading-snug">
@@ -485,9 +480,6 @@ function BookCard({ book }: { book: BookRow }) {
         </div>
       </div>
 
-      {/* Posisi rak sebagai footer full-bleed -- info paling penting
-          buat intern yang nyari fisik bukunya, sengaja dibikin paling
-          menonjol di kartu. */}
       {book.posisiKode && (
         <div className="bg-[var(--black)] text-[var(--white)] text-center font-bold tracking-widest py-2 text-sm">
           {book.posisiKode.replace(/-/g, ' - ')}
@@ -497,10 +489,6 @@ function BookCard({ book }: { book: BookRow }) {
   )
 }
 
-// Modal detail buku, dikendalikan lewat search param ?book=<id> di route
-// ini sendiri -- jadi tetap bisa dibagikan/dibuka lewat link langsung
-// (refresh halaman dengan ?book=123 di URL akan langsung membuka modal
-// yang sama), tanpa perlu route/halaman terpisah.
 function BookDetailModal({
   bookId,
   initialBook,
