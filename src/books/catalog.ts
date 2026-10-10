@@ -76,6 +76,17 @@ function statusCondition(status: 'dipinjam' | 'tersedia' | undefined) {
   return undefined
 }
 
+function inKategoriSubtree(kategoriId: number) {
+  return sql`${books.kategoriId} in (
+    with recursive sub(id) as (
+      select id from categories where id = ${kategoriId}
+      union all
+      select c.id from categories c join sub on c.parent_id = sub.id
+    )
+    select id from sub
+  )`
+}
+
 // GET /books setara -- list buku dengan pagination + filter.
 export const getBooks = createServerFn({ method: 'GET' })
   .inputValidator(bookFilterSchema)
@@ -84,7 +95,7 @@ export const getBooks = createServerFn({ method: 'GET' })
     const offset = (page - 1) * limit
 
     const conditions = []
-    if (kategoriId) conditions.push(eq(books.kategoriId, kategoriId))
+    if (kategoriId) conditions.push(inKategoriSubtree(kategoriId))
     if (posisiId) conditions.push(eq(books.posisiId, posisiId))
     if (tagId) {
       conditions.push(
@@ -166,7 +177,7 @@ export const searchBooks = createServerFn({ method: 'GET' })
     )
 
     const conditions = [searchCond]
-    if (kategoriId) conditions.push(eq(books.kategoriId, kategoriId))
+    if (kategoriId) conditions.push(inKategoriSubtree(kategoriId))
     if (tagId) {
       conditions.push(
         sql`EXISTS (SELECT 1 FROM ${bookCategories} WHERE ${bookCategories.bookId} = ${books.id} AND ${bookCategories.categoryId} = ${tagId})`,
@@ -312,11 +323,21 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
         id: categories.id,
         nama: categories.nama,
         grouping: categories.grouping,
+        kind: categories.kind,
+        parentId: categories.parentId,
+        urutan: categories.urutan,
         bookCount: count(books.id),
       })
       .from(categories)
       .leftJoin(books, eq(books.kategoriId, categories.id))
-      .groupBy(categories.id, categories.nama, categories.grouping)
+      .groupBy(
+        categories.id,
+        categories.nama,
+        categories.grouping,
+        categories.kind,
+        categories.parentId,
+        categories.urutan,
+      )
       .orderBy(asc(categories.nama))
   },
 )

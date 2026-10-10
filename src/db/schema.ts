@@ -11,6 +11,7 @@ import {
   unique,
   uniqueIndex,
   jsonb,
+  type AnyPgColumn,
 } from 'drizzle-orm/pg-core'
 import { relations, sql } from 'drizzle-orm'
 
@@ -21,6 +22,7 @@ export const memberRoleEnum = pgEnum('member_role', ['mahasiswa', 'dosen'])
 // sebenarnya query-nya role='dosen', bukan filter kolom ini).
 export const memberJenjangEnum = pgEnum('member_jenjang', ['S1', 'S2', 'S3'])
 export const categoryGroupingEnum = pgEnum('category_grouping', ['bentuk', 'konten', 'lain'])
+export const categoryKindEnum = pgEnum('category_kind', ['kategori', 'tag'])
 
 // ── ADMIN (identitas terhubung ke Supabase Auth) ────────────────
 // id di sini SAMA dengan auth.users.id — bukan bikin sistem auth sendiri lagi
@@ -38,11 +40,25 @@ export const adminProfiles = pgTable('admin_profiles', {
 })
 
 // ── CATEGORIES ───────────────────────────────────────────────────
-export const categories = pgTable('categories', {
-  id: serial('id').primaryKey(),
-  nama: text('nama').notNull().unique(),
-  grouping: categoryGroupingEnum('grouping'),
-})
+export const categories = pgTable(
+  'categories',
+  {
+    id: serial('id').primaryKey(),
+    nama: text('nama').notNull(),
+    grouping: categoryGroupingEnum('grouping'),
+    // 'kategori' = simpul pohon; 'tag' = label topik bebas
+    kind: categoryKindEnum('kind').notNull().default('kategori'),
+    parentId: integer('parent_id').references((): AnyPgColumn => categories.id, {
+      onDelete: 'restrict',
+    }),
+    urutan: integer('urutan').notNull().default(0),
+  },
+  (t) => [
+    unique('categories_kind_parent_nama_unique')
+      .on(t.kind, t.parentId, t.nama)
+      .nullsNotDistinct(),
+  ],
+)
 
 // ── POSISI (rak) ─────────────────────────────────────────────────
 export const posisi = pgTable('posisi', {

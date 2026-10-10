@@ -17,6 +17,8 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminActivityRouteImport } from './routes/admin/activity'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
+import { Route as AdminCategorizeRouteImport } from './routes/admin/categorize'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
@@ -68,6 +70,16 @@ const AdminActivityRoute = AdminActivityRouteImport.update({
 const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategorizeRoute = AdminCategorizeRouteImport.update({
+  id: '/categorize',
+  path: '/categorize',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminInventoryRoute = AdminInventoryRouteImport.update({
@@ -141,6 +153,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/categorize': typeof AdminCategorizeRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
@@ -162,6 +176,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/categorize': typeof AdminCategorizeRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
@@ -185,6 +201,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/categorize': typeof AdminCategorizeRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
@@ -209,6 +227,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
+    | '/admin/categories'
+    | '/admin/categorize'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
@@ -230,6 +250,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
+    | '/admin/categories'
+    | '/admin/categorize'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
@@ -252,6 +274,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/activity'
     | '/admin/approvals'
+    | '/admin/categories'
+    | '/admin/categorize'
     | '/admin/inventory'
     | '/admin/login'
     | '/admin/maintenance'
@@ -331,6 +355,20 @@ declare module '@tanstack/react-router' {
       path: '/approvals'
       fullPath: '/admin/approvals'
       preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categorize': {
+      id: '/admin/categorize'
+      path: '/categorize'
+      fullPath: '/admin/categorize'
+      preLoaderRoute: typeof AdminCategorizeRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/inventory': {
@@ -423,6 +461,8 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCategorizeRoute: typeof AdminCategorizeRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
@@ -441,6 +481,8 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCategorizeRoute: AdminCategorizeRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMaintenanceRoute: AdminMaintenanceRoute,

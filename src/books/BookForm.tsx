@@ -2,15 +2,17 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getCategories } from './catalog'
 import { getPosisiList, requestCategory } from './admin'
+import { kategoriOptions, tagOptions } from './category-options'
 
 export interface BookFormValues {
   kode: string
   judul: string
   penulis: string
-  tahun: string // string di form (input text/number kosong-able), di-parse ke number|undefined saat submit
+  tahun: string
   keterangan: string
   qty: string
-  categoryIds: number[]
+  kategoriId: number | null
+  tagIds: number[]
   posisiId: number | null
 }
 
@@ -21,7 +23,8 @@ export const emptyBookFormValues: BookFormValues = {
   tahun: '',
   keterangan: '',
   qty: '1',
-  categoryIds: [],
+  kategoriId: null,
+  tagIds: [],
   posisiId: null,
 }
 
@@ -32,10 +35,9 @@ interface BookFormProps {
   onSubmit: (values: BookFormValues) => Promise<void>
 }
 
-// Form CRUD buku dipakai bersama oleh new.tsx (create) dan
-// $bookId.edit.tsx (edit) -- field-nya identik, cuma beda default value
-// dan handler submit-nya (createBook vs updateBook), jadi dipusatkan di
-// sini daripada duplikat JSX.
+const inputClass =
+  'w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]'
+
 export function BookForm({
   initialValues,
   submitLabel,
@@ -46,8 +48,6 @@ export function BookForm({
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  // Form kecil buat ajukan kategori baru -- inline, gak perlu modal
-  // terpisah karena cuma dua field (nama + alasan opsional).
   const [showCategoryRequest, setShowCategoryRequest] = useState(false)
   const [categoryRequestNama, setCategoryRequestNama] = useState('')
   const [categoryRequestAlasan, setCategoryRequestAlasan] = useState('')
@@ -64,6 +64,9 @@ export function BookForm({
     queryKey: ['posisi-list'],
     queryFn: () => getPosisiList(),
   })
+
+  const kategoriList = kategoriOptions(categories)
+  const tagList = tagOptions(categories)
 
   async function handleSubmitCategoryRequest() {
     if (!categoryRequestNama.trim()) {
@@ -94,23 +97,17 @@ export function BookForm({
     }
   }
 
-  function toggleCategory(id: number) {
+  function toggleTag(id: number) {
     setValues((v) => ({
       ...v,
-      categoryIds: v.categoryIds.includes(id)
-        ? v.categoryIds.filter((c) => c !== id)
-        : [...v.categoryIds, id],
+      tagIds: v.tagIds.includes(id) ? v.tagIds.filter((t) => t !== id) : [...v.tagIds, id],
     }))
   }
 
-  // Validasi ringan client-side -- cuma mencegah submit yang jelas gagal
-  // (judul kosong, qty < 1, kategori/posisi belum dipilih). Validasi
-  // "asli" tetap di bookInputSchema (Zod) sisi server.
   function validate(): string | null {
     if (!values.judul.trim()) return 'Judul wajib diisi.'
     const qty = Number(values.qty)
     if (!Number.isInteger(qty) || qty < 1) return 'Qty minimal 1.'
-    if (values.categoryIds.length === 0) return 'Pilih minimal satu kategori.'
     if (values.posisiId === null) return 'Posisi rak wajib dipilih.'
     return null
   }
@@ -137,9 +134,7 @@ export function BookForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && (
-        <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">
-          {error}
-        </div>
+        <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">{error}</div>
       )}
 
       <div className="flex flex-col gap-2">
@@ -152,7 +147,7 @@ export function BookForm({
           value={values.judul}
           onChange={(e) => setValues((v) => ({ ...v, judul: e.target.value }))}
           required
-          className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className={inputClass}
         />
       </div>
 
@@ -167,7 +162,7 @@ export function BookForm({
             value={values.kode}
             onChange={(e) => setValues((v) => ({ ...v, kode: e.target.value }))}
             placeholder="(boleh kosong)"
-            className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className={inputClass}
           />
         </div>
 
@@ -180,7 +175,7 @@ export function BookForm({
             type="number"
             value={values.tahun}
             onChange={(e) => setValues((v) => ({ ...v, tahun: e.target.value }))}
-            className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className={inputClass}
           />
         </div>
       </div>
@@ -194,7 +189,7 @@ export function BookForm({
           type="text"
           value={values.penulis}
           onChange={(e) => setValues((v) => ({ ...v, penulis: e.target.value }))}
-          className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className={inputClass}
         />
       </div>
 
@@ -205,11 +200,9 @@ export function BookForm({
         <textarea
           id="keterangan"
           value={values.keterangan}
-          onChange={(e) =>
-            setValues((v) => ({ ...v, keterangan: e.target.value }))
-          }
+          onChange={(e) => setValues((v) => ({ ...v, keterangan: e.target.value }))}
           rows={3}
-          className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className={inputClass}
         />
       </div>
 
@@ -225,7 +218,7 @@ export function BookForm({
             value={values.qty}
             onChange={(e) => setValues((v) => ({ ...v, qty: e.target.value }))}
             required
-            className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className={inputClass}
           />
         </div>
 
@@ -244,7 +237,7 @@ export function BookForm({
             }
             disabled={loadingPosisi}
             required
-            className="w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] bg-[var(--white)]"
+            className={`${inputClass} bg-[var(--white)]`}
           >
             <option value="">-- Pilih posisi --</option>
             {posisiList.map((p) => (
@@ -257,32 +250,28 @@ export function BookForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="font-medium">
-          Kategori: <span className="text-[#c00]">*</span>
+        <label htmlFor="kategori" className="font-medium">
+          Kategori utama:
         </label>
-        {loadingCategories ? (
-          <p className="text-[var(--gray-600)] text-sm">Memuat kategori...</p>
-        ) : (
-          <div className="border-2 border-[var(--gray-200)] max-h-[220px] overflow-y-auto flex flex-col">
-            {categories.map((cat) => (
-              <label
-                key={cat.id}
-                className="flex items-center gap-3 px-3 py-2 border-b border-[var(--gray-100)] last:border-b-0 cursor-pointer hover:bg-[var(--gray-100)]"
-              >
-                <input
-                  type="checkbox"
-                  checked={values.categoryIds.includes(cat.id)}
-                  onChange={() => toggleCategory(cat.id)}
-                  className="w-4 h-4 accent-[var(--black)]"
-                />
-                <span>{cat.nama}</span>
-              </label>
-            ))}
-          </div>
-        )}
-        <p className="text-xs text-[var(--gray-600)]">
-          Kategori pertama yang dicentang jadi kategori utama buku.
-        </p>
+        <select
+          id="kategori"
+          value={values.kategoriId ?? ''}
+          onChange={(e) =>
+            setValues((v) => ({
+              ...v,
+              kategoriId: e.target.value ? Number(e.target.value) : null,
+            }))
+          }
+          disabled={loadingCategories}
+          className={`${inputClass} bg-[var(--white)]`}
+        >
+          <option value="">-- Belum dikategorikan --</option>
+          {kategoriList.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
 
         {categoryRequestSuccess && (
           <p className="text-xs text-[var(--accent)]">{categoryRequestSuccess}</p>
@@ -335,6 +324,32 @@ export function BookForm({
                 Batal
               </button>
             </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="font-medium">Tag:</label>
+        {loadingCategories ? (
+          <p className="text-[var(--gray-600)] text-sm">Memuat tag...</p>
+        ) : tagList.length === 0 ? (
+          <p className="text-[var(--gray-600)] text-sm">Belum ada tag.</p>
+        ) : (
+          <div className="border-2 border-[var(--gray-200)] max-h-[180px] overflow-y-auto flex flex-col">
+            {tagList.map((t) => (
+              <label
+                key={t.id}
+                className="flex items-center gap-3 px-3 py-2 border-b border-[var(--gray-100)] last:border-b-0 cursor-pointer hover:bg-[var(--gray-100)]"
+              >
+                <input
+                  type="checkbox"
+                  checked={values.tagIds.includes(t.id)}
+                  onChange={() => toggleTag(t.id)}
+                  className="w-4 h-4 accent-[var(--black)]"
+                />
+                <span>{t.label}</span>
+              </label>
+            ))}
           </div>
         )}
       </div>

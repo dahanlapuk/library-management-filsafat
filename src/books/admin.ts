@@ -34,11 +34,14 @@ const bookInputSchema = z.object({
   tahun: z.number().int().optional(),
   keterangan: z.string().trim().min(1).optional(),
   qty: z.number().int().min(1, 'Qty minimal 1.'),
-  categoryIds: z
-    .array(z.number().int())
-    .min(1, 'Pilih minimal satu kategori.'),
+  kategoriId: z.number().int().nullable(),
+  tagIds: z.array(z.number().int()).default([]),
   posisiId: z.number().int({ message: 'Posisi rak wajib dipilih.' }),
 })
+
+function semuaKategori(d: { kategoriId: number | null; tagIds: number[] }) {
+  return [...(d.kategoriId === null ? [] : [d.kategoriId]), ...d.tagIds]
+}
 
 // Type transaksi Drizzle -- dipakai biar helper di bawah bisa dipanggil
 // dari dalam db.transaction() tanpa `any`.
@@ -57,9 +60,11 @@ async function syncBookCategoriesAndStock(
   qty: number,
 ) {
   await tx.delete(bookCategories).where(eq(bookCategories.bookId, bookId))
-  await tx
-    .insert(bookCategories)
-    .values(categoryIds.map((categoryId) => ({ bookId, categoryId })))
+  if (categoryIds.length > 0) {
+    await tx
+      .insert(bookCategories)
+      .values(categoryIds.map((categoryId) => ({ bookId, categoryId })))
+  }
 
   await tx
     .delete(bookStockLocations)
@@ -88,7 +93,7 @@ export const createBook = createServerFn({ method: 'POST' })
           // pertama yang dipilih jadi primary, semuanya (termasuk yang
           // pertama) tetap tercatat penuh di book_categories. Niru
           // perilaku V1 yang auto-duplikat kategori utama ke tabel tag.
-          kategoriId: data.categoryIds[0],
+          kategoriId: data.kategoriId,
           posisiId: data.posisiId,
           createdBy: admin.id,
           updatedBy: admin.id,
@@ -98,7 +103,7 @@ export const createBook = createServerFn({ method: 'POST' })
       await syncBookCategoriesAndStock(
         tx,
         book.id,
-        data.categoryIds,
+        semuaKategori(data),
         data.posisiId,
         data.qty,
       )
@@ -112,7 +117,7 @@ export const createBook = createServerFn({ method: 'POST' })
           kode: data.kode ?? null,
           qty: data.qty,
           posisiId: data.posisiId,
-          categoryIds: data.categoryIds,
+          categoryIds: semuaKategori(data),
         },
       })
 
@@ -171,7 +176,7 @@ export const updateBook = createServerFn({ method: 'POST' })
       )
         .map((r) => r.id)
         .sort((a, b) => a - b)
-      const newCategoryIds = [...data.categoryIds].sort((a, b) => a - b)
+      const newCategoryIds = semuaKategori(data).sort((a, b) => a - b)
       if (oldCategoryIds.join(',') !== newCategoryIds.join(',')) {
         changes.categoryIds = { dari: oldCategoryIds, ke: newCategoryIds }
       }
@@ -185,7 +190,7 @@ export const updateBook = createServerFn({ method: 'POST' })
           tahun: data.tahun,
           keterangan: data.keterangan,
           qty: data.qty,
-          kategoriId: data.categoryIds[0],
+          kategoriId: data.kategoriId,
           posisiId: data.posisiId,
           updatedBy: admin.id,
           updatedAt: new Date(),
@@ -200,7 +205,7 @@ export const updateBook = createServerFn({ method: 'POST' })
       await syncBookCategoriesAndStock(
         tx,
         data.id,
-        data.categoryIds,
+        semuaKategori(data),
         data.posisiId,
         data.qty,
       )
@@ -497,6 +502,7 @@ export const getBookForEdit = createServerFn({ method: 'GET' })
         tahun: books.tahun,
         keterangan: books.keterangan,
         qty: books.qty,
+        kategoriId: books.kategoriId,
       })
       .from(books)
       .where(eq(books.id, data.id))
@@ -506,10 +512,11 @@ export const getBookForEdit = createServerFn({ method: 'GET' })
       throw new Error('Buku tidak ditemukan.')
     }
 
-    const categoryRows = await db
+    const tagRows = await db
       .select({ categoryId: bookCategories.categoryId })
       .from(bookCategories)
-      .where(eq(bookCategories.bookId, data.id))
+      .innerJoin(categories, eq(bookCategories.categoryId, categories.id))
+      .where(and(eq(bookCategories.bookId, data.id), eq(categories.kind, 'tag')))
 
     const [stockRow] = await db
       .select({ posisiId: bookStockLocations.posisiId })
@@ -519,7 +526,7 @@ export const getBookForEdit = createServerFn({ method: 'GET' })
 
     return {
       ...book,
-      categoryIds: categoryRows.map((c) => c.categoryId),
+      tagIds: tagRows.map((c) => c.categoryId),
       posisiId: stockRow?.posisiId ?? null,
     }
   })

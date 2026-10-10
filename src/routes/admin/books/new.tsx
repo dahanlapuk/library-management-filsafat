@@ -19,7 +19,8 @@ function NewBookPage() {
         tahun: values.tahun ? Number(values.tahun) : undefined,
         keterangan: values.keterangan.trim() || undefined,
         qty: Number(values.qty),
-        categoryIds: values.categoryIds,
+        kategoriId: values.kategoriId,
+        tagIds: values.tagIds,
         posisiId: values.posisiId as number,
       },
     })

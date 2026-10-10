@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { getCurrentAdmin } from '../../../admin/auth'
 import { getBooks, searchBooks, getCategories } from '../../../books/catalog'
+import { kategoriOptions } from '../../../books/category-options'
 import {
   deleteBook,
   requestBookDeletion,
@@ -183,9 +184,9 @@ function AdminBooksPage() {
             className="p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] bg-[var(--white)]"
           >
             <option value="">Semua kategori</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nama} ({c.bookCount})
+            {kategoriOptions(categories).map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.label}
               </option>
             ))}
           </select>

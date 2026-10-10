@@ -11,8 +11,10 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Buku',
     links: [
       { to: '/admin/books', label: 'Kelola Buku' },
+      { to: '/admin/categorize', label: 'Kategorisasi Massal' },
       { to: '/admin/books/category-requests', label: 'Pengajuan Kategori', superadminOnly: true },
       { to: '/admin/books/delete-requests', label: 'Pengajuan Hapus', superadminOnly: true },
+      { to: '/admin/categories', label: 'Kelola Kategori', superadminOnly: true },
     ],
   },
   {

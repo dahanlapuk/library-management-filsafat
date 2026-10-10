@@ -33,7 +33,8 @@ function EditBookPage() {
         tahun: values.tahun ? Number(values.tahun) : undefined,
         keterangan: values.keterangan.trim() || undefined,
         qty: Number(values.qty),
-        categoryIds: values.categoryIds,
+        kategoriId: values.kategoriId,
+        tagIds: values.tagIds,
         posisiId: values.posisiId as number,
       },
     })
@@ -76,7 +77,8 @@ function EditBookPage() {
                 tahun: book.tahun ? String(book.tahun) : '',
                 keterangan: book.keterangan ?? '',
                 qty: String(book.qty),
-                categoryIds: book.categoryIds,
+                kategoriId: book.kategoriId,
+                tagIds: book.tagIds,
                 posisiId: book.posisiId,
               }}
               submitLabel="Simpan Perubahan"
