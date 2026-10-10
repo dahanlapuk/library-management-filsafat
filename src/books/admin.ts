@@ -234,15 +234,6 @@ export const updateBook = createServerFn({ method: 'POST' })
 
 const deleteBookSchema = z.object({ id: z.number().int() })
 
-// DELETE /admin/books/:id setara -- hapus buku permanen.
-//
-// PERHATIAN: `loans.bookId` di schema.ts pakai onDelete: 'cascade',
-// jadi menghapus buku ini JUGA menghapus semua histori peminjaman buku
-// itu (termasuk loan_stock_allocations-nya). Kalau nanti histori
-// peminjaman perlu dipertahankan meski bukunya dihapus, ini perlu
-// didesain ulang jadi soft-delete -- sengaja tidak dikerjakan sekarang
-// (di luar scope CRUD sederhana yang disepakati), dicatat di sini biar
-// tidak kelupaan.
 export const deleteBook = createServerFn({ method: 'POST' })
   .inputValidator(deleteBookSchema)
   .handler(async ({ data }) => {
