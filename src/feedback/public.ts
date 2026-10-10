@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeader } from '@tanstack/react-start/server'
+import { getRequestHeader, getRequestHeaders } from '@tanstack/react-start/server'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { and, count, eq, gt, sql } from 'drizzle-orm'
@@ -7,6 +7,7 @@ import { db } from '../db'
 import { books, feedback, feedbackJenisEnum } from '../db/schema'
 
 const MAX_PER_HOUR = 3
+const MAX_PER_HOUR_UNKNOWN = 20
 
 const submitFeedbackSchema = z.object({
   jenis: z.enum(feedbackJenisEnum.enumValues),
@@ -35,21 +36,23 @@ export const submitFeedback = createServerFn({ method: 'POST' })
     const ip = forwarded?.split(',')[0]?.trim() || getRequestHeader('x-real-ip') || null
     const ipHash = createHash('sha256').update(`${salt}:${ip ?? 'unknown'}`).digest('hex')
 
-    if (ip) {
-      const [{ n }] = await db
-        .select({ n: count() })
-        .from(feedback)
-        .where(
-          and(
-            eq(feedback.ipHash, ipHash),
-            gt(feedback.createdAt, sql`now() - interval '1 hour'`),
-          ),
-        )
-      if (n >= MAX_PER_HOUR) {
-        throw new Error('Terlalu banyak kiriman. Coba lagi dalam satu jam.')
-      }
-    } else {
-      console.warn('submitFeedback: IP klien tidak terbaca, pembatas dilewati')
+    if (!ip) {
+      const h = getRequestHeaders()
+      const names = h instanceof Headers ? [...h.keys()] : Object.keys(h)
+      console.warn('submitFeedback: IP klien tidak terbaca; header:', names.join(','))
+    }
+
+    const [{ n }] = await db
+      .select({ n: count() })
+      .from(feedback)
+      .where(
+        and(
+          eq(feedback.ipHash, ipHash),
+          gt(feedback.createdAt, sql`now() - interval '1 hour'`),
+        ),
+      )
+    if (n >= (ip ? MAX_PER_HOUR : MAX_PER_HOUR_UNKNOWN)) {
+      throw new Error('Terlalu banyak kiriman. Coba lagi dalam satu jam.')
     }
 
     let bookJudulSnapshot: string | null = null
