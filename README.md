@@ -75,7 +75,7 @@ Live di Vercel, terhubung otomatis ke branch `main`. Environment variable produk
 
 ## Prosedur darurat
 
-**Lupa password admin:** belum ada alur reset mandiri (menyusul setelah plumbing email custom SMTP selesai). Untuk sekarang, superadmin/pengelola sistem bisa reset lewat **Supabase Dashboard → Authentication → Users** — cari akun berdasarkan email, gunakan opsi reset password dari sana. Pastikan akses dashboard Supabase dipegang oleh lebih dari satu orang tepercaya, supaya tidak ada single point of failure kalau satu orang tidak bisa dihubungi.
+**Lupa password admin:** admin membuka `/forgot-password` (atau tautan "Lupa password?" di halaman login), memilih namanya, lalu mengikuti tautan di email (berlaku 1 jam, sekali pakai). Hasilnya semua sesi admin itu dicabut dan dia login ulang dengan password baru. Kalau email tidak sampai, pengelola sistem bisa mengirim tautan yang sama dari **Supabase Dashboard → Authentication → Users → pilih akun → Send password recovery**. Setiap reset tercatat di activity log (`RESET_PASSWORD_REQUEST`, `RESET_PASSWORD`). Alurnya sama untuk superadmin. Email akun harus sama di Supabase Auth dan `admin_profiles.email`, kalau tidak, tautan terkirim ke alamat yang salah. Pastikan akses dashboard Supabase dipegang oleh lebih dari satu orang tepercaya, supaya tidak ada single point of failure kalau satu orang tidak bisa dihubungi.
 
 ## Kontribusi
 
