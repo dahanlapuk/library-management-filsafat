@@ -4,7 +4,6 @@ import { and, eq, sql } from 'drizzle-orm'
 import { createClient } from '@supabase/supabase-js'
 import { db } from '../db'
 import { activityLogs, adminProfiles } from '../db/schema'
-import { getSupabaseServerClient } from '../lib/supabase/server'
 import { requireApprovedAdmin } from './guards'
 import { logActivity } from './activity-log'
 
@@ -55,29 +54,33 @@ export const requestEmailChange = createServerFn({ method: 'POST' })
       throw new Error('Tunggu beberapa menit sebelum mengajukan lagi.')
     }
 
+    // Client terisolasi (alur implicit): token email tanpa awalan pkce_,
+    // jadi bisa ditukar di server lewat verifyOtp dari perangkat mana pun.
     const verifier = createIsolatedClient()
-    const { error: verifyError } = await verifier.auth.signInWithPassword({
-      email: admin.email,
-      password: data.password,
-    })
     try {
-      await verifier.auth.signOut({ scope: 'local' })
-    } catch {
-      // sesi sementara tidak pernah dipakai
-    }
-    if (verifyError) throw new Error('Password salah.')
-
-    const supabase = getSupabaseServerClient()
-    await db.transaction(async (tx) => {
-      await logActivity(tx, admin, {
-        action: 'EMAIL_CHANGE_REQUEST',
-        entityType: 'ADMIN',
-        entityName: admin.nama,
-        details: { emailBaru: data.emailBaru },
+      const { error: verifyError } = await verifier.auth.signInWithPassword({
+        email: admin.email,
+        password: data.password,
       })
-      const { error } = await supabase.auth.updateUser({ email: data.emailBaru })
-      if (error) throw new Error(error.message)
-    })
+      if (verifyError) throw new Error('Password salah.')
+
+      await db.transaction(async (tx) => {
+        await logActivity(tx, admin, {
+          action: 'EMAIL_CHANGE_REQUEST',
+          entityType: 'ADMIN',
+          entityName: admin.nama,
+          details: { emailBaru: data.emailBaru },
+        })
+        const { error } = await verifier.auth.updateUser({ email: data.emailBaru })
+        if (error) throw new Error(error.message)
+      })
+    } finally {
+      try {
+        await verifier.auth.signOut({ scope: 'local' })
+      } catch {
+        // sesi sementara tidak dipakai lagi
+      }
+    }
 
     return { success: true }
   })
@@ -96,6 +99,7 @@ export const completeEmailChange = createServerFn({ method: 'POST' })
     })
     const user = result?.user
     if (error || !user?.email) {
+      console.error('verifyOtp email_change gagal', error?.message, error?.status)
       throw new Error('Tautan tidak valid atau sudah kedaluwarsa.')
     }
     const emailBaru = user.email.toLowerCase()
