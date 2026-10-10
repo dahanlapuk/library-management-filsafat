@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { updateMyProfile, changeMyPassword } from '../../admin/profile'
+import { requestEmailChange } from '../../admin/email-change'
 import { AdminHeader } from '../../admin/AdminHeader'
 import { errorMessage } from '../../lib/error-message'
 
@@ -144,6 +145,51 @@ function PasswordForm() {
   )
 }
 
+function EmailForm() {
+  const [emailBaru, setEmailBaru] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    setSaving(true)
+    try {
+      await requestEmailChange({ data: { emailBaru, password } })
+      setPassword('')
+      setSuccess(
+        'Email konfirmasi dikirim ke ' + emailBaru + '. Klik tautan di dalamnya untuk menyelesaikan penggantian.',
+      )
+      setEmailBaru('')
+    } catch (err) {
+      setError(errorMessage(err, 'Gagal mengajukan ganti email.'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <h2 className="text-lg font-semibold">Ganti Email</h2>
+      <Notice error={error} success={success} />
+      <div className="flex flex-col gap-2">
+        <label className="font-medium">Email baru:</label>
+        <input type="email" value={emailBaru} onChange={(e) => setEmailBaru(e.target.value)} autoComplete="off" className={inputClass} />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="font-medium">Password saat ini:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" className={inputClass} />
+      </div>
+      <button type="submit" disabled={saving || !emailBaru || !password} className={buttonClass}>
+        {saving ? 'Memproses...' : 'Kirim Email Konfirmasi'}
+      </button>
+    </form>
+  )
+}
+
 function AdminProfilePage() {
   const { data: currentAdmin, isPending } = useQuery({
     queryKey: ['current-admin'],
@@ -166,6 +212,9 @@ function AdminProfilePage() {
             </div>
             <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
               <PasswordForm />
+            </div>
+            <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+              <EmailForm />
             </div>
           </div>
         )}

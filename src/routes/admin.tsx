@@ -7,6 +7,7 @@ const PUBLIC_ADMIN_PATHS = [
   '/admin/signup',
   '/admin/forgot-password',
   '/admin/reset-password',
+  '/admin/confirm-email',
 ]
 
 // Layout untuk semua route /admin/*. Ini cuma lapisan UX (arahkan ke login

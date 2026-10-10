@@ -8,6 +8,8 @@ const ACTION_LABELS: Record<string, string> = {
   DELETE_ADMIN: 'Hapus admin',
   UPDATE_PROFILE: 'Ubah profil',
   CHANGE_PASSWORD: 'Ganti password',
+  EMAIL_CHANGE_REQUEST: 'Permintaan ganti email',
+  EMAIL_CHANGE: 'Ganti email',
   RESET_PASSWORD_REQUEST: 'Permintaan reset password',
   RESET_PASSWORD: 'Reset password',
   CREATE: 'Tambah buku',

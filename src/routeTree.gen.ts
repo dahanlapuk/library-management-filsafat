@@ -23,6 +23,7 @@ import { Route as AdminActivityRouteImport } from './routes/admin/activity'
 import { Route as AdminApprovalsRouteImport } from './routes/admin/approvals'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as AdminCategorizeRouteImport } from './routes/admin/categorize'
+import { Route as AdminConfirmEmailRouteImport } from './routes/admin/confirm-email'
 import { Route as AdminForgotPasswordRouteImport } from './routes/admin/forgot-password'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
@@ -106,6 +107,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
 const AdminCategorizeRoute = AdminCategorizeRouteImport.update({
   id: '/categorize',
   path: '/categorize',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfirmEmailRoute = AdminConfirmEmailRouteImport.update({
+  id: '/confirm-email',
+  path: '/confirm-email',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/confirm-email': typeof AdminConfirmEmailRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/confirm-email': typeof AdminConfirmEmailRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/categorize': typeof AdminCategorizeRoute
+  '/admin/confirm-email': typeof AdminConfirmEmailRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/confirm-email'
     | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/confirm-email'
     | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/categories'
     | '/admin/categorize'
+    | '/admin/confirm-email'
     | '/admin/forgot-password'
     | '/admin/inventory'
     | '/admin/login'
@@ -475,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategorizeRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/confirm-email': {
+      id: '/admin/confirm-email'
+      path: '/confirm-email'
+      fullPath: '/admin/confirm-email'
+      preLoaderRoute: typeof AdminConfirmEmailRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/forgot-password': {
       id: '/admin/forgot-password'
       path: '/forgot-password'
@@ -581,6 +600,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCategorizeRoute: typeof AdminCategorizeRoute
+  AdminConfirmEmailRoute: typeof AdminConfirmEmailRoute
   AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -603,6 +623,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCategorizeRoute: AdminCategorizeRoute,
+  AdminConfirmEmailRoute: AdminConfirmEmailRoute,
   AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminLoginRoute: AdminLoginRoute,
