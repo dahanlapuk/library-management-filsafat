@@ -297,19 +297,9 @@ export const categoryRequests = pgTable(
   ],
 )
 
-// ── LOAN REQUESTS (pengajuan peminjaman dari mahasiswa/dosen) ─────
-// Diisi PUBLIK lewat modal detail buku di katalog (tanpa login) --
-// bukan admin yang input. Petugas approve/reject manual di admin panel
-// setelah peminjam konfirmasi tatap muka (lihat alur di pengumuman
-// resmi). TIDAK pakai partial-unique-per-book seperti delete/category
-// request, karena satu buku (qty > 1) boleh punya beberapa pengajuan
-// pending sekaligus dari peminjam berbeda.
-//
-// Approve = transaksi: cek canCreateLoan (reuse src/loans/allocation.ts
-// apa adanya) -> insert members baru dari snapshot data form ini ->
-// insert loans (dueAt: mahasiswa = jam tutup hari itu, dosen = +14 hari)
-// -> insert loan_stock_allocations (posisi dari allocateFromLargestStock)
-// -> update status jadi approved + isi createdMemberId/createdLoanId.
+// ── LOAN REQUESTS ─────────────────────────────────────────────────
+// Diisi publik tanpa login. Tanpa unique per buku: satu buku (qty > 1)
+// boleh punya beberapa pengajuan pending.
 export const loanRequestStatusEnum = pgEnum('loan_request_status', [
   'pending',
   'approved',
@@ -318,17 +308,12 @@ export const loanRequestStatusEnum = pgEnum('loan_request_status', [
 
 export const loanRequests = pgTable('loan_requests', {
   id: serial('id').primaryKey(),
-  // set null, bukan cascade -- baris pengajuan (siapa minjem, kapan,
-  // disetujui siapa) HARUS tetap ada sebagai audit trail meski bukunya
-  // nanti dihapus. bookJudulSnapshot diisi pas pengajuan dibuat, biar
-  // tetap terbaca walau bookId null.
+  // set null: pengajuan tetap ada sebagai audit trail; judul ada di snapshot.
   bookId: integer('book_id').references(() => books.id, { onDelete: 'set null' }),
   bookJudulSnapshot: text('book_judul_snapshot').notNull(),
   namaPeminjam: text('nama_peminjam').notNull(),
   role: memberRoleEnum('role').notNull(),
-  // jenjang & angkatan cuma diisi kalau role='mahasiswa' -- dipilih
-  // sendiri sama peminjam di form publik, diverifikasi manual sama
-  // petugas pas konfirmasi tatap muka (bukan validasi sistem).
+  // Hanya untuk role mahasiswa; diverifikasi petugas secara manual.
   jenjang: memberJenjangEnum('jenjang'),
   angkatan: integer('angkatan'),
   whatsapp: text('whatsapp').notNull(),
@@ -337,21 +322,15 @@ export const loanRequests = pgTable('loan_requests', {
   status: loanRequestStatusEnum('status').notNull().default('pending'),
   reviewedBy: uuid('reviewed_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
   reviewedAt: timestamp('reviewed_at'),
-  // Diisi pas approve -- traceability ke member & loan yang beneran
-  // dibuat, pola sama seperti createdCategoryId di category_requests.
   createdMemberId: integer('created_member_id').references(() => members.id, { onDelete: 'set null' }),
   createdLoanId: integer('created_loan_id').references(() => loans.id, { onDelete: 'set null' }),
-  // Diisi pas admin reject -- alasan wajib ditulis admin (bukan dari
-  // peminjam), ditampilkan di pesan WhatsApp reject yang bisa diedit.
   rejectionAlasan: text('rejection_alasan'),
   rejectionNotifiedAt: timestamp('rejection_notified_at'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
-// ── MAINTENANCE REQUESTS (mode maintenance katalog-saja) ──────────
-// Admin biasa mengajukan, superadmin approve/reject/akhiri. Status
-// 'active' = katalog publik sedang ditutup (admin tetap bisa masuk).
-// Mode penuh tetap env var MAINTENANCE_MODE (saklar darurat).
+// ── MAINTENANCE REQUESTS ──────────────────────────────────────────
+// 'active' = katalog publik ditutup. Mode penuh tetap env MAINTENANCE_MODE.
 export const maintenanceRequestStatusEnum = pgEnum('maintenance_request_status', [
   'pending',
   'active',
