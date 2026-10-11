@@ -9,7 +9,7 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
-    versi: '0.11.0',
+    versi: '2.8.0',
     judul: 'Feedback publik',
     ringkas: [
       'Pengunjung dapat mengirim saran, koreksi data buku, atau usul buku lewat halaman Kirim Feedback, tanpa perlu masuk.',
@@ -24,7 +24,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.10.0',
+    versi: '2.7.0',
     judul: 'Ganti email, role developer, request fitur',
     ringkas: [
       'Admin dapat mengganti email dari halaman profil. Tautan konfirmasi dikirim ke alamat yang baru.',
@@ -37,7 +37,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.9.0',
+    versi: '2.6.0',
     judul: 'Logo baru, label aksi Bahasa Indonesia, analitik kunjungan, perbaikan skema',
     ringkas: [
       'Logo dan ikon baru. Tautan yang dibagikan, misalnya lewat WhatsApp, menampilkan gambar pratinjau.',
@@ -52,7 +52,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.8.0',
+    versi: '2.5.0',
     judul: 'Halaman Informasi, SEO, reset password mandiri',
     ringkas: [
       'Halaman Informasi: lokasi, jam buka, cara pinjam, tata tertib, dan petugas yang bertugas hari ini.',
@@ -66,7 +66,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.7.0',
+    versi: '2.4.0',
     judul: 'Pohon kategori dan kategorisasi massal',
     ringkas: [
       'Kategori buku kini berbentuk pohon: kategori utama dengan subkategori, maksimal tiga tingkat.',
@@ -80,7 +80,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.6.0',
+    versi: '2.3.0',
     judul: 'Maintenance katalog-saja, urutan judul alami, pembaruan keamanan',
     ringkas: [
       'Admin dapat mengajukan maintenance yang hanya menutup katalog publik; setelah disetujui superadmin, halaman admin tetap dapat dipakai.',
@@ -94,7 +94,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.5.1',
+    versi: '2.2.1',
     judul: 'Dokumentasi dan perapian repo',
     ringkas: ['Dokumentasi proyek ditulis ulang. Tidak ada perubahan tampilan.'],
     teknis: [
@@ -102,7 +102,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.5.0',
+    versi: '2.2.0',
     judul: 'Mode maintenance, SEO per buku, domain baru, pencarian lintas rak',
     ringkas: [
       'Situs dapat ditutup sementara untuk perawatan; pengunjung melihat halaman pemberitahuan.',
@@ -117,21 +117,41 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.4.0',
-    judul: 'Log aktivitas, sesi admin lebih aman, profil, nama Biblioteka',
+    versi: '2.1.0',
+    judul: 'Rebrand Biblioteka, pesan login, alias /login, halaman 404, footer',
     ringkas: [
+      'Nama berubah menjadi Biblioteka Departemen Filsafat UI, dengan logo ikon di header admin.',
+      'Pesan login lebih jelas: email yang belum dikonfirmasi atau terlalu banyak percobaan tidak lagi dikira salah password.',
+      'Ada halaman 404, footer, dan alamat pendek /login. Tautan masuk admin dipindahkan dari bawah katalog ke footer.',
+    ],
+    teknis: [
+      'loginErrorMessage memetakan kode error Supabase (email_not_confirmed, over_request_rate_limit) ke pesan yang jelas; kode aslinya tetap dicatat pada log LOGIN_FAILED.',
+      'notFoundComponent di root, alias /login ke /admin/login, dan komponen Footer.',
+      'Judul katalog, subtitle, dan title tab diganti; favicon dan logo ikon di AdminHeader.',
+    ],
+  },
+  {
+    versi: '2.0.1',
+    judul: 'Perbaikan cookie sesi',
+    ringkas: ['Perbaikan keamanan pada pengaturan cookie sesi login.'],
+    teknis: ['Pengaturan cookie sesi login diperkuat pada client Supabase di sisi server.'],
+  },
+  {
+    versi: '2.0.0',
+    judul: 'Deploy pertama: log aktivitas, sesi admin, profil, halaman Activity',
+    ringkas: [
+      'Rilis pertama yang tayang di produksi. Seluruh pekerjaan pra-rilis (katalog, kelola buku, peminjaman, cek inventaris) ikut tayang bersama versi ini.',
       'Setiap tindakan admin tercatat di log aktivitas: siapa, kapan, dan apa. Superadmin dapat membacanya di halaman Activity.',
       'Sesi admin dibatasi 8 jam. Ada halaman profil untuk mengubah nama, nomor WhatsApp, dan password.',
-      'Pesan login lebih jelas, ada halaman 404 dan footer, dan nama berubah menjadi Biblioteka Departemen Filsafat UI.',
     ],
     teknis: [
       'logActivity(tx, actor, entry) dipasang di 14 mutation dan ditulis dalam transaksi yang sama dengan aksinya. Aktor selalu dari sesi tervalidasi, bukan dari request body.',
       'Log autentikasi: LOGIN, LOGOUT, LOGIN_FAILED, SIGNUP_ADMIN. Batas sesi 8 jam diperiksa server lewat auth.sessions, dan rute /admin dijaga di sisi route.',
-      'Migrasi 0009: kolom no_whatsapp. Perbaikan opsi cookie sesi (httpOnly, secure). Alias /login ke /admin/login.',
+      'Migrasi 0009: kolom no_whatsapp. Halaman /admin/activity khusus superadmin dengan filter aksi dan paginasi.',
     ],
   },
   {
-    versi: '0.3.0',
+    versi: '2.0.0-pre.3',
     judul: 'Peminjaman, cek inventaris, pengajuan kategori',
     ringkas: [
       'Peminjaman: mahasiswa dan dosen mengajukan dari halaman buku, lalu petugas menyetujui dan mencatat pengembalian.',
@@ -146,7 +166,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.2.0',
+    versi: '2.0.0-pre.2',
     judul: 'Katalog publik dan kelola buku',
     ringkas: [
       'Katalog publik dibuka: cari buku, saring kategori, dan buka detail buku lewat tautan yang dapat dibagikan.',
@@ -162,7 +182,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '0.1.0',
+    versi: '2.0.0-pre.1',
     judul: 'Fondasi: login admin dan persetujuan akun',
     ringkas: [
       'Fondasi sistem V2: admin dapat mendaftar dan masuk, dan akun baru aktif setelah disetujui superadmin.',

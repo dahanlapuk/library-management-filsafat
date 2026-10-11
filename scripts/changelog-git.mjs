@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs'
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
 
-const tags = git('tag', '-l', 'v*', '--sort=version:refname').split('\n').filter(Boolean)
+const tags = git('tag', '-l', 'v*', '--sort=creatordate').split('\n').filter(Boolean)
 
 const rilis = {}
 tags.forEach((tag, i) => {

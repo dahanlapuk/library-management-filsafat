@@ -5,7 +5,7 @@ export type GitRilis = {
 }
 
 export const GIT_RILIS: Record<string, GitRilis> = {
-  "0.1.0": {
+  "2.0.0-pre.1": {
     "tanggal": "2026-09-15",
     "dari": null,
     "commits": [
@@ -43,9 +43,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.2.0": {
+  "2.0.0-pre.2": {
     "tanggal": "2026-09-17",
-    "dari": "0.1.0",
+    "dari": "2.0.0-pre.1",
     "commits": [
       {
         "hash": "16596d7",
@@ -85,9 +85,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.3.0": {
+  "2.0.0-pre.3": {
     "tanggal": "2026-09-19",
-    "dari": "0.2.0",
+    "dari": "2.0.0-pre.2",
     "commits": [
       {
         "hash": "392f088",
@@ -111,9 +111,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.4.0": {
+  "2.0.0": {
     "tanggal": "2026-09-21",
-    "dari": "0.3.0",
+    "dari": "2.0.0-pre.3",
     "commits": [
       {
         "hash": "4138c8e",
@@ -146,11 +146,23 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "664207c",
         "pesan": "Fase 3: halaman /admin/activity (baca activity log, superadmin-only, filter aksi + pagination)"
-      },
+      }
+    ]
+  },
+  "2.0.1": {
+    "tanggal": "2026-09-21",
+    "dari": "2.0.0",
+    "commits": [
       {
         "hash": "f521fc6",
         "pesan": "Fix: teruskan cookie options (httpOnly, secure) ke setCookie sesi Supabase"
-      },
+      }
+    ]
+  },
+  "2.1.0": {
+    "tanggal": "2026-09-21",
+    "dari": "2.0.1",
+    "commits": [
       {
         "hash": "fcbf2f6",
         "pesan": "Rebrand: Perpustakaan Departemen Filsafat (judul katalog, subtitle, title tab), favicon, logo ikon di AdminHeader"
@@ -173,9 +185,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.5.0": {
+  "2.2.0": {
     "tanggal": "2026-09-23",
-    "dari": "0.4.0",
+    "dari": "2.1.0",
     "commits": [
       {
         "hash": "ad7c9bf",
@@ -211,9 +223,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.5.1": {
+  "2.2.1": {
     "tanggal": "2026-10-01",
-    "dari": "0.5.0",
+    "dari": "2.2.0",
     "commits": [
       {
         "hash": "52d2481",
@@ -229,9 +241,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.6.0": {
+  "2.3.0": {
     "tanggal": "2026-10-05",
-    "dari": "0.5.1",
+    "dari": "2.2.1",
     "commits": [
       {
         "hash": "f990f40",
@@ -251,9 +263,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.7.0": {
+  "2.4.0": {
     "tanggal": "2026-10-10",
-    "dari": "0.6.0",
+    "dari": "2.3.0",
     "commits": [
       {
         "hash": "1c0a157",
@@ -273,9 +285,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.8.0": {
+  "2.5.0": {
     "tanggal": "2026-10-10",
-    "dari": "0.7.0",
+    "dari": "2.4.0",
     "commits": [
       {
         "hash": "cb29f1b",
@@ -299,9 +311,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.9.0": {
+  "2.6.0": {
     "tanggal": "2026-10-10",
-    "dari": "0.8.0",
+    "dari": "2.5.0",
     "commits": [
       {
         "hash": "d0f8a0f",
@@ -333,9 +345,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.10.0": {
+  "2.7.0": {
     "tanggal": "2026-10-10",
-    "dari": "0.9.0",
+    "dari": "2.6.0",
     "commits": [
       {
         "hash": "8311a4c",
@@ -359,9 +371,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "0.11.0": {
+  "2.8.0": {
     "tanggal": "2026-10-10",
-    "dari": "0.10.0",
+    "dari": "2.7.0",
     "commits": [
       {
         "hash": "288cd67",
