@@ -48,15 +48,20 @@ function susunPohon(): { simpul: Simpul[]; pra: Rilis[] } {
   return { simpul, pra }
 }
 
-function Judul({ r, live }: { r: Rilis; live: boolean }) {
+function Judul({ r, live, sembunyiFitur }: { r: Rilis; live: boolean; sembunyiFitur?: boolean }) {
   const git = GIT_RILIS[r.versi]
   return (
     <span className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <span className="text-base font-bold">v{r.versi}</span>
       <span className="text-sm font-normal">{r.judul}</span>
+      {r.fitur && !sembunyiFitur && (
+        <span className="bg-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
+          Fitur baru
+        </span>
+      )}
       {live && (
         <span className="border border-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em]">
-          Sedang live
+          Current version
         </span>
       )}
       {git && <span className="text-xs font-normal text-[var(--gray-600)]">{formatTanggal(git.tanggal)}</span>}
@@ -144,10 +149,16 @@ function ChangelogPage() {
       <main className="mx-auto flex max-w-[800px] flex-col gap-4 px-5 py-8">
         {simpul.map((s) => {
           const terbuka = s.induk.versi === live || s.anak.some((a) => a.versi === live)
+          const jumlahFitur = [s.induk, ...s.anak].filter((r) => r.fitur).length
           return (
             <details key={s.induk.versi} open={terbuka} className="border border-[var(--gray-200)] bg-[var(--white)] p-4">
               <summary className="cursor-pointer">
-                <Judul r={s.induk} live={s.induk.versi === live} />
+                <Judul r={s.induk} live={terbuka} sembunyiFitur />
+                {jumlahFitur > 0 && (
+                  <span className="ml-3 bg-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
+                    {jumlahFitur} fitur baru
+                  </span>
+                )}
               </summary>
               <div className="mt-4 flex flex-col gap-5">
                 <Isi r={s.induk} />

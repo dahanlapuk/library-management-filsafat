@@ -166,19 +166,43 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "fcbf2f6",
         "pesan": "Rebrand: Perpustakaan Departemen Filsafat (judul katalog, subtitle, title tab), favicon, logo ikon di AdminHeader"
-      },
+      }
+    ]
+  },
+  "2.1.1": {
+    "tanggal": "2026-09-21",
+    "dari": "2.1.0",
+    "commits": [
       {
         "hash": "79a543a",
         "pesan": "Login: pesan jelas untuk email belum dikonfirmasi dan rate limit, bukan selalu 'Password salah'"
-      },
+      }
+    ]
+  },
+  "2.1.2": {
+    "tanggal": "2026-09-21",
+    "dari": "2.1.1",
+    "commits": [
       {
         "hash": "d9cabeb",
         "pesan": "Alias /login ke /admin/login, halaman 404 (notFoundComponent di root)"
-      },
+      }
+    ]
+  },
+  "2.1.3": {
+    "tanggal": "2026-09-21",
+    "dari": "2.1.2",
+    "commits": [
       {
         "hash": "4a36af2",
         "pesan": "Alias /login, halaman 404, footer (menu, link admin, kredit Hexadev Technologies)"
-      },
+      }
+    ]
+  },
+  "2.1.4": {
+    "tanggal": "2026-09-21",
+    "dari": "2.1.3",
+    "commits": [
       {
         "hash": "1c777e9",
         "pesan": "Rebrand: Biblioteka Departemen Filsafat UI (heading, title tab, login, AdminHeader), hapus link admin di bawah katalog, footer: Koleksi Buku"
@@ -186,46 +210,88 @@ export const GIT_RILIS: Record<string, GitRilis> = {
     ]
   },
   "2.2.0": {
-    "tanggal": "2026-09-23",
-    "dari": "2.1.0",
+    "tanggal": "2026-09-22",
+    "dari": "2.1.4",
     "commits": [
       {
         "hash": "ad7c9bf",
         "pesan": "Maintenance mode: redirect semua route ke /maintenance via env var MAINTENANCE_MODE"
-      },
+      }
+    ]
+  },
+  "2.2.1": {
+    "tanggal": "2026-09-22",
+    "dari": "2.2.0",
+    "commits": [
       {
         "hash": "d7e5455",
         "pesan": "Fix: redirect keluar dari /maintenance saat MAINTENANCE_MODE dimatikan"
-      },
+      }
+    ]
+  },
+  "2.2.2": {
+    "tanggal": "2026-09-22",
+    "dari": "2.2.1",
+    "commits": [
       {
         "hash": "eb17aab",
         "pesan": "feat(catalog): SSR title/meta per buku via loader+head untuk SEO"
-      },
+      }
+    ]
+  },
+  "2.2.3": {
+    "tanggal": "2026-09-22",
+    "dari": "2.2.2",
+    "commits": [
       {
         "hash": "f1f9645",
         "pesan": "feat: 301 redirect domain default vercel.app ke biblioteka.filsafatui.app"
-      },
+      }
+    ]
+  },
+  "2.2.4": {
+    "tanggal": "2026-09-22",
+    "dari": "2.2.3",
+    "commits": [
       {
         "hash": "935776e",
         "pesan": "feat(seo): robots.txt statis + sitemap.xml dinamis per-buku"
-      },
+      }
+    ]
+  },
+  "2.2.5": {
+    "tanggal": "2026-09-22",
+    "dari": "2.2.4",
+    "commits": [
       {
         "hash": "7388ddd",
         "pesan": "feat(inventory): search buku lintas rak di halaman inventory check"
-      },
+      }
+    ]
+  },
+  "2.2.6": {
+    "tanggal": "2026-09-23",
+    "dari": "2.2.5",
+    "commits": [
       {
         "hash": "e14f3df",
         "pesan": "fix(books): unwrap DrizzleQueryError.cause.code saat cek unique_violation pending delete-request"
-      },
+      }
+    ]
+  },
+  "2.2.7": {
+    "tanggal": "2026-09-23",
+    "dari": "2.2.6",
+    "commits": [
       {
         "hash": "c4dea1b",
         "pesan": "fix(books): remount BookForm saat data edit selesai di-refetch"
       }
     ]
   },
-  "2.2.1": {
+  "2.2.8": {
     "tanggal": "2026-10-01",
-    "dari": "2.2.0",
+    "dari": "2.2.7",
     "commits": [
       {
         "hash": "52d2481",
@@ -243,20 +309,38 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.3.0": {
     "tanggal": "2026-10-05",
-    "dari": "2.2.1",
+    "dari": "2.2.8",
     "commits": [
       {
         "hash": "f990f40",
         "pesan": "chore: upgrade TanStack Start to patched version (CVE-2026-102989), align router-core"
-      },
+      }
+    ]
+  },
+  "2.3.1": {
+    "tanggal": "2026-10-05",
+    "dari": "2.3.0",
+    "commits": [
       {
         "hash": "97a42cb",
         "pesan": "update message on maintenance mode"
-      },
+      }
+    ]
+  },
+  "2.3.2": {
+    "tanggal": "2026-10-05",
+    "dari": "2.3.1",
+    "commits": [
       {
         "hash": "fa57ed4",
         "pesan": "fix: natural sort judul, urutan fisik rak, toggle urutan di inventory check"
-      },
+      }
+    ]
+  },
+  "2.3.3": {
+    "tanggal": "2026-10-06",
+    "dari": "2.3.2",
+    "commits": [
       {
         "hash": "de18d07",
         "pesan": "feat: maintenance katalog-saja dengan persetujuan superadmin"
@@ -265,7 +349,7 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.4.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.3.0",
+    "dari": "2.3.3",
     "commits": [
       {
         "hash": "1c0a157",
@@ -274,11 +358,23 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "9fdbdf6",
         "pesan": "feat: filter kategori publik berbentuk pohon, sembunyikan tag"
-      },
+      }
+    ]
+  },
+  "2.4.1": {
+    "tanggal": "2026-10-10",
+    "dari": "2.4.0",
+    "commits": [
       {
         "hash": "ff4059a",
         "pesan": "refactor: jalur kategori di kartu dan daftar, hapus komentar berlebih"
-      },
+      }
+    ]
+  },
+  "2.4.2": {
+    "tanggal": "2026-10-10",
+    "dari": "2.4.1",
+    "commits": [
       {
         "hash": "b5b6103",
         "pesan": "feat: daftar kategori katalog publik diciutkan di mobile"
@@ -287,24 +383,48 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.5.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.4.0",
+    "dari": "2.4.2",
     "commits": [
       {
         "hash": "cb29f1b",
         "pesan": "feat: seo dasar (lang id, canonical, og, nosnippet footer)"
-      },
+      }
+    ]
+  },
+  "2.5.1": {
+    "tanggal": "2026-10-10",
+    "dari": "2.5.0",
+    "commits": [
       {
         "hash": "017be84",
         "pesan": "feat: halaman informasi biblioteka + seo nama alternatif"
-      },
+      }
+    ]
+  },
+  "2.5.2": {
+    "tanggal": "2026-10-10",
+    "dari": "2.5.1",
+    "commits": [
       {
         "hash": "9fa859a",
         "pesan": "feat: reset password mandiri, halaman lupa/reset password, alias /signin /signup /forgot-password"
-      },
+      }
+    ]
+  },
+  "2.5.3": {
+    "tanggal": "2026-10-10",
+    "dari": "2.5.2",
+    "commits": [
       {
         "hash": "28753d4",
         "pesan": "feat: tautan reset password yang sudah dipakai atau kedaluwarsa langsung ditolak saat halaman dibuka"
-      },
+      }
+    ]
+  },
+  "2.5.4": {
+    "tanggal": "2026-10-10",
+    "dari": "2.5.3",
+    "commits": [
       {
         "hash": "cafd254",
         "pesan": "docs: prosedur darurat lupa password mengikuti alur reset mandiri"
@@ -313,20 +433,28 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.6.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.0",
+    "dari": "2.5.4",
     "commits": [
-      {
-        "hash": "d0f8a0f",
-        "pesan": "Install Vercel Web Analytics"
-      },
       {
         "hash": "d952f28",
         "pesan": "chore: seragamkan nama Biblioteka (Filsafat UI) di UI dan perpendek judul/deskripsi SEO beranda dan informasi"
-      },
+      }
+    ]
+  },
+  "2.6.1": {
+    "tanggal": "2026-10-10",
+    "dari": "2.6.0",
+    "commits": [
       {
         "hash": "fa12647",
         "pesan": "feat: logo png (favicon, apple-touch-icon, og:image 1200x630), hapus favicon.svg jpeg-berbungkus-svg dan drizzle.svg"
-      },
+      }
+    ]
+  },
+  "2.6.2": {
+    "tanggal": "2026-10-10",
+    "dari": "2.6.1",
+    "commits": [
       {
         "hash": "3d13661",
         "pesan": "docs: hapus komentar deleteBook yang keliru (loans.book_id set null, bukan cascade)"
@@ -334,11 +462,33 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "fda4309",
         "pesan": "fix: requested_by di category_requests dan delete_requests nullable (selaras FK set null)"
-      },
+      }
+    ]
+  },
+  "2.6.3": {
+    "tanggal": "2026-10-10",
+    "dari": "2.6.2",
+    "commits": [
       {
         "hash": "8753666",
         "pesan": "feat: label bahasa Indonesia untuk kode aksi di halaman activity"
-      },
+      }
+    ]
+  },
+  "2.6.4": {
+    "tanggal": "2026-10-10",
+    "dari": "2.6.3",
+    "commits": [
+      {
+        "hash": "d0f8a0f",
+        "pesan": "Install Vercel Web Analytics"
+      }
+    ]
+  },
+  "2.6.5": {
+    "tanggal": "2026-10-10",
+    "dari": "2.6.4",
+    "commits": [
       {
         "hash": "10da019",
         "pesan": "chore: npm audit fix (tanpa --force)"
@@ -347,16 +497,28 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.7.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.0",
+    "dari": "2.6.5",
     "commits": [
       {
         "hash": "8311a4c",
         "pesan": "feat: ganti email di profil (konfirmasi ke alamat baru, password wajib, sinkron admin_profiles)"
-      },
+      }
+    ]
+  },
+  "2.7.1": {
+    "tanggal": "2026-10-10",
+    "dari": "2.7.0",
+    "commits": [
       {
         "hash": "49ed75d",
         "pesan": "fix: ganti email lewat client terisolasi (token tanpa pkce, bisa ditukar di server)"
-      },
+      }
+    ]
+  },
+  "2.7.2": {
+    "tanggal": "2026-10-10",
+    "dari": "2.7.1",
+    "commits": [
       {
         "hash": "064d5c2",
         "pesan": "docs: pangkas komentar guards dan loan/maintenance requests"
@@ -364,7 +526,13 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "9379cd2",
         "pesan": "feat: role developer (kolom is_developer, requireDeveloper)"
-      },
+      }
+    ]
+  },
+  "2.7.3": {
+    "tanggal": "2026-10-10",
+    "dari": "2.7.2",
+    "commits": [
       {
         "hash": "2c5ae71",
         "pesan": "feat: request fitur admin (tiket ke developer, role developer)"
@@ -373,28 +541,58 @@ export const GIT_RILIS: Record<string, GitRilis> = {
   },
   "2.8.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.7.0",
+    "dari": "2.7.3",
     "commits": [
       {
         "hash": "288cd67",
         "pesan": "feat: skema feedback publik (feedback, feedback_votes), RLS feature_requests dicatat di skema"
-      },
+      }
+    ]
+  },
+  "2.8.1": {
+    "tanggal": "2026-10-10",
+    "dari": "2.8.0",
+    "commits": [
       {
         "hash": "4713e3f",
         "pesan": "feat: submitFeedback (publik; honeypot, pembatas 3/jam per ip_hash, validasi zod)"
-      },
+      }
+    ]
+  },
+  "2.8.2": {
+    "tanggal": "2026-10-10",
+    "dari": "2.8.1",
+    "commits": [
       {
         "hash": "b5161f5",
         "pesan": "feat: fungsi admin feedback (daftar, vote, status, teruskan jadi request fitur)"
-      },
+      }
+    ]
+  },
+  "2.8.3": {
+    "tanggal": "2026-10-10",
+    "dari": "2.8.2",
+    "commits": [
       {
         "hash": "61c1bd6",
         "pesan": "feat: halaman publik /feedback, tautan dari modal buku dan footer"
-      },
+      }
+    ]
+  },
+  "2.8.4": {
+    "tanggal": "2026-10-10",
+    "dari": "2.8.3",
+    "commits": [
       {
         "hash": "7f647a4",
         "pesan": "fix: pembatas feedback gagal-tertutup saat IP tidak terbaca (bucket unknown 20/jam), log nama header untuk diagnosis"
-      },
+      }
+    ]
+  },
+  "2.8.5": {
+    "tanggal": "2026-10-10",
+    "dari": "2.8.4",
+    "commits": [
       {
         "hash": "c9fda55",
         "pesan": "chore: sederhanakan log IP tak terbaca di submitFeedback"
@@ -402,6 +600,24 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       {
         "hash": "d6da3ce",
         "pesan": "feat: halaman admin /admin/feedback (daftar, vote, status, teruskan jadi request), warna status"
+      }
+    ]
+  },
+  "2.8.6": {
+    "tanggal": "2026-10-11",
+    "dari": "2.8.5",
+    "commits": [
+      {
+        "hash": "403f00f",
+        "pesan": "feat: data changelog (ringkasan awam + catatan teknis) dan skrip generator daftar commit dari tag"
+      },
+      {
+        "hash": "65f25a8",
+        "pesan": "chore: changelog mengikuti skema versi v2"
+      },
+      {
+        "hash": "488a727",
+        "pesan": "chore: pangkas komentar schema.ts"
       }
     ]
   }
