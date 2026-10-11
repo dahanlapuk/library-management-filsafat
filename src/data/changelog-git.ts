@@ -634,5 +634,23 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "chore: changelog per deploy produksi (48 rilis), penanda fitur baru dan current version"
       }
     ]
+  },
+  "2.10.0": {
+    "tanggal": "2026-10-11",
+    "dari": "2.9.0",
+    "commits": [
+      {
+        "hash": "6f20053",
+        "pesan": "docs: tulis ulang README (versioning dan alur rilis); chore: entri changelog v2.9.0"
+      },
+      {
+        "hash": "957592b",
+        "pesan": "feat: email terima kasih ke peminjam saat buku dikembalikan (opsional, tanpa balasan)"
+      },
+      {
+        "hash": "43f13a8",
+        "pesan": "style: email terima kasih berbentuk HTML (seragam dengan template auth)"
+      }
+    ]
   }
 }

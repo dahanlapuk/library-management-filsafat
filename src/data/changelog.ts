@@ -10,6 +10,19 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.10.0',
+    judul: 'Email terima kasih saat buku dikembalikan',
+    fitur: true,
+    ringkas: [
+      'Peminjam yang mengisi alamat email di formulir pinjam kini menerima ucapan terima kasih otomatis saat bukunya dikembalikan.',
+      'Peminjam yang tidak mengisi email tidak terpengaruh. Email ini dikirim otomatis dan tidak perlu dibalas.',
+    ],
+    teknis: [
+      'src/loans/thank-you.ts: email HTML dikirim lewat API pengirim email setelah transaksi returnLoan selesai. Kegagalan kirim tidak membatalkan pengembalian.',
+      'Kode aksi baru di log aktivitas: LOAN_THANKYOU_SENT dan LOAN_THANKYOU_FAILED, lengkap dengan label.',
+    ],
+  },
+  {
     versi: '2.9.0',
     judul: 'Halaman Changelog',
     fitur: true,
