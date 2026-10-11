@@ -620,5 +620,19 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "chore: pangkas komentar schema.ts"
       }
     ]
+  },
+  "2.9.0": {
+    "tanggal": "2026-10-11",
+    "dari": "2.8.6",
+    "commits": [
+      {
+        "hash": "76d1131",
+        "pesan": "feat: halaman /changelog (pohon versi, noindex)"
+      },
+      {
+        "hash": "84eab09",
+        "pesan": "chore: changelog per deploy produksi (48 rilis), penanda fitur baru dan current version"
+      }
+    ]
   }
 }

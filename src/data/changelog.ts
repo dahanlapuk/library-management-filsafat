@@ -10,6 +10,20 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.9.0',
+    judul: 'Halaman Changelog',
+    fitur: true,
+    ringkas: [
+      'Ada halaman Changelog yang memuat riwayat perubahan, dikelompokkan per versi dan dapat dibuka satu per satu.',
+      'Setiap versi menampilkan tanggal, ringkasan, dan penanda Fitur baru. Rincian teknis dan daftar commit dapat dibuka dari tiap versi.',
+      'Tautan Changelog tersedia di kolom Menu pada footer.',
+    ],
+    teknis: [
+      'Rute /changelog (noindex, tidak masuk sitemap). Data ringkasan ditulis tangan di src/data/changelog.ts; tanggal dan daftar commit dihasilkan dari tag git lewat scripts/changelog-git.mjs.',
+      'Penomoran versi kini mengikuti deploy produksi: tiap deploy mendapat tag, 45 tag lama diganti dan riwayat dari v2.0.0 sampai v2.8.6 dinomori ulang.',
+    ],
+  },
+  {
     versi: '2.8.6',
     judul: 'Data changelog dan perapian',
     ringkas: ['Persiapan halaman changelog dan perapian kode. Tidak ada perubahan tampilan.'],
