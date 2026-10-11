@@ -31,6 +31,9 @@ export function Footer() {
           <Link to="/feedback" className="hover:underline">
             Kirim feedback
           </Link>
+          <Link to="/changelog" className="hover:underline">
+            Changelog
+          </Link>
           {!isAdminArea && (
             <Link to="/admin/login" className="hover:underline">
               Masuk sebagai admin
