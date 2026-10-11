@@ -14,6 +14,7 @@ import {
 import { requireApprovedAdmin } from '../admin/guards'
 import { logActivity } from '../admin/activity-log'
 import { allocateFromLargestStock, canCreateLoan } from './allocation'
+import { sendThankYouEmail } from './thank-you'
 
 // Durasi pinjam dosen -- konstanta kode (bukan di DB/settings table) biar
 // gampang diubah kalau kesepakatan berubah, tanpa perlu migration.
@@ -298,7 +299,7 @@ export const returnLoan = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const admin = await requireApprovedAdmin()
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [loan] = await tx
         .select({
           id: loans.id,
@@ -335,8 +336,37 @@ export const returnLoan = createServerFn({ method: 'POST' })
         details: { memberId: loan.memberId },
       })
 
-      return { id: data.id }
+      const [member] = await tx
+        .select({ nama: members.nama, email: members.email })
+        .from(members)
+        .where(eq(members.id, loan.memberId))
+        .limit(1)
+
+      return { judul: loan.bookJudul, member }
     })
+
+    const to = result.member?.email?.trim()
+    if (to && result.member) {
+      try {
+        const ok = await sendThankYouEmail({
+          to,
+          nama: result.member.nama,
+          judul: result.judul ?? 'buku',
+        })
+        await db.transaction((tx) =>
+          logActivity(tx, admin, {
+            action: ok ? 'LOAN_THANKYOU_SENT' : 'LOAN_THANKYOU_FAILED',
+            entityType: 'LOAN',
+            entityId: data.id,
+            entityName: result.judul,
+          }),
+        )
+      } catch (err) {
+        console.error('Email terima kasih gagal', err instanceof Error ? err.message : err)
+      }
+    }
+
+    return { id: data.id }
   })
 
 // ── LOAN NOTIFICATION TIMESTAMPS (chat WhatsApp manual) ───────────

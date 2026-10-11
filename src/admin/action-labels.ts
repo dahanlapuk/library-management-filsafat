@@ -38,6 +38,8 @@ const ACTION_LABELS: Record<string, string> = {
   REJECT_CATEGORY_REQUEST: 'Tolak pengajuan kategori',
   APPROVE_LOAN_REQUEST: 'Setujui permintaan pinjam',
   REJECT_LOAN_REQUEST: 'Tolak permintaan pinjam',
+  LOAN_THANKYOU_SENT: 'Email terima kasih terkirim',
+  LOAN_THANKYOU_FAILED: 'Email terima kasih gagal',
   RETURN_LOAN: 'Pengembalian buku',
   MAINTENANCE_START: 'Mulai maintenance',
   MAINTENANCE_APPROVE: 'Setujui maintenance',
