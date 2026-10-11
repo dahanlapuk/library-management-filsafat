@@ -19,15 +19,11 @@ import { relations, sql } from 'drizzle-orm'
 
 // ── ENUMS ────────────────────────────────────────────────────────
 export const memberRoleEnum = pgEnum('member_role', ['mahasiswa', 'dosen'])
-// Jenjang cuma relevan buat mahasiswa (S1/S2/S3) -- null buat dosen. Dipakai
-// buat filter di halaman admin members (jenjang S1/S2/S3, atau "Dosen" yang
-// sebenarnya query-nya role='dosen', bukan filter kolom ini).
 export const memberJenjangEnum = pgEnum('member_jenjang', ['S1', 'S2', 'S3'])
 export const categoryGroupingEnum = pgEnum('category_grouping', ['bentuk', 'konten', 'lain'])
 export const categoryKindEnum = pgEnum('category_kind', ['kategori', 'tag'])
 
 // ── ADMIN (identitas terhubung ke Supabase Auth) ────────────────
-// id di sini SAMA dengan auth.users.id — bukan bikin sistem auth sendiri lagi
 export const adminProfiles = pgTable('admin_profiles', {
   id: uuid('id').primaryKey(), // = auth.users.id
   nama: text('nama').notNull(),
@@ -49,7 +45,6 @@ export const categories = pgTable(
     id: serial('id').primaryKey(),
     nama: text('nama').notNull(),
     grouping: categoryGroupingEnum('grouping'),
-    // 'kategori' = simpul pohon; 'tag' = label topik bebas
     kind: categoryKindEnum('kind').notNull().default('kategori'),
     parentId: integer('parent_id').references((): AnyPgColumn => categories.id, {
       onDelete: 'restrict',
@@ -69,9 +64,6 @@ export const posisi = pgTable('posisi', {
   kode: text('kode').notNull().unique(), // 'A1', 'B3', dst
   rak: text('rak').notNull(),
   deskripsi: text('deskripsi'),
-  // Kolom tambahan dari V1 (ditemukan lewat introspeksi live DB, bukan ada
-  // di schema.sql yang usang) -- semua keisi penuh di data V1, wajib
-  // dipertahankan.
   rakNo: integer('rak_no'),
   baris: text('baris'),
   kolomNo: integer('kolom_no'),
@@ -81,7 +73,7 @@ export const posisi = pgTable('posisi', {
 // ── BOOKS ────────────────────────────────────────────────────────
 export const books = pgTable('books', {
   id: serial('id').primaryKey(),
-  kode: text('kode'), // boleh kosong, sesuai V1 (49% buku tanpa kode)
+  kode: text('kode'),
   judul: text('judul').notNull(),
   penulis: text('penulis'),
   tahun: integer('tahun'),
@@ -91,24 +83,16 @@ export const books = pgTable('books', {
   keterangan: text('keterangan'),
   lastChecked: timestamp('last_checked'),
   checkedBy: text('checked_by'),
-  // Catatan opsional saat inventory check -- diisi kalau ada
-  // ketidaksesuaian (tidak ditemukan di rak manapun, ternyata sedang
-  // dipinjam informal, dll). Ditimpa/dikosongkan tiap kali dicek ulang,
-  // BUKAN histori penuh (audit trail lengkap masih Fase 3).
   lastCheckCatatan: text('last_check_catatan'),
   createdBy: uuid('created_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
   updatedBy: uuid('updated_by').references(() => adminProfiles.id, { onDelete: 'set null' }),
-  // Snapshot nama admin dari V1 -- createdBy/updatedBy (FK di atas) di-NULL
-  // untuk data migrasi karena ID admin integer V1 tidak bisa dipetakan ke
-  // UUID Supabase Auth V2. Kolom ini menyimpan nama aslinya sebagai jejak
-  // historis, meski tidak bisa di-link ke akun admin V2 manapun.
   legacyCreatedByNama: text('legacy_created_by_nama'),
   legacyUpdatedByNama: text('legacy_updated_by_nama'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
-// Tag tambahan per buku (many-to-many, terpisah dari kategoriId utama)
+// Tag tambahan per buku
 export const bookCategories = pgTable(
   'book_categories',
   {
@@ -118,7 +102,7 @@ export const bookCategories = pgTable(
   (t) => [unique().on(t.bookId, t.categoryId)],
 )
 
-// Stok buku per-posisi — INI business rule paling penting dari V1, jangan disederhanakan
+// Stok buku per-posisi
 export const bookStockLocations = pgTable(
   'book_stock_locations',
   {
