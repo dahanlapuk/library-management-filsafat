@@ -44,13 +44,13 @@ export function BookDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex overflow-y-auto bg-[var(--ink)]/50 p-3 sm:p-4"
+      className="fixed inset-0 z-50 flex overflow-y-auto bg-[var(--ink)]/50 pt-8 sm:p-4"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="relative m-auto flex w-full max-w-[640px] flex-col gap-4 sm:gap-5 overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--white)] p-5 shadow-[0_24px_60px_-20px_rgba(24,22,0,0.45)] sm:p-7"
+        className="sheet-in relative mt-auto sm:m-auto flex w-full max-w-[640px] flex-col gap-4 sm:gap-5 overflow-hidden rounded-t-2xl sm:rounded-2xl border border-[var(--rule)] bg-[var(--white)] p-5 shadow-[0_24px_60px_-20px_rgba(24,22,0,0.45)] sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
