@@ -93,7 +93,7 @@ export const Route = createFileRoute('/')({
   },
 })
 
-const PAGE_SIZE_OPTIONS = [20, 40, 80] as const
+const PAGE_SIZE_OPTIONS = [10, 20, 40, 80] as const
 
 const statusOptions: {
   value: 'dipinjam' | 'tersedia' | undefined
@@ -118,7 +118,7 @@ function PublicCatalogPage() {
   const [status, setStatus] = useState<'dipinjam' | 'tersedia' | undefined>(
     undefined,
   )
-  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE_OPTIONS[0])
+  const [pageSize, setPageSize] = useState<number>(20)
   const [page, setPage] = useState(1)
 
   const [categoryFilter, setCategoryFilter] = useState('')
@@ -402,18 +402,18 @@ function PublicCatalogPage() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-2 border border-[var(--black)] disabled:opacity-40"
+                className="rounded-lg border border-[var(--rule)] bg-[var(--white)] px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--pale-soft)] disabled:opacity-40 disabled:hover:bg-[var(--white)]"
               >
                 ← Sebelumnya
               </button>
               <span className="text-sm text-[var(--gray-600)]">
-                Halaman {page} dari {totalPages}
+                <span className="hidden sm:inline">Halaman</span><span className="sm:hidden">Hal.</span> {page} dari {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-2 border border-[var(--black)] disabled:opacity-40"
+                className="rounded-lg border border-[var(--rule)] bg-[var(--white)] px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--pale-soft)] disabled:opacity-40 disabled:hover:bg-[var(--white)]"
               >
                 Berikutnya →
               </button>
