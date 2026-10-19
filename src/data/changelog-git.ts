@@ -652,5 +652,35 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "style: email terima kasih berbentuk HTML (seragam dengan template auth)"
       }
     ]
+  },
+  "2.11.0": {
+    "tanggal": "2026-10-19",
+    "dari": "2.10.0",
+    "commits": [
+      {
+        "hash": "d7b4195",
+        "pesan": "chore: entri changelog v2.10.0"
+      },
+      {
+        "hash": "5593592",
+        "pesan": "fix: ketersediaan katalog dihitung dari sisa eksemplar, bukan ada/tidaknya pinjaman aktif"
+      },
+      {
+        "hash": "159e8d4",
+        "pesan": "fix: kunci baris buku saat approve loan request (cegah approval bersamaan melebihi stok)"
+      },
+      {
+        "hash": "2c04fa2",
+        "pesan": "feat: lencana peran Developer/Superadmin dibedakan di halaman login dan header admin"
+      },
+      {
+        "hash": "de7e98d",
+        "pesan": "feat: constraint database developer wajib superadmin (migrasi 0017)"
+      },
+      {
+        "hash": "295057c",
+        "pesan": "feat: kredit footer dan README jadi crkstudio, tautan balik ke filsafatui.app"
+      }
+    ]
   }
 }

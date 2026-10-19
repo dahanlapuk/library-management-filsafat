@@ -10,6 +10,22 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.11.0',
+    judul: 'Lencana peran, katalog buku multi-eksemplar, dan kredit baru',
+    fitur: true,
+    ringkas: [
+      'Buku yang punya lebih dari satu eksemplar kini tetap tampil Tersedia selama masih ada eksemplar yang belum dipinjam. Sebelumnya, begitu satu eksemplar dipinjam, seluruh buku tampil Dipinjam dan tombol pinjam tertutup.',
+      'Halaman login dan header admin kini membedakan peran dengan jelas: Developer (lencana solid), Superadmin (lencana garis), dan Admin biasa (tanpa lencana).',
+      'Footer memuat tautan ke situs Departemen Filsafat UI (filsafatui.app) dan kredit pengembang kini crkstudio.',
+    ],
+    teknis: [
+      'Ketersediaan katalog dihitung dari qty dikurangi pinjaman aktif (sisa), bukan EXISTS pinjaman aktif. Data katalog publik kini membawa jumlah sisa, tanpa identitas peminjam.',
+      'approveLoanRequest mengunci baris buku (SELECT ... FOR UPDATE) di dalam transaksi supaya dua persetujuan bersamaan tidak melebihi stok.',
+      'Komponen PeranBadge (src/admin/PeranBadge.tsx) dengan hierarki developer, superadmin, admin; getAdminList kini menyertakan isDeveloper.',
+      'Migrasi 0017: CHECK constraint developer_implies_superadmin pada admin_profiles (developer wajib superadmin).',
+    ],
+  },
+  {
     versi: '2.10.0',
     judul: 'Email terima kasih saat buku dikembalikan',
     fitur: true,
