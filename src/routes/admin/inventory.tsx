@@ -2,6 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button, Chip } from '../../components/ui/Button'
+import { Input, Select } from '../../components/ui/Field'
 import { getPosisiList } from '../../books/admin'
 import {
   getPosisiWithProgress,
@@ -27,14 +30,10 @@ function formatTanggal(value: string | Date | null) {
   })
 }
 
-// Draft per buku -- qty, posisi tujuan (null = Belum Ditempatkan), dan
-// catatan opsional. Direset begitu simpan sukses.
+// posisiId null = Belum Ditempatkan. Direset setelah simpan sukses.
 type Draft = { qty: number; posisiId: number | null; catatan: string }
 
-// Tipe gabungan buat baris buku yang dirender -- posisiId/posisiKode
-// cuma ADA kalau datang dari hasil search (lihat searchBooksForInventoryCheck),
-// makanya opsional di sini. Ini yang bikin narrowing di JSX jadi
-// straightforward, ketimbang andalkan `in` di tengah render.
+// posisiId/posisiKode hanya ada di hasil search.
 type InventoryBookRow = {
   id: number
   kode: string | null
@@ -53,9 +52,7 @@ function InventoryCheckPage() {
   const [drafts, setDrafts] = useState<Record<number, Draft>>({})
   const [urutan, setUrutan] = useState<'rak' | 'jumlah'>('rak')
 
-  // Search lintas SEMUA rak -- independen dari pilihan rak di sidebar,
-  // buat kasus "lagi nyari buku spesifik ini ada di mana" ketimbang
-  // "lagi ngecek rak ini isinya apa aja".
+  // Search lintas semua rak, independen dari rak yang dipilih.
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   useEffect(() => {
@@ -103,8 +100,7 @@ function InventoryCheckPage() {
   })
 
   const posisiProgress = posisiProgressQuery.data ?? []
-  // Mode 'jumlah': belum-dicek terbanyak di atas. Sort stabil, jadi yang
-  // seri tetap urut rak.
+  // Mode 'jumlah': belum-dicek terbanyak di atas.
   const posisiProgressList =
     urutan === 'rak'
       ? posisiProgress
@@ -122,10 +118,7 @@ function InventoryCheckPage() {
   const isLoadingList = isSearching ? searchQuery.isLoading : booksQuery.isLoading
   const showList = isSearching || selection !== 'none'
 
-  // `posisiId` cuma ada di hasil search (bisa datang dari rak mana pun,
-  // jadi default-nya harus posisi ASLI buku itu). Buku dari list per-rak
-  // biasa tidak punya field ini -- default-nya tetap ikut rak yang lagi
-  // dipilih di sidebar, sama seperti sebelumnya.
+  // Hasil search: default ke posisi asli buku. List per-rak: ikut rak terpilih.
   function getDraft(book: InventoryBookRow): Draft {
     if (drafts[book.id]) return drafts[book.id]
     const defaultPosisiId =
@@ -141,200 +134,194 @@ function InventoryCheckPage() {
     setDrafts((prev) => ({ ...prev, [bookId]: { ...base, ...patch } }))
   }
 
+  const smallBtn =
+    'rounded-full border border-[var(--rule)] px-2.5 py-1 text-xs text-[var(--muted)] transition-colors hover:bg-[var(--pale-soft)]'
+
   return (
     <AdminPage>
-      <div className="flex flex-col md:flex-row gap-6">
-      <aside className="w-full md:w-64 shrink-0">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
-          Posisi Rak
-        </h2>
-        <div className="mb-3 flex gap-1 text-xs">
-          {(
-            [
-              ['rak', 'Urutan rak'],
-              ['jumlah', 'Jumlah'],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={urutan === value}
-              onClick={() => setUrutan(value)}
-              className={`border px-2 py-1 ${
-                urutan === value
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] font-semibold'
-                  : 'border-[var(--gray-200)] text-[var(--gray-600)]'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {posisiProgressQuery.isLoading && (
-          <p className="text-sm text-[var(--gray-600)]">Memuat...</p>
-        )}
-        <ul className="max-h-64 md:max-h-[70vh] space-y-1 overflow-y-auto">
-          {posisiProgressList.map((p) => {
-            const belum = p.totalBuku - p.sudahDicek
-            const isUnpositioned = p.id === null
-            const isSelected = isUnpositioned
-              ? selection === 'unpositioned'
-              : selection === p.id
-            return (
-              <li key={p.id ?? 'unpositioned'}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelection(isUnpositioned ? 'unpositioned' : (p.id as number))
-                  }
-                  className={`flex w-full items-center justify-between border px-3 py-2 text-left text-sm ${
-                    isSelected
-                      ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
-                      : isUnpositioned
-                        ? 'border-dashed border-[var(--gray-600)]'
-                        : 'border-[var(--gray-200)]'
-                  }`}
-                >
-                  <span>
-                    {p.kode}
-                    {!isUnpositioned && (
-                      <span className="ml-1 text-[var(--gray-600)]">({p.rak})</span>
-                    )}
-                  </span>
-                  <span
-                    className={`text-xs ${
-                      belum > 0 ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--gray-600)]'
+      <div className="flex flex-col gap-6 md:flex-row">
+        <aside className="w-full shrink-0 md:w-64">
+          <h2 className="mb-2 text-sm font-medium text-[var(--muted)]">Posisi Rak</h2>
+          <div className="mb-3 flex gap-2">
+            {(
+              [
+                ['rak', 'Urutan rak'],
+                ['jumlah', 'Jumlah'],
+              ] as const
+            ).map(([value, label]) => (
+              <Chip
+                key={value}
+                active={urutan === value}
+                onClick={() => setUrutan(value)}
+                className="text-xs"
+              >
+                {label}
+              </Chip>
+            ))}
+          </div>
+          {posisiProgressQuery.isLoading && (
+            <p className="text-sm text-[var(--muted)]">Memuat...</p>
+          )}
+          <ul className="max-h-64 space-y-1.5 overflow-y-auto md:max-h-[70vh]">
+            {posisiProgressList.map((p) => {
+              const belum = p.totalBuku - p.sudahDicek
+              const isUnpositioned = p.id === null
+              const isSelected = isUnpositioned
+                ? selection === 'unpositioned'
+                : selection === p.id
+              return (
+                <li key={p.id ?? 'unpositioned'}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelection(isUnpositioned ? 'unpositioned' : (p.id as number))
+                    }
+                    className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                      isSelected
+                        ? 'border-[var(--sun)] bg-[var(--pale)]'
+                        : isUnpositioned
+                          ? 'border-dashed border-[var(--muted)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
+                          : 'border-[var(--rule)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
                     }`}
                   >
-                    {p.sudahDicek}/{p.totalBuku}
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </aside>
+                    <span>
+                      {p.kode}
+                      {!isUnpositioned && (
+                        <span className="ml-1 text-[var(--muted)]">({p.rak})</span>
+                      )}
+                    </span>
+                    <span
+                      className={`text-xs ${
+                        belum > 0 ? 'font-semibold' : 'text-[var(--muted)]'
+                      }`}
+                    >
+                      {p.sudahDicek}/{p.totalBuku}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </aside>
 
-      <section className="flex-1">
-        <h1 className="mb-4 text-xl font-semibold text-[var(--text-primary)]">
-          Inventory Check
-        </h1>
+        <section className="min-w-0 flex-1">
+          <h1 className="mb-4 text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
+            Inventory Check
+          </h1>
 
-        <input
-          type="search"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Cari judul atau kode buku (lintas semua rak)..."
-          className="mb-4 w-full border border-[var(--gray-200)] px-3 py-2 text-sm"
-        />
+          <Input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Cari judul atau kode buku (lintas semua rak)..."
+            className="mb-4 w-full"
+          />
 
-        {!showList && (
-          <p className="text-sm text-[var(--gray-600)]">
-            Pilih rak (atau "Belum Ditempatkan") di sidebar, atau cari nama/kode buku
-            di atas untuk mulai checklist.
-          </p>
-        )}
+          {!showList && (
+            <p className="text-sm text-[var(--muted)]">
+              Pilih rak (atau "Belum Ditempatkan") di samping, atau cari nama/kode buku di atas
+              untuk mulai checklist.
+            </p>
+          )}
 
-        {showList && (
-          <>
-            {isSearching && (
-              <p className="mb-2 text-xs text-[var(--gray-600)]">
-                Hasil cari lintas semua rak -- posisi tujuan default mengikuti
-                posisi tercatat buku itu sekarang, bukan rak yang dipilih di
-                sidebar.
-              </p>
-            )}
-            {isLoadingList && (
-              <p className="text-sm text-[var(--gray-600)]">Memuat buku...</p>
-            )}
-            {!isLoadingList && displayList.length === 0 && (
-              <p className="text-sm text-[var(--gray-600)]">
-                {isSearching ? 'Tidak ada buku yang cocok.' : 'Tidak ada buku di sini.'}
-              </p>
-            )}
+          {showList && (
+            <>
+              {isSearching && (
+                <p className="mb-3 text-xs text-[var(--muted)]">
+                  Hasil cari lintas semua rak. Posisi tujuan default mengikuti posisi tercatat
+                  buku itu sekarang, bukan rak yang dipilih.
+                </p>
+              )}
+              {isLoadingList && <p className="text-sm text-[var(--muted)]">Memuat buku...</p>}
+              {!isLoadingList && displayList.length === 0 && (
+                <p className="text-sm text-[var(--muted)]">
+                  {isSearching ? 'Tidak ada buku yang cocok.' : 'Tidak ada buku di sini.'}
+                </p>
+              )}
 
-            <ul className="space-y-3">
-              {displayList.map((book) => {
-                const draft = getDraft(book)
-                const belumPernahDicek = book.lastChecked === null
-                const isSaving =
-                  checkMutation.isPending &&
-                  checkMutation.variables?.data.bookId === book.id
+              <ul className="space-y-3">
+                {displayList.map((book) => {
+                  const draft = getDraft(book)
+                  const belumPernahDicek = book.lastChecked === null
+                  const isSaving =
+                    checkMutation.isPending &&
+                    checkMutation.variables?.data.bookId === book.id
 
-                return (
-                  <li key={book.id} className="border border-[var(--gray-200)] p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-[var(--text-primary)]">{book.judul}</p>
-                        <p className="text-xs text-[var(--gray-600)]">
+                  return (
+                    <li
+                      key={book.id}
+                      className="rounded-xl border border-[var(--rule)] bg-[var(--white)] p-4 shadow-[0_1px_2px_rgba(24,22,0,0.05)]"
+                    >
+                      <div className="flex min-w-0 flex-col gap-1">
+                        <p className="break-words font-semibold">{book.judul}</p>
+                        <p className="text-xs text-[var(--muted)]">
                           {book.kode ?? '(tanpa kode)'}
+                          {isSearching && (
+                            <>
+                              {' · '}Rak sekarang:{' '}
+                              <span className="font-medium text-[var(--ink)]">
+                                {book.posisiKode ?? 'Belum Ditempatkan'}
+                              </span>
+                            </>
+                          )}
                         </p>
-                        {isSearching && (
-                          <p className="mt-1 text-xs text-[var(--gray-600)]">
-                            Rak sekarang:{' '}
-                            <span className="font-medium text-[var(--text-primary)]">
-                              {book.posisiKode ?? 'Belum Ditempatkan'}
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
+                          {belumPernahDicek ? (
+                            <Badge tone="soft">Belum pernah dicek</Badge>
+                          ) : (
+                            <span>
+                              Terakhir dicek {formatTanggal(book.lastChecked)}
+                              {book.checkedBy ? ` oleh ${book.checkedBy}` : ''}
                             </span>
-                          </p>
-                        )}
-                        {belumPernahDicek ? (
-                          <span className="mt-1 inline-block border border-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--text-primary)]">
-                            Belum pernah dicek
-                          </span>
-                        ) : (
-                          <p className="mt-1 text-xs text-[var(--gray-600)]">
-                            Terakhir dicek {formatTanggal(book.lastChecked)}
-                            {book.checkedBy ? ` oleh ${book.checkedBy}` : ''}
-                          </p>
-                        )}
+                          )}
+                        </div>
                         {book.lastCheckCatatan && (
-                          <p className="mt-1 text-xs italic text-[var(--text-primary)]">
+                          <p className="break-words text-xs italic">
                             Catatan sebelumnya: {book.lastCheckCatatan}
                           </p>
                         )}
                       </div>
 
-                      <div className="flex shrink-0 flex-col items-end gap-2">
-                        <div className="flex items-center gap-2">
-                          <label className="text-xs text-[var(--gray-600)]">
+                      <div className="mt-3 flex flex-col gap-2 border-t border-[var(--rule)] pt-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <label className="text-xs text-[var(--muted)]">
                             Sistem: {book.qty}
                           </label>
-                          <input
+                          <Input
                             type="number"
                             min={0}
                             value={draft.qty}
                             onChange={(e) =>
                               setDraft(book.id, { qty: Number(e.target.value) }, draft)
                             }
-                            className="w-20 border border-[var(--gray-200)] px-2 py-1 text-sm"
+                            className="w-24"
                           />
+                          <Select
+                            value={draft.posisiId === null ? UNPOSITIONED_VALUE : draft.posisiId}
+                            onChange={(e) =>
+                              setDraft(
+                                book.id,
+                                {
+                                  posisiId:
+                                    e.target.value === UNPOSITIONED_VALUE
+                                      ? null
+                                      : Number(e.target.value),
+                                },
+                                draft,
+                              )
+                            }
+                            className="min-w-0 flex-1 sm:flex-none"
+                          >
+                            <option value={UNPOSITIONED_VALUE}>Belum Ditempatkan</option>
+                            {posisiList.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.kode} ({p.rak})
+                              </option>
+                            ))}
+                          </Select>
                         </div>
 
-                        <select
-                          value={draft.posisiId === null ? UNPOSITIONED_VALUE : draft.posisiId}
-                          onChange={(e) =>
-                            setDraft(
-                              book.id,
-                              {
-                                posisiId:
-                                  e.target.value === UNPOSITIONED_VALUE
-                                    ? null
-                                    : Number(e.target.value),
-                              },
-                              draft,
-                            )
-                          }
-                          className="border border-[var(--gray-200)] px-2 py-1 text-xs"
-                        >
-                          <option value={UNPOSITIONED_VALUE}>Belum Ditempatkan</option>
-                          {posisiList.map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.kode} ({p.rak})
-                            </option>
-                          ))}
-                        </select>
-
-                        <div className="flex gap-1">
+                        <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
                             onClick={() =>
@@ -348,7 +335,7 @@ function InventoryCheckPage() {
                                 draft,
                               )
                             }
-                            className="border border-[var(--gray-600)] px-2 py-0.5 text-xs text-[var(--gray-600)]"
+                            className={smallBtn}
                           >
                             Tidak ditemukan
                           </button>
@@ -364,48 +351,47 @@ function InventoryCheckPage() {
                                 draft,
                               )
                             }
-                            className="border border-[var(--gray-600)] px-2 py-0.5 text-xs text-[var(--gray-600)]"
+                            className={smallBtn}
                           >
                             Sedang dipinjam?
                           </button>
                         </div>
 
-                        <input
-                          type="text"
-                          placeholder="Catatan (opsional)"
-                          value={draft.catatan}
-                          onChange={(e) =>
-                            setDraft(book.id, { catatan: e.target.value }, draft)
-                          }
-                          className="w-48 border border-[var(--gray-200)] px-2 py-1 text-xs"
-                        />
-
-                        <button
-                          type="button"
-                          disabled={isSaving}
-                          onClick={() =>
-                            checkMutation.mutate({
-                              data: {
-                                bookId: book.id,
-                                newPosisiId: draft.posisiId,
-                                actualQty: draft.qty,
-                                catatan: draft.catatan || undefined,
-                              },
-                            })
-                          }
-                          className="border border-[var(--black)] px-3 py-1 text-sm font-medium disabled:opacity-50"
-                        >
-                          {isSaving ? 'Menyimpan...' : 'Simpan'}
-                        </button>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <Input
+                            type="text"
+                            placeholder="Catatan (opsional)"
+                            value={draft.catatan}
+                            onChange={(e) =>
+                              setDraft(book.id, { catatan: e.target.value }, draft)
+                            }
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="accent"
+                            disabled={isSaving}
+                            onClick={() =>
+                              checkMutation.mutate({
+                                data: {
+                                  bookId: book.id,
+                                  newPosisiId: draft.posisiId,
+                                  actualQty: draft.qty,
+                                  catatan: draft.catatan || undefined,
+                                },
+                              })
+                            }
+                          >
+                            {isSaving ? 'Menyimpan...' : 'Simpan'}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        )}
-      </section>
+                    </li>
+                  )
+                })}
+              </ul>
+            </>
+          )}
+        </section>
       </div>
     </AdminPage>
   )
