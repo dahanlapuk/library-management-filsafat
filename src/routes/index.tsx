@@ -227,19 +227,19 @@ function PublicCatalogPage() {
           <p className="text-sm text-[var(--ink)]/75">
             Katalog koleksi · Fakultas Ilmu Pengetahuan Budaya
           </p>
-        </div>
-      </header>
-
-      <main className="max-w-[1100px] mx-auto px-5 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <aside className="lg:w-[260px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-4">
           <input
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Cari judul, kode..."
-            className="w-full rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--black)]"
+            aria-label="Cari buku"
+            className="search-hero mt-3 w-full max-w-xl rounded-full border border-[var(--ink)]/20 bg-[var(--white)] px-5 py-3 text-base shadow-sm"
           />
+        </div>
+      </header>
 
+      <main className="max-w-[1100px] mx-auto px-5 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
+        <aside className="lg:w-[260px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-4">
           <div className="flex flex-col gap-2">
             <button
               type="button"
@@ -381,9 +381,18 @@ function PublicCatalogPage() {
           </p>
 
           {isLoading ? (
-            <p className="text-[var(--gray-600)] py-8 text-center">
-              Memuat katalog...
-            </p>
+            <div
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+              aria-busy="true"
+              aria-label="Memuat katalog"
+            >
+              {Array.from({ length: 6 }, (_, i) => (
+                <div
+                  key={i}
+                  className="h-36 animate-pulse rounded-xl border border-[var(--rule)] bg-[var(--pale-soft)]"
+                />
+              ))}
+            </div>
           ) : books.length === 0 ? (
             <div className="rounded-xl border border-[var(--gray-200)] p-8 text-center text-[var(--gray-600)]">
               Tidak ada buku yang cocok dengan pencarian ini.
