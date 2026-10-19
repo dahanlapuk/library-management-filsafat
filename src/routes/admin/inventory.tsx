@@ -51,6 +51,8 @@ function InventoryCheckPage() {
   const [selection, setSelection] = useState<Selection>('none')
   const [drafts, setDrafts] = useState<Record<number, Draft>>({})
   const [urutan, setUrutan] = useState<'rak' | 'jumlah'>('rak')
+  const [hanyaBelum, setHanyaBelum] = useState(false)
+  const [detailOpen, setDetailOpen] = useState<Record<number, boolean>>({})
 
   // Search lintas semua rak, independen dari rak yang dipilih.
   const [searchInput, setSearchInput] = useState('')
@@ -132,6 +134,21 @@ function InventoryCheckPage() {
 
   function setDraft(bookId: number, patch: Partial<Draft>, base: Draft) {
     setDrafts((prev) => ({ ...prev, [bookId]: { ...base, ...patch } }))
+  }
+
+  const sudah = displayList.filter((b) => b.lastChecked !== null).length
+  const visibleList =
+    hanyaBelum && !isSearching ? displayList.filter((b) => b.lastChecked === null) : displayList
+
+  function simpan(book: InventoryBookRow, draft: Draft) {
+    checkMutation.mutate({
+      data: {
+        bookId: book.id,
+        newPosisiId: draft.posisiId,
+        actualQty: draft.qty,
+        catatan: draft.catatan || undefined,
+      },
+    })
   }
 
   const smallBtn =
@@ -232,16 +249,53 @@ function InventoryCheckPage() {
                   buku itu sekarang, bukan rak yang dipilih.
                 </p>
               )}
+              {!isSearching && displayList.length > 0 && (
+                <div className="mb-4 flex flex-col gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--muted)]">
+                    <span>
+                      {sudah} dari {displayList.length} sudah dicek
+                    </span>
+                    <Chip
+                      active={hanyaBelum}
+                      onClick={() => setHanyaBelum((v) => !v)}
+                      className="text-xs"
+                    >
+                      Hanya yang belum dicek
+                    </Chip>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full border border-[var(--rule)] bg-[var(--pale-soft)]">
+                    <div
+                      className="h-full bg-[var(--sun)] transition-all"
+                      style={{ width: `${Math.round((sudah / displayList.length) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {checkMutation.isError && (
+                <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {checkMutation.error instanceof Error
+                    ? checkMutation.error.message
+                    : 'Gagal menyimpan.'}
+                </div>
+              )}
+              {checkMutation.isSuccess && (
+                <p className="mb-3 text-sm text-[var(--muted)]">Tersimpan.</p>
+              )}
               {isLoadingList && <p className="text-sm text-[var(--muted)]">Memuat buku...</p>}
-              {!isLoadingList && displayList.length === 0 && (
+              {!isLoadingList && visibleList.length === 0 && (
                 <p className="text-sm text-[var(--muted)]">
-                  {isSearching ? 'Tidak ada buku yang cocok.' : 'Tidak ada buku di sini.'}
+                  {isSearching
+                    ? 'Tidak ada buku yang cocok.'
+                    : displayList.length > 0
+                      ? 'Semua buku di rak ini sudah dicek.'
+                      : 'Tidak ada buku di sini.'}
                 </p>
               )}
 
               <ul className="space-y-3">
-                {displayList.map((book) => {
+                {visibleList.map((book) => {
                   const draft = getDraft(book)
+                  const terbuka = detailOpen[book.id] ?? book.qty === 0
                   const belumPernahDicek = book.lastChecked === null
                   const isSaving =
                     checkMutation.isPending &&
@@ -282,106 +336,110 @@ function InventoryCheckPage() {
                         )}
                       </div>
 
-                      <div className="mt-3 flex flex-col gap-2 border-t border-[var(--rule)] pt-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <label className="text-xs text-[var(--muted)]">
-                            Sistem: {book.qty}
-                          </label>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={draft.qty}
-                            onChange={(e) =>
-                              setDraft(book.id, { qty: Number(e.target.value) }, draft)
-                            }
-                            className="w-24"
-                          />
-                          <Select
-                            value={draft.posisiId === null ? UNPOSITIONED_VALUE : draft.posisiId}
-                            onChange={(e) =>
-                              setDraft(
-                                book.id,
-                                {
-                                  posisiId:
-                                    e.target.value === UNPOSITIONED_VALUE
-                                      ? null
-                                      : Number(e.target.value),
-                                },
-                                draft,
-                              )
-                            }
-                            className="min-w-0 flex-1 sm:flex-none"
-                          >
-                            <option value={UNPOSITIONED_VALUE}>Belum Ditempatkan</option>
-                            {posisiList.map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.kode} ({p.rak})
-                              </option>
-                            ))}
-                          </Select>
-                        </div>
-
+                      <div className="mt-3 flex flex-col gap-3 border-t border-[var(--rule)] pt-3">
+                        {terbuka && (
+                          <div className="flex flex-col gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <label className="text-xs text-[var(--muted)]">
+                                Sistem: {book.qty}
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={draft.qty}
+                                onChange={(e) =>
+                                  setDraft(book.id, { qty: Number(e.target.value) }, draft)
+                                }
+                                className="w-24"
+                              />
+                              <Select
+                                value={
+                                  draft.posisiId === null ? UNPOSITIONED_VALUE : draft.posisiId
+                                }
+                                onChange={(e) =>
+                                  setDraft(
+                                    book.id,
+                                    {
+                                      posisiId:
+                                        e.target.value === UNPOSITIONED_VALUE
+                                          ? null
+                                          : Number(e.target.value),
+                                    },
+                                    draft,
+                                  )
+                                }
+                                className="min-w-0 flex-1 sm:flex-none"
+                              >
+                                <option value={UNPOSITIONED_VALUE}>Belum Ditempatkan</option>
+                                {posisiList.map((p) => (
+                                  <option key={p.id} value={p.id}>
+                                    {p.kode} ({p.rak})
+                                  </option>
+                                ))}
+                              </Select>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDraft(
+                                    book.id,
+                                    {
+                                      qty: 0,
+                                      posisiId: null,
+                                      catatan:
+                                        'Tidak ditemukan di rak manapun, perlu ditelusuri.',
+                                    },
+                                    draft,
+                                  )
+                                }
+                                className={smallBtn}
+                              >
+                                Tidak ditemukan
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDraft(
+                                    book.id,
+                                    {
+                                      qty: 0,
+                                      catatan:
+                                        'Kemungkinan sedang dipinjam, belum tercatat sistem.',
+                                    },
+                                    draft,
+                                  )
+                                }
+                                className={smallBtn}
+                              >
+                                Sedang dipinjam?
+                              </button>
+                            </div>
+                            <Input
+                              type="text"
+                              placeholder="Catatan (opsional)"
+                              value={draft.catatan}
+                              onChange={(e) =>
+                                setDraft(book.id, { catatan: e.target.value }, draft)
+                              }
+                            />
+                          </div>
+                        )}
                         <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setDraft(
-                                book.id,
-                                {
-                                  qty: 0,
-                                  posisiId: null,
-                                  catatan: 'Tidak ditemukan di rak manapun, perlu ditelusuri.',
-                                },
-                                draft,
-                              )
-                            }
-                            className={smallBtn}
-                          >
-                            Tidak ditemukan
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setDraft(
-                                book.id,
-                                {
-                                  qty: 0,
-                                  catatan: 'Kemungkinan sedang dipinjam, belum tercatat sistem.',
-                                },
-                                draft,
-                              )
-                            }
-                            className={smallBtn}
-                          >
-                            Sedang dipinjam?
-                          </button>
-                        </div>
-
-                        <div className="flex flex-col gap-2 sm:flex-row">
-                          <Input
-                            type="text"
-                            placeholder="Catatan (opsional)"
-                            value={draft.catatan}
-                            onChange={(e) =>
-                              setDraft(book.id, { catatan: e.target.value }, draft)
-                            }
-                            className="flex-1"
-                          />
                           <Button
                             variant="accent"
                             disabled={isSaving}
+                            onClick={() => simpan(book, draft)}
+                          >
+                            {isSaving ? 'Menyimpan...' : terbuka ? 'Simpan' : 'Ada, sesuai'}
+                          </Button>
+                          <Button
+                            variant="quiet"
                             onClick={() =>
-                              checkMutation.mutate({
-                                data: {
-                                  bookId: book.id,
-                                  newPosisiId: draft.posisiId,
-                                  actualQty: draft.qty,
-                                  catatan: draft.catatan || undefined,
-                                },
-                              })
+                              setDetailOpen((prev) => ({ ...prev, [book.id]: !terbuka }))
                             }
                           >
-                            {isSaving ? 'Menyimpan...' : 'Simpan'}
+                            {terbuka ? 'Tutup detail' : 'Ada selisih / ubah'}
                           </Button>
                         </div>
                       </div>
