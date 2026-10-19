@@ -10,7 +10,7 @@ import {
   getPendingDeleteRequests,
   getPendingCategoryRequests,
 } from '../../../books/admin'
-import { AdminHeader } from '../../../admin/AdminHeader'
+import { AdminPage } from '../../../components/ui/AdminPage'
 
 export const Route = createFileRoute('/admin/books/')({
   component: AdminBooksPage,
@@ -112,159 +112,156 @@ function AdminBooksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
+    <AdminPage>
 
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
-            Kelola Buku
-          </h1>
-          <div className="flex items-center gap-3 flex-wrap">
-            {currentAdmin?.isSuperadmin && (
-              <Link
-                to="/admin/books/category-requests"
-                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
-              >
-                Pengajuan Kategori
-                {pendingCategoryRequests.length > 0 && (
-                  <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
-                    {pendingCategoryRequests.length}
-                  </span>
-                )}
-              </Link>
-            )}
-            {currentAdmin?.isSuperadmin && (
-              <Link
-                to="/admin/books/delete-requests"
-                className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
-              >
-                Pengajuan Hapus
-                {pendingDeleteRequests.length > 0 && (
-                  <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
-                    {pendingDeleteRequests.length}
-                  </span>
-                )}
-              </Link>
-            )}
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+          Kelola Buku
+        </h1>
+        <div className="flex items-center gap-3 flex-wrap">
+          {currentAdmin?.isSuperadmin && (
             <Link
-              to="/admin/books/new"
-              className="px-4 py-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm whitespace-nowrap"
+              to="/admin/books/category-requests"
+              className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
             >
-              + Tambah Buku
+              Pengajuan Kategori
+              {pendingCategoryRequests.length > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
+                  {pendingCategoryRequests.length}
+                </span>
+              )}
             </Link>
-          </div>
-        </div>
-
-        {error && (
-          <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
-            {error}
-          </div>
-        )}
-
-        <div className="flex gap-3 mb-4 flex-wrap">
-          <input
-            type="text"
-            value={rawSearch}
-            onChange={(e) => setRawSearch(e.target.value)}
-            placeholder="Cari judul, kode, keterangan..."
-            className="flex-1 min-w-[220px] p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
-          />
-          <select
-            value={kategoriId ?? ''}
-            onChange={(e) => {
-              setKategoriId(e.target.value ? Number(e.target.value) : undefined)
-              setPage(1)
-            }}
-            className="p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] bg-[var(--white)]"
-          >
-            <option value="">Semua kategori</option>
-            {kategoriOptions(categories).map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
-          {isLoading ? (
-            <p className="text-center py-8">Memuat...</p>
-          ) : books.length === 0 ? (
-            <p className="text-center py-8 text-[var(--gray-600)]">
-              Tidak ada buku ditemukan.
-            </p>
-          ) : (
-            <div className="flex flex-col">
-              {books.map((book) => (
-                <div
-                  key={book.id}
-                  className="flex items-center justify-between gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
-                >
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <span className="font-semibold text-[var(--text-primary)] truncate">
-                      {book.judul}
-                    </span>
-                    <span className="text-sm text-[var(--gray-600)]">
-                      {book.kode || '(tanpa kode)'} · {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ?? book.kategoriNama ?? '-'} ·
-                      qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'} ·{' '}
-                      {book.tidakTersedia ? 'Tidak tersedia' : book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Link
-                      to="/admin/books/$bookId/edit"
-                      params={{ bookId: String(book.id) }}
-                      className="px-3 py-2 border-2 border-[var(--black)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)]"
-                    >
-                      Edit
-                    </Link>
-                    {currentAdmin?.isSuperadmin ? (
-                      <button
-                        onClick={() => handleDelete(book.id, book.judul)}
-                        disabled={deletingId === book.id}
-                        className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
-                      >
-                        {deletingId === book.id ? '...' : 'Hapus'}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleRequestDelete(book.id, book.judul)}
-                        disabled={requestingId === book.id}
-                        className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
-                      >
-                        {requestingId === book.id ? '...' : 'Ajukan Hapus'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
+          {currentAdmin?.isSuperadmin && (
+            <Link
+              to="/admin/books/delete-requests"
+              className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
+            >
+              Pengajuan Hapus
+              {pendingDeleteRequests.length > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
+                  {pendingDeleteRequests.length}
+                </span>
+              )}
+            </Link>
+          )}
+          <Link
+            to="/admin/books/new"
+            className="px-4 py-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm whitespace-nowrap"
+          >
+            + Tambah Buku
+          </Link>
         </div>
+      </div>
 
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-4">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
-            >
-              ← Prev
-            </button>
-            <span className="text-[var(--gray-600)]">
-              Halaman {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
-            >
-              Next →
-            </button>
+      {error && (
+        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+          {error}
+        </div>
+      )}
+
+      <div className="flex gap-3 mb-4 flex-wrap">
+        <input
+          type="text"
+          value={rawSearch}
+          onChange={(e) => setRawSearch(e.target.value)}
+          placeholder="Cari judul, kode, keterangan..."
+          className="flex-1 min-w-[220px] p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        />
+        <select
+          value={kategoriId ?? ''}
+          onChange={(e) => {
+            setKategoriId(e.target.value ? Number(e.target.value) : undefined)
+            setPage(1)
+          }}
+          className="p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] bg-[var(--white)]"
+        >
+          <option value="">Semua kategori</option>
+          {kategoriOptions(categories).map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+        {isLoading ? (
+          <p className="text-center py-8">Memuat...</p>
+        ) : books.length === 0 ? (
+          <p className="text-center py-8 text-[var(--gray-600)]">
+            Tidak ada buku ditemukan.
+          </p>
+        ) : (
+          <div className="flex flex-col">
+            {books.map((book) => (
+              <div
+                key={book.id}
+                className="flex items-center justify-between gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+              >
+                <div className="flex flex-col gap-1 min-w-0">
+                  <span className="font-semibold text-[var(--text-primary)] truncate">
+                    {book.judul}
+                  </span>
+                  <span className="text-sm text-[var(--gray-600)]">
+                    {book.kode || '(tanpa kode)'} · {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ?? book.kategoriNama ?? '-'} ·
+                    qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'} ·{' '}
+                    {book.tidakTersedia ? 'Tidak tersedia' : book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Link
+                    to="/admin/books/$bookId/edit"
+                    params={{ bookId: String(book.id) }}
+                    className="px-3 py-2 border-2 border-[var(--black)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)]"
+                  >
+                    Edit
+                  </Link>
+                  {currentAdmin?.isSuperadmin ? (
+                    <button
+                      onClick={() => handleDelete(book.id, book.judul)}
+                      disabled={deletingId === book.id}
+                      className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
+                    >
+                      {deletingId === book.id ? '...' : 'Hapus'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleRequestDelete(book.id, book.judul)}
+                      disabled={requestingId === book.id}
+                      className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
+                    >
+                      {requestingId === book.id ? '...' : 'Ajukan Hapus'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
+          >
+            ← Prev
+          </button>
+          <span className="text-[var(--gray-600)]">
+            Halaman {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+    </AdminPage>
   )
 }

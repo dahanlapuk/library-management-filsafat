@@ -2,7 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
-import { AdminHeader } from '../../admin/AdminHeader'
+import { AdminPage } from '../../components/ui/AdminPage'
 import {
   listFeedback,
   toggleFeedbackVote,
@@ -313,61 +313,58 @@ function FeedbackPage() {
   )
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-          Feedback Publik
-        </h1>
-        <p className="text-[var(--gray-600)] mb-6">
-          Kiriman pengunjung katalog. Kritik dan saran yang didukung dua admin naik menjadi perlu perhatian,
-          lalu superadmin dapat meneruskannya sebagai request fitur.
-        </p>
+    <AdminPage>
+      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
+        Feedback Publik
+      </h1>
+      <p className="text-[var(--gray-600)] mb-6">
+        Kiriman pengunjung katalog. Kritik dan saran yang didukung dua admin naik menjadi perlu perhatian,
+        lalu superadmin dapat meneruskannya sebagai request fitur.
+      </p>
 
-        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 flex flex-col gap-4">
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <select
-              value={jenisFilter}
-              onChange={(e) => setJenisFilter(e.target.value as 'semua' | Item['jenis'])}
-              className={inputClass}
-            >
-              <option value="semua">Semua jenis</option>
-              {JENIS.map((j) => (
-                <option key={j.value} value={j.value}>
-                  {j.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={tampil}
-              onChange={(e) => setTampil(e.target.value as 'aktif' | 'semua')}
-              className={inputClass}
-            >
-              <option value="aktif">Belum selesai</option>
-              <option value="semua">Semua status</option>
-            </select>
-          </div>
-
-          {error ? (
-            <ErrorNotice error={errorMessage(error, 'Gagal memuat feedback.')} />
-          ) : isPending ? (
-            <p className="text-center py-4">Memuat...</p>
-          ) : shown.length === 0 ? (
-            <p className="text-center py-4 text-[var(--gray-600)]">Tidak ada feedback.</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {shown.map((f) => (
-                <FeedbackCard
-                  key={f.id}
-                  f={f}
-                  isSuperadmin={!!me?.isSuperadmin}
-                  onChanged={refresh}
-                />
-              ))}
-            </div>
-          )}
+      <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <select
+            value={jenisFilter}
+            onChange={(e) => setJenisFilter(e.target.value as 'semua' | Item['jenis'])}
+            className={inputClass}
+          >
+            <option value="semua">Semua jenis</option>
+            {JENIS.map((j) => (
+              <option key={j.value} value={j.value}>
+                {j.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={tampil}
+            onChange={(e) => setTampil(e.target.value as 'aktif' | 'semua')}
+            className={inputClass}
+          >
+            <option value="aktif">Belum selesai</option>
+            <option value="semua">Semua status</option>
+          </select>
         </div>
+
+        {error ? (
+          <ErrorNotice error={errorMessage(error, 'Gagal memuat feedback.')} />
+        ) : isPending ? (
+          <p className="text-center py-4">Memuat...</p>
+        ) : shown.length === 0 ? (
+          <p className="text-center py-4 text-[var(--gray-600)]">Tidak ada feedback.</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {shown.map((f) => (
+              <FeedbackCard
+                key={f.id}
+                f={f}
+                isSuperadmin={!!me?.isSuperadmin}
+                onChanged={refresh}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </AdminPage>
   )
 }

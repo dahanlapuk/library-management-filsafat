@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { AdminHeader } from '../../admin/AdminHeader'
+import { AdminPage } from '../../components/ui/AdminPage'
 import {
   getCategoryTree,
   createCategory,
@@ -212,77 +212,74 @@ function CategoriesPage() {
   const roots = byParent.get(null) ?? []
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="mx-auto w-full max-w-6xl">
-        <AdminHeader />
+    <AdminPage>
 
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
-            Kelola Kategori
-          </h1>
-          <button
-            type="button"
-            onClick={() => handleAdd('kategori', null)}
-            disabled={busy}
-            className="bg-[var(--black)] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[var(--white)] disabled:opacity-50"
-          >
-            + Kategori teratas
-          </button>
-        </div>
-
-        {(error || loadError) && (
-          <div className="mb-4 border border-[#fcc] bg-[#fee] p-3 text-[#c00]">
-            {error || 'Gagal memuat kategori.'}
-          </div>
-        )}
-
-        <div className="mb-8 border-2 border-[var(--black)] bg-[var(--white)]">
-          {isLoading ? (
-            <p className="py-8 text-center">Memuat...</p>
-          ) : roots.length === 0 ? (
-            <p className="py-8 text-center text-[var(--gray-600)]">Belum ada kategori.</p>
-          ) : (
-            roots.map((r, i) => renderNode(r, 0, i, roots.length))
-          )}
-        </div>
-
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
-            Tag
-          </h2>
-          <button
-            type="button"
-            onClick={() => handleAdd('tag', null)}
-            disabled={busy}
-            className="border-2 border-[var(--black)] px-3 py-1 text-xs font-semibold uppercase tracking-wide disabled:opacity-50"
-          >
-            + Tag
-          </button>
-        </div>
-        <div className="border-2 border-[var(--black)] bg-[var(--white)]">
-          {tags.length === 0 ? (
-            <p className="py-6 text-center text-[var(--gray-600)]">Belum ada tag.</p>
-          ) : (
-            tags.map((t) => (
-              <div
-                key={t.id}
-                className="flex flex-wrap items-center gap-2 border-b border-[var(--gray-200)] px-3 py-2 last:border-b-0"
-              >
-                <span className="font-medium text-[var(--text-primary)]">{t.nama}</span>
-                <span className="text-xs text-[var(--gray-600)]">{t.tagCount} buku</span>
-                <span className="ml-auto flex gap-1">
-                  <Btn onClick={() => handleRename(t)} disabled={busy}>
-                    Ganti nama
-                  </Btn>
-                  <Btn onClick={() => handleDelete(t)} disabled={busy} danger>
-                    Hapus
-                  </Btn>
-                </span>
-              </div>
-            ))
-          )}
-        </div>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+          Kelola Kategori
+        </h1>
+        <button
+          type="button"
+          onClick={() => handleAdd('kategori', null)}
+          disabled={busy}
+          className="bg-[var(--black)] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[var(--white)] disabled:opacity-50"
+        >
+          + Kategori teratas
+        </button>
       </div>
-    </div>
+
+      {(error || loadError) && (
+        <div className="mb-4 border border-[#fcc] bg-[#fee] p-3 text-[#c00]">
+          {error || 'Gagal memuat kategori.'}
+        </div>
+      )}
+
+      <div className="mb-8 border-2 border-[var(--black)] bg-[var(--white)]">
+        {isLoading ? (
+          <p className="py-8 text-center">Memuat...</p>
+        ) : roots.length === 0 ? (
+          <p className="py-8 text-center text-[var(--gray-600)]">Belum ada kategori.</p>
+        ) : (
+          roots.map((r, i) => renderNode(r, 0, i, roots.length))
+        )}
+      </div>
+
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
+          Tag
+        </h2>
+        <button
+          type="button"
+          onClick={() => handleAdd('tag', null)}
+          disabled={busy}
+          className="border-2 border-[var(--black)] px-3 py-1 text-xs font-semibold uppercase tracking-wide disabled:opacity-50"
+        >
+          + Tag
+        </button>
+      </div>
+      <div className="border-2 border-[var(--black)] bg-[var(--white)]">
+        {tags.length === 0 ? (
+          <p className="py-6 text-center text-[var(--gray-600)]">Belum ada tag.</p>
+        ) : (
+          tags.map((t) => (
+            <div
+              key={t.id}
+              className="flex flex-wrap items-center gap-2 border-b border-[var(--gray-200)] px-3 py-2 last:border-b-0"
+            >
+              <span className="font-medium text-[var(--text-primary)]">{t.nama}</span>
+              <span className="text-xs text-[var(--gray-600)]">{t.tagCount} buku</span>
+              <span className="ml-auto flex gap-1">
+                <Btn onClick={() => handleRename(t)} disabled={busy}>
+                  Ganti nama
+                </Btn>
+                <Btn onClick={() => handleDelete(t)} disabled={busy} danger>
+                  Hapus
+                </Btn>
+              </span>
+            </div>
+          ))
+        )}
+      </div>
+    </AdminPage>
   )
 }

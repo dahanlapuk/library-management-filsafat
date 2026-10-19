@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getCurrentAdmin } from '../../admin/auth'
 import { getAdminStats } from '../../admin/approval'
-import { AdminHeader } from '../../admin/AdminHeader'
+import { AdminPage } from '../../components/ui/AdminPage'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
@@ -20,80 +20,77 @@ function AdminDashboard() {
   })
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
+    <AdminPage>
 
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-1">
-          Dashboard Admin
-        </h1>
-        <p className="text-[var(--gray-600)] mb-6">
-          Halo, {currentAdmin?.nama ?? '...'}.
-        </p>
+      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-1">
+        Dashboard Admin
+      </h1>
+      <p className="text-[var(--gray-600)] mb-6">
+        Halo, {currentAdmin?.nama ?? '...'}.
+      </p>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-4">
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-4">
+          <span className="text-sm text-[var(--gray-600)]">
+            Total Admin Aktif
+          </span>
+          <p className="text-3xl font-semibold text-[var(--text-primary)]">
+            {stats?.totalApprovedAdmins ?? '...'}
+          </p>
+        </div>
+
+        {currentAdmin?.isSuperadmin && (
+          <Link
+            to="/admin/approvals"
+            className="bg-[var(--white)] border-2 border-[var(--black)] p-4 hover:bg-[var(--gray-100)] transition-colors"
+          >
             <span className="text-sm text-[var(--gray-600)]">
-              Total Admin Aktif
+              Menunggu Persetujuan
             </span>
             <p className="text-3xl font-semibold text-[var(--text-primary)]">
-              {stats?.totalApprovedAdmins ?? '...'}
-            </p>
-          </div>
-
-          {currentAdmin?.isSuperadmin && (
-            <Link
-              to="/admin/approvals"
-              className="bg-[var(--white)] border-2 border-[var(--black)] p-4 hover:bg-[var(--gray-100)] transition-colors"
-            >
-              <span className="text-sm text-[var(--gray-600)]">
-                Menunggu Persetujuan
-              </span>
-              <p className="text-3xl font-semibold text-[var(--text-primary)]">
-                {stats?.pendingCount ?? '...'}
-              </p>
-            </Link>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <Link
-            to="/admin/books"
-            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
-          >
-            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
-              Kelola Buku →
+              {stats?.pendingCount ?? '...'}
             </p>
           </Link>
-
-          <Link
-            to="/admin/loans/requests"
-            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
-          >
-            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
-              Pengajuan Peminjaman →
-            </p>
-          </Link>
-
-          <Link
-            to="/admin/members"
-            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
-          >
-            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
-              Data Anggota →
-            </p>
-          </Link>
-
-          <Link
-            to="/admin/inventory"
-            className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
-          >
-            <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
-              Inventory Check →
-            </p>
-          </Link>
-        </div>
+        )}
       </div>
-    </div>
+
+      <div className="flex flex-col gap-4">
+        <Link
+          to="/admin/books"
+          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+        >
+          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+            Kelola Buku →
+          </p>
+        </Link>
+
+        <Link
+          to="/admin/loans/requests"
+          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+        >
+          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+            Pengajuan Peminjaman →
+          </p>
+        </Link>
+
+        <Link
+          to="/admin/members"
+          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+        >
+          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+            Data Anggota →
+          </p>
+        </Link>
+
+        <Link
+          to="/admin/inventory"
+          className="block bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center hover:bg-[var(--gray-100)] transition-colors"
+        >
+          <p className="text-[var(--text-primary)] font-semibold uppercase tracking-wide">
+            Inventory Check →
+          </p>
+        </Link>
+      </div>
+    </AdminPage>
   )
 }

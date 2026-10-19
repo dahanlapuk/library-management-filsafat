@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { AdminHeader } from '../../../admin/AdminHeader'
+import { AdminPage } from '../../../components/ui/AdminPage'
 import {
   getPendingDeleteRequests,
   approveDeleteRequest,
@@ -65,76 +65,73 @@ function DeleteRequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
+    <AdminPage>
 
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
-            Pengajuan Hapus Buku
-          </h1>
-          <Link
-            to="/admin/books"
-            className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
-          >
-            ← Kembali ke daftar buku
-          </Link>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+          Pengajuan Hapus Buku
+        </h1>
+        <Link
+          to="/admin/books"
+          className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
+        >
+          ← Kembali ke daftar buku
+        </Link>
+      </div>
+
+      {(error || loadError) && (
+        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+          {error || 'Gagal memuat pengajuan hapus.'}
         </div>
+      )}
 
-        {(error || loadError) && (
-          <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
-            {error || 'Gagal memuat pengajuan hapus.'}
+      <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+        {isLoading ? (
+          <p className="text-center py-8">Memuat...</p>
+        ) : requests.length === 0 ? (
+          <p className="text-center py-8 text-[var(--gray-600)]">
+            Tidak ada pengajuan hapus yang menunggu.
+          </p>
+        ) : (
+          <div className="flex flex-col">
+            {requests.map((req) => (
+              <div
+                key={req.id}
+                className="flex items-center justify-between gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+              >
+                <div className="flex flex-col gap-1 min-w-0">
+                  <span className="font-semibold text-[var(--text-primary)] truncate">
+                    {req.bookJudul}
+                  </span>
+                  <span className="text-sm text-[var(--gray-600)]">
+                    Diajukan oleh {req.requestedByNama} ·{' '}
+                    {req.createdAt ? new Date(req.createdAt).toLocaleDateString('id-ID') : '-'}
+                  </span>
+                  <span className="text-sm text-[var(--text-primary)]">
+                    Alasan: {req.alasan}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleApprove(req.id, req.bookJudul)}
+                    disabled={processingId === req.id}
+                    className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
+                  >
+                    {processingId === req.id ? '...' : 'Approve'}
+                  </button>
+                  <button
+                    onClick={() => handleReject(req.id, req.bookJudul)}
+                    disabled={processingId === req.id}
+                    className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
+                  >
+                    {processingId === req.id ? '...' : 'Reject'}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
-          {isLoading ? (
-            <p className="text-center py-8">Memuat...</p>
-          ) : requests.length === 0 ? (
-            <p className="text-center py-8 text-[var(--gray-600)]">
-              Tidak ada pengajuan hapus yang menunggu.
-            </p>
-          ) : (
-            <div className="flex flex-col">
-              {requests.map((req) => (
-                <div
-                  key={req.id}
-                  className="flex items-center justify-between gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
-                >
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <span className="font-semibold text-[var(--text-primary)] truncate">
-                      {req.bookJudul}
-                    </span>
-                    <span className="text-sm text-[var(--gray-600)]">
-                      Diajukan oleh {req.requestedByNama} ·{' '}
-                      {req.createdAt ? new Date(req.createdAt).toLocaleDateString('id-ID') : '-'}
-                    </span>
-                    <span className="text-sm text-[var(--text-primary)]">
-                      Alasan: {req.alasan}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleApprove(req.id, req.bookJudul)}
-                      disabled={processingId === req.id}
-                      className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
-                    >
-                      {processingId === req.id ? '...' : 'Approve'}
-                    </button>
-                    <button
-                      onClick={() => handleReject(req.id, req.bookJudul)}
-                      disabled={processingId === req.id}
-                      className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
-                    >
-                      {processingId === req.id ? '...' : 'Reject'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-    </div>
+    </AdminPage>
   )
 }

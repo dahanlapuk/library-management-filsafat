@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { updateMyProfile, changeMyPassword } from '../../admin/profile'
 import { requestEmailChange } from '../../admin/email-change'
-import { AdminHeader } from '../../admin/AdminHeader'
+import { AdminPage } from '../../components/ui/AdminPage'
 import { errorMessage } from '../../lib/error-message'
 
 export const Route = createFileRoute('/admin/profile')({
@@ -197,28 +197,25 @@ function AdminProfilePage() {
   })
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-6">
-          Profil Saya
-        </h1>
-        {isPending || !currentAdmin ? (
-          <p>Memuat...</p>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
-              <ProfileForm admin={currentAdmin} />
-            </div>
-            <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
-              <PasswordForm />
-            </div>
-            <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
-              <EmailForm />
-            </div>
+    <AdminPage>
+      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-6">
+        Profil Saya
+      </h1>
+      {isPending || !currentAdmin ? (
+        <p>Memuat...</p>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+            <ProfileForm admin={currentAdmin} />
           </div>
-        )}
-      </div>
-    </div>
+          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+            <PasswordForm />
+          </div>
+          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+            <EmailForm />
+          </div>
+        </div>
+      )}
+    </AdminPage>
   )
 }

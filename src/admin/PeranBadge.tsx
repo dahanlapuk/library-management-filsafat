@@ -33,7 +33,7 @@ export function PeranBadge({ admin, onDark = false }: { admin: PeranInput; onDar
   if (peran === 'admin') return null
   return (
     <span
-      className={`inline-block w-fit border px-2 py-0.5 text-xs font-semibold ${
+      className={`inline-block w-fit rounded-full border px-2 py-0.5 text-xs font-semibold ${
         (onDark ? GELAP : TERANG)[peran]
       }`}
     >

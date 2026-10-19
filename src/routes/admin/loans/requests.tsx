@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { AdminHeader } from '../../../admin/AdminHeader'
+import { AdminPage } from '../../../components/ui/AdminPage'
 import { getCurrentAdmin } from '../../../admin/auth'
 import {
   getPendingLoanRequests,
@@ -376,246 +376,243 @@ function LoanRequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto flex flex-col gap-8">
-        <AdminHeader />
+    <AdminPage className="flex flex-col gap-8">
 
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
-            Peminjaman
-          </h1>
-          <Link
-            to="/admin"
-            className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
-          >
-            ← Kembali ke dashboard
-          </Link>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+          Peminjaman
+        </h1>
+        <Link
+          to="/admin"
+          className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
+        >
+          ← Kembali ke dashboard
+        </Link>
+      </div>
+
+      {(error || requestsError || activeError || historyError) && (
+        <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">
+          {error ||
+            (requestsError ? 'Gagal memuat pengajuan peminjaman.' : '') ||
+            (activeError ? 'Gagal memuat peminjaman aktif.' : '') ||
+            (historyError ? 'Gagal memuat riwayat peminjaman.' : '')}
         </div>
+      )}
 
-        {(error || requestsError || activeError || historyError) && (
-          <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">
-            {error ||
-              (requestsError ? 'Gagal memuat pengajuan peminjaman.' : '') ||
-              (activeError ? 'Gagal memuat peminjaman aktif.' : '') ||
-              (historyError ? 'Gagal memuat riwayat peminjaman.' : '')}
-          </div>
-        )}
+      {/* ── Pengajuan Masuk ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
+          Pengajuan Masuk
+        </h2>
+        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+          {requestsLoading ? (
+            <p className="text-center py-8">Memuat...</p>
+          ) : requests.length === 0 ? (
+            <p className="text-center py-8 text-[var(--gray-600)]">
+              Tidak ada pengajuan yang menunggu.
+            </p>
+          ) : (
+            <div className="flex flex-col">
+              {requests.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex flex-col gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+                >
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {req.bookJudul}
+                    </span>
+                    <span className="text-sm text-[var(--text-primary)]">
+                      {req.namaPeminjam} ·{' '}
+                      {req.role === 'dosen'
+                        ? 'Dosen'
+                        : `Mahasiswa ${req.jenjang ?? ''} ${req.angkatan ?? ''}`}
+                    </span>
+                    <span className="text-sm text-[var(--gray-600)]">
+                      {req.whatsapp}
+                      {req.email ? ` · ${req.email}` : ''}
+                    </span>
+                    {req.keperluan && (
+                      <span className="text-sm text-[var(--text-primary)]">
+                        Keperluan: {req.keperluan}
+                      </span>
+                    )}
+                    {req.status === 'rejected' && req.rejectionAlasan && (
+                      <span className="text-sm text-[#c00]">Ditolak: {req.rejectionAlasan}</span>
+                    )}
+                    <span className="text-xs text-[var(--gray-600)]">
+                      {formatDate(req.createdAt)}
+                    </span>
+                  </div>
 
-        {/* ── Pengajuan Masuk ── */}
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-            Pengajuan Masuk
-          </h2>
-          <div className="bg-[var(--white)] border-2 border-[var(--black)]">
-            {requestsLoading ? (
-              <p className="text-center py-8">Memuat...</p>
-            ) : requests.length === 0 ? (
-              <p className="text-center py-8 text-[var(--gray-600)]">
-                Tidak ada pengajuan yang menunggu.
-              </p>
-            ) : (
-              <div className="flex flex-col">
-                {requests.map((req) => (
+                  <div className="flex flex-wrap items-start gap-2">
+                    {req.status === 'pending' ? (
+                      <>
+                        <button
+                          onClick={() => handleApprove(req.id)}
+                          disabled={processingId === req.id}
+                          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
+                        >
+                          {processingId === req.id ? '...' : 'Approve'}
+                        </button>
+                        <RejectBox onSubmit={(alasan) => handleReject(req.id, alasan)} />
+                      </>
+                    ) : (
+                      <WhatsAppMessageBox
+                        label="Chat WhatsApp"
+                        whatsapp={req.whatsapp}
+                        defaultMessage={`Halo ${req.namaPeminjam}, mohon maaf pengajuan peminjaman buku "${req.bookJudul}" belum bisa kami setujui. Alasan: ${req.rejectionAlasan ?? '-'}.`}
+                        onSent={async () => {
+                          await markLoanRequestRejectionNotified({ data: { id: req.id } })
+                          invalidateRequests()
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Peminjaman Aktif ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
+          Peminjaman Aktif
+        </h2>
+        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+          {activeLoading ? (
+            <p className="text-center py-8">Memuat...</p>
+          ) : activeLoans.length === 0 ? (
+            <p className="text-center py-8 text-[var(--gray-600)]">Tidak ada peminjaman aktif.</p>
+          ) : (
+            <div className="flex flex-col">
+              {activeLoans.map((loan) => {
+                const overdue = isOverdue(loan.dueAt)
+                return (
                   <div
-                    key={req.id}
+                    key={loan.id}
                     className="flex flex-col gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
                   >
                     <div className="flex flex-col gap-1 min-w-0">
                       <span className="font-semibold text-[var(--text-primary)]">
-                        {req.bookJudul}
+                        {loan.bookJudul}
                       </span>
                       <span className="text-sm text-[var(--text-primary)]">
-                        {req.namaPeminjam} ·{' '}
-                        {req.role === 'dosen'
-                          ? 'Dosen'
-                          : `Mahasiswa ${req.jenjang ?? ''} ${req.angkatan ?? ''}`}
+                        {loan.memberNama} · {loan.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
                       </span>
                       <span className="text-sm text-[var(--gray-600)]">
-                        {req.whatsapp}
-                        {req.email ? ` · ${req.email}` : ''}
+                        Dipinjam: {formatDate(loan.tanggalPinjam)}
                       </span>
-                      {req.keperluan && (
-                        <span className="text-sm text-[var(--text-primary)]">
-                          Keperluan: {req.keperluan}
-                        </span>
-                      )}
-                      {req.status === 'rejected' && req.rejectionAlasan && (
-                        <span className="text-sm text-[#c00]">Ditolak: {req.rejectionAlasan}</span>
-                      )}
-                      <span className="text-xs text-[var(--gray-600)]">
-                        {formatDate(req.createdAt)}
+                      <span
+                        className={`text-sm font-medium ${overdue ? 'text-[#c00]' : 'text-[var(--gray-600)]'}`}
+                      >
+                        Jatuh tempo: {formatDate(loan.dueAt)}
+                        {overdue ? ' · TERLAMBAT' : ''}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap items-start gap-2">
-                      {req.status === 'pending' ? (
-                        <>
-                          <button
-                            onClick={() => handleApprove(req.id)}
-                            disabled={processingId === req.id}
-                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
-                          >
-                            {processingId === req.id ? '...' : 'Approve'}
-                          </button>
-                          <RejectBox onSubmit={(alasan) => handleReject(req.id, alasan)} />
-                        </>
-                      ) : (
-                        <WhatsAppMessageBox
-                          label="Chat WhatsApp"
-                          whatsapp={req.whatsapp}
-                          defaultMessage={`Halo ${req.namaPeminjam}, mohon maaf pengajuan peminjaman buku "${req.bookJudul}" belum bisa kami setujui. Alasan: ${req.rejectionAlasan ?? '-'}.`}
-                          onSent={async () => {
-                            await markLoanRequestRejectionNotified({ data: { id: req.id } })
-                            invalidateRequests()
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+                      <WhatsAppMessageBox
+                        label="Chat WhatsApp - Peminjam"
+                        whatsapp={loan.memberWhatsapp ?? ''}
+                        defaultMessage={buildPickupMessage(loan, adminNama)}
+                        onSent={async () => {
+                          await markLoanPickupNotified({ data: { id: loan.id } })
+                          invalidateActive()
+                        }}
+                      />
 
-        {/* ── Peminjaman Aktif ── */}
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-            Peminjaman Aktif
-          </h2>
-          <div className="bg-[var(--white)] border-2 border-[var(--black)]">
-            {activeLoading ? (
-              <p className="text-center py-8">Memuat...</p>
-            ) : activeLoans.length === 0 ? (
-              <p className="text-center py-8 text-[var(--gray-600)]">Tidak ada peminjaman aktif.</p>
-            ) : (
-              <div className="flex flex-col">
-                {activeLoans.map((loan) => {
-                  const overdue = isOverdue(loan.dueAt)
-                  return (
-                    <div
-                      key={loan.id}
-                      className="flex flex-col gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
-                    >
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-semibold text-[var(--text-primary)]">
-                          {loan.bookJudul}
-                        </span>
-                        <span className="text-sm text-[var(--text-primary)]">
-                          {loan.memberNama} · {loan.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
-                        </span>
-                        <span className="text-sm text-[var(--gray-600)]">
-                          Dipinjam: {formatDate(loan.tanggalPinjam)}
-                        </span>
-                        <span
-                          className={`text-sm font-medium ${overdue ? 'text-[#c00]' : 'text-[var(--gray-600)]'}`}
+                      {loan.returnNotifiedAt ? (
+                        <button
+                          onClick={() => handleReturn(loan.id)}
+                          disabled={processingId === loan.id}
+                          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                         >
-                          Jatuh tempo: {formatDate(loan.dueAt)}
-                          {overdue ? ' · TERLAMBAT' : ''}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap items-start gap-2">
+                          {processingId === loan.id ? '...' : 'Pengembalian'}
+                        </button>
+                      ) : loan.returnReminderStartedAt ? (
                         <WhatsAppMessageBox
-                          label="Chat WhatsApp - Peminjam"
+                          label="Chat WhatsApp - Reminder"
                           whatsapp={loan.memberWhatsapp ?? ''}
-                          defaultMessage={buildPickupMessage(loan, adminNama)}
+                          defaultMessage={buildReturnReminderMessage(loan, adminNama)}
+                          variant="muted"
                           onSent={async () => {
-                            await markLoanPickupNotified({ data: { id: loan.id } })
+                            await markLoanReturnNotified({ data: { id: loan.id } })
                             invalidateActive()
                           }}
                         />
-
-                        {loan.returnNotifiedAt ? (
-                          <button
-                            onClick={() => handleReturn(loan.id)}
-                            disabled={processingId === loan.id}
-                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
-                          >
-                            {processingId === loan.id ? '...' : 'Pengembalian'}
-                          </button>
-                        ) : loan.returnReminderStartedAt ? (
-                          <WhatsAppMessageBox
-                            label="Chat WhatsApp - Reminder"
-                            whatsapp={loan.memberWhatsapp ?? ''}
-                            defaultMessage={buildReturnReminderMessage(loan, adminNama)}
-                            variant="muted"
-                            onSent={async () => {
-                              await markLoanReturnNotified({ data: { id: loan.id } })
-                              invalidateActive()
-                            }}
-                          />
-                        ) : (
-                          <button
-                            onClick={() => handleStartReturnReminder(loan.id)}
-                            disabled={processingId === loan.id}
-                            className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
-                          >
-                            {processingId === loan.id ? '...' : 'Konfirmasi Pengembalian'}
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        <button
+                          onClick={() => handleStartReturnReminder(loan.id)}
+                          disabled={processingId === loan.id}
+                          className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
+                        >
+                          {processingId === loan.id ? '...' : 'Konfirmasi Pengembalian'}
+                        </button>
+                      )}
                     </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </section>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </section>
 
-        {/* ── Riwayat Peminjaman ── */}
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-            Riwayat Peminjaman
-          </h2>
-          <p className="text-sm text-[var(--gray-600)] -mt-2">
-            50 aktivitas peminjaman terbaru (aktif maupun sudah dikembalikan), beserta admin yang
-            memprosesnya.
-          </p>
-          <div className="bg-[var(--white)] border-2 border-[var(--black)] overflow-x-auto">
-            {historyLoading ? (
-              <p className="text-center py-8">Memuat...</p>
-            ) : loanHistory.length === 0 ? (
-              <p className="text-center py-8 text-[var(--gray-600)]">Belum ada riwayat peminjaman.</p>
-            ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b-2 border-[var(--black)] text-left">
-                    <th className="p-2 font-semibold">Buku</th>
-                    <th className="p-2 font-semibold">Peminjam</th>
-                    <th className="p-2 font-semibold">Dipinjam</th>
-                    <th className="p-2 font-semibold">Status</th>
-                    <th className="p-2 font-semibold">Admin</th>
+      {/* ── Riwayat Peminjaman ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
+          Riwayat Peminjaman
+        </h2>
+        <p className="text-sm text-[var(--gray-600)] -mt-2">
+          50 aktivitas peminjaman terbaru (aktif maupun sudah dikembalikan), beserta admin yang
+          memprosesnya.
+        </p>
+        <div className="bg-[var(--white)] border-2 border-[var(--black)] overflow-x-auto">
+          {historyLoading ? (
+            <p className="text-center py-8">Memuat...</p>
+          ) : loanHistory.length === 0 ? (
+            <p className="text-center py-8 text-[var(--gray-600)]">Belum ada riwayat peminjaman.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-[var(--black)] text-left">
+                  <th className="p-2 font-semibold">Buku</th>
+                  <th className="p-2 font-semibold">Peminjam</th>
+                  <th className="p-2 font-semibold">Dipinjam</th>
+                  <th className="p-2 font-semibold">Status</th>
+                  <th className="p-2 font-semibold">Admin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loanHistory.map((row) => (
+                  <tr key={row.id} className="border-b border-[var(--gray-200)] last:border-b-0">
+                    <td className="p-2">{row.bookJudul}</td>
+                    <td className="p-2">
+                      {row.memberNama} · {row.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
+                    </td>
+                    <td className="p-2 text-[var(--gray-600)]">{formatDate(row.tanggalPinjam)}</td>
+                    <td className="p-2">
+                      {row.tanggalKembali ? (
+                        <span className="text-[var(--gray-600)]">
+                          Dikembalikan {formatDate(row.tanggalKembali)}
+                        </span>
+                      ) : isOverdue(row.dueAt) ? (
+                        <span className="text-[#c00] font-medium">Aktif · TERLAMBAT</span>
+                      ) : (
+                        <span className="text-[var(--text-primary)] font-medium">Aktif</span>
+                      )}
+                    </td>
+                    <td className="p-2 text-[var(--gray-600)]">{row.dicatatOlehNama ?? '-'}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {loanHistory.map((row) => (
-                    <tr key={row.id} className="border-b border-[var(--gray-200)] last:border-b-0">
-                      <td className="p-2">{row.bookJudul}</td>
-                      <td className="p-2">
-                        {row.memberNama} · {row.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
-                      </td>
-                      <td className="p-2 text-[var(--gray-600)]">{formatDate(row.tanggalPinjam)}</td>
-                      <td className="p-2">
-                        {row.tanggalKembali ? (
-                          <span className="text-[var(--gray-600)]">
-                            Dikembalikan {formatDate(row.tanggalKembali)}
-                          </span>
-                        ) : isOverdue(row.dueAt) ? (
-                          <span className="text-[#c00] font-medium">Aktif · TERLAMBAT</span>
-                        ) : (
-                          <span className="text-[var(--text-primary)] font-medium">Aktif</span>
-                        )}
-                      </td>
-                      <td className="p-2 text-[var(--gray-600)]">{row.dicatatOlehNama ?? '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </section>
-      </div>
-    </div>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </section>
+    </AdminPage>
   )
 }

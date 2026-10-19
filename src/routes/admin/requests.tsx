@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
-import { AdminHeader } from '../../admin/AdminHeader'
+import { AdminPage } from '../../components/ui/AdminPage'
 import {
   listFeatureRequests,
   createFeatureRequest,
@@ -256,49 +256,46 @@ function RequestsPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['feature-requests'] })
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-6xl mx-auto">
-        <AdminHeader />
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-          Request Fitur
-        </h1>
-        <p className="text-[var(--gray-600)] mb-6">
-          Usulkan fitur atau perbaikan untuk dashboard admin dan katalog. Nama pengirim tercatat otomatis.
-        </p>
+    <AdminPage>
+      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
+        Request Fitur
+      </h1>
+      <p className="text-[var(--gray-600)] mb-6">
+        Usulkan fitur atau perbaikan untuk dashboard admin dan katalog. Nama pengirim tercatat otomatis.
+      </p>
 
-        <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 self-start">
-            <h2 className="text-lg font-semibold mb-4">Kirim request</h2>
-            <RequestForm
-              submitLabel="Kirim"
-              onSubmit={async (values) => {
-                await createFeatureRequest({ data: values })
-                refresh()
-              }}
-            />
-          </div>
+      <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 self-start">
+          <h2 className="text-lg font-semibold mb-4">Kirim request</h2>
+          <RequestForm
+            submitLabel="Kirim"
+            onSubmit={async (values) => {
+              await createFeatureRequest({ data: values })
+              refresh()
+            }}
+          />
+        </div>
 
-          <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
-            {isPending ? (
-              <p className="text-center py-4">Memuat...</p>
-            ) : !requests || requests.length === 0 ? (
-              <p className="text-center py-4 text-[var(--gray-600)]">Belum ada request.</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {requests.map((r) => (
-                  <RequestCard
-                    key={r.id}
-                    r={r}
-                    meId={me?.id}
-                    isDeveloper={!!me?.isDeveloper}
-                    onChanged={refresh}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+          {isPending ? (
+            <p className="text-center py-4">Memuat...</p>
+          ) : !requests || requests.length === 0 ? (
+            <p className="text-center py-4 text-[var(--gray-600)]">Belum ada request.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {requests.map((r) => (
+                <RequestCard
+                  key={r.id}
+                  r={r}
+                  meId={me?.id}
+                  isDeveloper={!!me?.isDeveloper}
+                  onChanged={refresh}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </AdminPage>
   )
 }
