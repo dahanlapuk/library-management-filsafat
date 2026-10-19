@@ -13,6 +13,7 @@ import {
   index,
   primaryKey,
   jsonb,
+  check,
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core'
 import { relations, sql } from 'drizzle-orm'
@@ -36,7 +37,10 @@ export const adminProfiles = pgTable('admin_profiles', {
   isApproved: boolean('is_approved').notNull().default(false),
   noWhatsapp: text('no_whatsapp'),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}, (t) => [
+  // Hierarki peran: developer selalu juga superadmin.
+  check('developer_implies_superadmin', sql`NOT ${t.isDeveloper} OR ${t.isSuperadmin}`),
+])
 
 // ── CATEGORIES ───────────────────────────────────────────────────
 export const categories = pgTable(

@@ -1,0 +1,1 @@
+ALTER TABLE "admin_profiles" ADD CONSTRAINT "developer_implies_superadmin" CHECK (NOT "admin_profiles"."is_developer" OR "admin_profiles"."is_superadmin");
