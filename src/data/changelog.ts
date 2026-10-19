@@ -10,6 +10,25 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.12.0',
+    judul: 'Tampilan baru Biblioteka: lebih lembut dan lebih nyaman di HP',
+    fitur: true,
+    ringkas: [
+      'Seluruh halaman publik (katalog, informasi, kritik dan saran, changelog) tampil dengan gaya baru yang sejalan dengan situs Departemen Filsafat UI: warna krem dan kuning, huruf baru, dan sudut yang membulat.',
+      'Kolom cari kini besar di bagian atas katalog. Di HP, kategori dibuka lewat tombol Kategori yang menampilkan daftarnya dari bawah layar.',
+      'Detail buku ditata ulang: kode, jumlah eksemplar, dan posisi rak dikelompokkan dalam satu bidang. Judul yang panjang tidak lagi terpotong.',
+      'Halaman katalog tidak lagi melompat ke atas setelah membaca detail buku, jadi kamu tetap di posisi semula.',
+      'Kartu buku lebih ringkas di HP, ada pilihan 10 buku per halaman, dan saat memuat tampil kartu kosong berdenyut.',
+      'Jenis masukan Saran kini bernama Kritik dan saran.',
+    ],
+    teknis: [
+      'Token warna dan huruf di src/styles.css; Inter dan Source Serif 4 dipasang lokal lewat fontsource, tanpa Google Fonts. Nama variabel lama dipetakan ke token baru sehingga halaman admin ikut berubah warna.',
+      'src/routes/index.tsx dipecah ke src/components/catalog/ (BookCard, BookDetailModal, CategoryTree, StatusBadge, BookTags, dan lainnya).',
+      'Posisi scroll dipertahankan saat modal buku dibuka dan ditutup (resetScroll: false). Lebar tata letak standar 1280px.',
+      'Jenis feedback saran hanya berubah label tampilan; nilai di database tidak diubah dan tidak ada migrasi.',
+    ],
+  },
+  {
     versi: '2.11.0',
     judul: 'Lencana peran, katalog buku multi-eksemplar, dan kredit baru',
     fitur: true,

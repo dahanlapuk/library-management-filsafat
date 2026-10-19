@@ -682,5 +682,95 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "feat: kredit footer dan README jadi crkstudio, tautan balik ke filsafatui.app"
       }
     ]
+  },
+  "2.12.0": {
+    "tanggal": "2026-10-19",
+    "dari": "2.11.0",
+    "commits": [
+      {
+        "hash": "7f95b82",
+        "pesan": "chore: entri changelog v2.11.0"
+      },
+      {
+        "hash": "0cae9bc",
+        "pesan": "chore: mulai branch redesign katalog"
+      },
+      {
+        "hash": "d499432",
+        "pesan": "refactor: pecah katalog publik ke src/components/catalog (tanpa perubahan tampilan)"
+      },
+      {
+        "hash": "d82b039",
+        "pesan": "style: token warna dan huruf mengikuti filsafatui.app (Source Serif 4, Inter lokal)"
+      },
+      {
+        "hash": "ace21eb",
+        "pesan": "style: teks aksen di latar terang memakai tinta (kontras), kuning hanya untuk garis dan bidang"
+      },
+      {
+        "hash": "ab0a7f3",
+        "pesan": "style: header strip kuning, sidebar kategori sticky dan tidak terpotong, bingkai filter lebih tipis"
+      },
+      {
+        "hash": "0d8ba31",
+        "pesan": "style: kartu dan modal buku didesain ulang, tampilkan sisa eksemplar, ekstrak StatusBadge dan BookTags"
+      },
+      {
+        "hash": "cf40c3d",
+        "pesan": "style: sudut membulat dan bayangan hover pada kartu, filter, dan input katalog"
+      },
+      {
+        "hash": "8278ba2",
+        "pesan": "style: modal detail buku ditata ulang dengan bidang info, sudut membulat"
+      },
+      {
+        "hash": "8eebba2",
+        "pesan": "style: formulir pengajuan dan chip lokasi stok ikut sudut membulat"
+      },
+      {
+        "hash": "cc34706",
+        "pesan": "fix: modal buku tidak lagi terpotong di atas saat isinya tinggi, dan lebih ringkas di HP"
+      },
+      {
+        "hash": "691e7ad",
+        "pesan": "style: pagination baru, kartu lebih ringkas di HP, opsi 10 per halaman"
+      },
+      {
+        "hash": "4f3a6e5",
+        "pesan": "style: kolom cari pindah ke header, skeleton saat memuat, cincin fokus kuning"
+      },
+      {
+        "hash": "4077f97",
+        "pesan": "style: modal buku muncul sebagai bottom sheet di HP"
+      },
+      {
+        "hash": "44fa8a2",
+        "pesan": "style: halaman feedback dan footer mengikuti gaya katalog"
+      },
+      {
+        "hash": "57bc4da",
+        "pesan": "style: kolom cari di kanan header, tata letak katalog dan footer diperlebar"
+      },
+      {
+        "hash": "62fb5ca",
+        "pesan": "fix: posisi scroll katalog dipertahankan saat modal buku dibuka dan ditutup, lebar tata letak 1280px"
+      },
+      {
+        "hash": "9b1564e",
+        "pesan": "style: informasi, changelog, feedback selebar 1280px dan mengikuti gaya katalog"
+      },
+      {
+        "hash": "eacfdc2",
+        "pesan": "feat: feedback jadi kritik dan saran; style: peta di informasi diberi bingkai"
+      },
+      {
+        "hash": "1ad39dd",
+        "pesan": "style: bingkai peta kuning berpendar; fix: label Kritik dan saran di admin feedback"
+      },
+      {
+        "hash": "fb24b12",
+        "pesan": "refactor: pohon kategori diekstrak ke CategoryTree; style: sidebar lebih ringan di desktop, bottom sheet kategori di HP"
+      }
+    ]
   }
 }
