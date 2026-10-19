@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getCurrentAdmin, logout } from './auth'
+import { PeranBadge } from './PeranBadge'
 
 type NavLink = { to: string; label: string; superadminOnly?: boolean }
 type NavGroup = { label: string; links: NavLink[] }
@@ -168,11 +169,7 @@ export function AdminHeader() {
           <Link to="/admin/profile" className="text-[var(--gray-200)] underline">
             {currentAdmin?.nama ?? '...'}
           </Link>
-          {isSuperadmin && (
-            <span className="inline-block bg-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--black)]">
-              Superadmin
-            </span>
-          )}
+          {currentAdmin && <PeranBadge admin={currentAdmin} onDark />}
           <button onClick={handleLogout} className="text-[var(--white)] underline">
             Logout
           </button>

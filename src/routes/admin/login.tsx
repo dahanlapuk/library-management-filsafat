@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link, redirect } from '@tanstack/react-ro
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getAdminList, getCurrentAdmin, login } from '../../admin/auth'
+import { PeranBadge } from '../../admin/PeranBadge'
 
 export const Route = createFileRoute('/admin/login')({
   // Sudah login (sesi valid) → langsung ke dashboard.
@@ -116,11 +117,7 @@ function AdminLoginPage() {
                             {admin.title}
                           </span>
                         )}
-                        {admin.isSuperadmin && (
-                          <span className="inline-block text-xs bg-[var(--black)] text-[var(--white)] px-2 py-0.5 font-medium w-fit">
-                            Superadmin
-                          </span>
-                        )}
+                        <PeranBadge admin={admin} />
                       </div>
                     </label>
                   ))}

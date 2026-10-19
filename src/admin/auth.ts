@@ -17,6 +17,7 @@ export const getAdminList = createServerFn({ method: 'GET' }).handler(
         nama: true,
         title: true,
         isSuperadmin: true,
+        isDeveloper: true,
       },
     })
     return admins
