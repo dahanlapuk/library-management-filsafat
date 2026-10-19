@@ -50,14 +50,14 @@ export function BookDetailModal({
       <div
         role="dialog"
         aria-modal="true"
-        className="relative my-8 flex w-full max-w-[640px] flex-col gap-4 overflow-hidden border border-[var(--rule)] bg-[var(--white)] p-6 sm:my-0"
+        className="relative my-8 flex w-full max-w-[640px] flex-col gap-5 overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--white)] p-6 shadow-[0_24px_60px_-20px_rgba(24,22,0,0.45)] sm:my-0 sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Tutup"
-          className="absolute right-4 top-4 text-xl leading-none text-[var(--muted)] hover:text-[var(--ink)]"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-[var(--muted)] hover:bg-[var(--pale-soft)] hover:text-[var(--ink)]"
         >
           ✕
         </button>
@@ -70,39 +70,50 @@ export function BookDetailModal({
           </div>
         ) : (
           <>
-            <div className="flex flex-col items-start gap-3 pr-8">
+            <div className="flex flex-col items-start gap-3 pr-10">
               <StatusBadge isDipinjam={book.isDipinjam} />
-              <h2 className="font-[var(--font-heading)] text-2xl font-semibold leading-snug text-[var(--ink)]">
-                {book.judul}
-              </h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="font-[var(--font-heading)] text-2xl font-semibold leading-snug text-[var(--ink)] sm:text-[1.7rem]">
+                  {book.judul}
+                </h2>
+                {book.penulis && (
+                  <p className="text-sm text-[var(--muted)]">
+                    {book.penulis}
+                    {book.tahun ? `, ${book.tahun}` : ''}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {book.penulis && (
-              <p className="text-sm text-[var(--muted)]">
-                {book.penulis}
-                {book.tahun ? `, ${book.tahun}` : ''}
-              </p>
-            )}
-
-            <div className="flex items-center justify-between gap-3 border-y border-[var(--rule)] py-2 text-sm">
-              <span className="font-mono font-semibold text-[var(--ink)]">{book.kode ?? ''}</span>
-              <span className="shrink-0 text-[var(--muted)]">{eksLabel(book.qty, book.sisa)}</span>
-            </div>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl bg-[var(--pale-soft)] p-4 text-sm">
+              <div className="flex flex-col gap-0.5">
+                <dt className="text-xs text-[var(--muted)]">Kode</dt>
+                <dd className="font-mono font-semibold text-[var(--ink)]">{book.kode || '—'}</dd>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <dt className="text-xs text-[var(--muted)]">Eksemplar</dt>
+                <dd className="font-medium text-[var(--ink)]">{eksLabel(book.qty, book.sisa)}</dd>
+              </div>
+              {book.posisiKode && (
+                <div className="col-span-2 flex items-center justify-between gap-3 rounded-lg bg-[var(--ink)] px-3 py-2 text-[var(--cream)]">
+                  <span className="text-xs opacity-75">Posisi rak</span>
+                  <span className="font-semibold tracking-widest">
+                    {book.posisiKode.replace(/-/g, ' - ')}
+                  </span>
+                </div>
+              )}
+            </dl>
 
             <BookTags tags={book.tags} kategoriId={book.kategoriId} />
 
-            {book.posisiKode && (
-              <div className="-mx-6 bg-[var(--ink)] py-2 text-center text-sm font-semibold tracking-widest text-[var(--cream)]">
-                {book.posisiKode.replace(/-/g, ' - ')}
-              </div>
-            )}
-
             {book.keterangan && (
-              <p className="whitespace-pre-line text-sm text-[var(--muted)]">{book.keterangan}</p>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--muted)]">
+                {book.keterangan}
+              </p>
             )}
 
             {book.qty > 1 && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
                 <h3 className="text-sm font-semibold text-[var(--ink)]">Lokasi Stok</h3>
                 <StockLocationsList bookId={book.id} />
               </div>
