@@ -10,6 +10,19 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.12.1',
+    judul: 'Buku tanpa eksemplar tampil Tidak tersedia',
+    ringkas: [
+      'Buku yang eksemplarnya tidak tercatat atau tidak ditemukan di rak kini tampil Tidak tersedia, bukan Dipinjam.',
+      'Buku yang tidak tersedia tidak lagi menampilkan tombol pengajuan pinjam dan tidak muncul di filter Tersedia.',
+      'Daftar buku di admin memakai penandaan yang sama.',
+    ],
+    teknis: [
+      'isDipinjam di src/books/catalog.ts kini mensyaratkan qty > 0. Ditambah field tidakTersedia (qty <= 0) yang dipakai StatusBadge, LoanRequestSection, dan daftar buku admin.',
+      'Filter Tersedia memakai qty > 0 dan sisa > 0. Tanpa migrasi skema.',
+    ],
+  },
+  {
     versi: '2.12.0',
     judul: 'Tampilan baru Biblioteka: lebih lembut dan lebih nyaman di HP',
     fitur: true,

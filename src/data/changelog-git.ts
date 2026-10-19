@@ -772,5 +772,19 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "refactor: pohon kategori diekstrak ke CategoryTree; style: sidebar lebih ringan di desktop, bottom sheet kategori di HP"
       }
     ]
+  },
+  "2.12.1": {
+    "tanggal": "2026-10-19",
+    "dari": "2.12.0",
+    "commits": [
+      {
+        "hash": "aef0c27",
+        "pesan": "chore: entri changelog v2.12.0"
+      },
+      {
+        "hash": "bd48096",
+        "pesan": "fix: buku tanpa eksemplar tampil Tidak tersedia, bukan Dipinjam"
+      }
+    ]
   }
 }
