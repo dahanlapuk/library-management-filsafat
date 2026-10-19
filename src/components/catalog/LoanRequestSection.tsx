@@ -105,7 +105,7 @@ export function LoanRequestSection({
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="w-full px-3 py-2 border border-[var(--sun)] bg-[var(--sun-bright)] text-[var(--ink)] text-sm font-semibold uppercase tracking-wide hover:bg-[var(--sun)]"
+          className="w-full rounded-lg px-3 py-2.5 border border-[var(--sun)] bg-[var(--sun-bright)] text-[var(--ink)] text-sm font-semibold uppercase tracking-wide hover:bg-[var(--sun)]"
         >
           Ajukan Peminjaman
         </button>
@@ -123,7 +123,7 @@ export function LoanRequestSection({
       </h3>
 
       {error && (
-        <div className="p-2 bg-[#fee] border border-[#fcc] text-[#c00] text-xs">
+        <div className="rounded-lg p-2 bg-[#fee] border border-[#fcc] text-[#c00] text-xs">
           {error}
         </div>
       )}
@@ -133,7 +133,7 @@ export function LoanRequestSection({
         placeholder="Nama lengkap"
         value={form.namaPeminjam}
         onChange={(e) => setForm((f) => ({ ...f, namaPeminjam: e.target.value }))}
-        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <div className="flex gap-2">
@@ -147,7 +147,7 @@ export function LoanRequestSection({
               angkatan: '',
             }))
           }
-          className="flex-1 text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className="flex-1 text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
         >
           <option value="mahasiswa">Mahasiswa</option>
           <option value="dosen">Dosen</option>
@@ -162,7 +162,7 @@ export function LoanRequestSection({
                 jenjang: e.target.value as 'S1' | 'S2' | 'S3' | '',
               }))
             }
-            className="flex-1 text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className="flex-1 text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
           >
             <option value="">Jenjang</option>
             <option value="S1">S1</option>
@@ -178,7 +178,7 @@ export function LoanRequestSection({
           placeholder="Angkatan (mis. 2023)"
           value={form.angkatan}
           onChange={(e) => setForm((f) => ({ ...f, angkatan: e.target.value }))}
-          className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className="w-full text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
         />
       )}
 
@@ -187,7 +187,7 @@ export function LoanRequestSection({
         placeholder="Nomor WhatsApp"
         value={form.whatsapp}
         onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <input
@@ -195,7 +195,7 @@ export function LoanRequestSection({
         placeholder="Email (opsional)"
         value={form.email}
         onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <textarea
@@ -203,21 +203,21 @@ export function LoanRequestSection({
         value={form.keperluan}
         onChange={(e) => setForm((f) => ({ ...f, keperluan: e.target.value }))}
         rows={2}
-        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] resize-none"
+        className="w-full text-sm px-3 py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] resize-none"
       />
 
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 px-3 py-2 bg-[var(--black)] text-[var(--white)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
+          className="flex-1 rounded-lg px-3 py-2.5 bg-[var(--black)] text-[var(--white)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
         >
           {submitting ? 'Mengirim...' : 'Kirim Pengajuan'}
         </button>
         <button
           type="button"
           onClick={() => setShowForm(false)}
-          className="px-3 py-2 border border-[var(--gray-200)] text-sm text-[var(--gray-600)]"
+          className="rounded-lg px-4 py-2.5 border border-[var(--gray-200)] text-sm text-[var(--gray-600)]"
         >
           Batal
         </button>

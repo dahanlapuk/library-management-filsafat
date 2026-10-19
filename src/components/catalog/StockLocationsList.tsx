@@ -22,7 +22,7 @@ export function StockLocationsList({ bookId }: { bookId: number }) {
       {data.allocations.map((a) => (
         <li
           key={a.posisiId ?? 'tanpa-rak'}
-          className="text-xs border border-[var(--gray-200)] bg-[var(--gray-100)] px-1.5 py-0.5"
+          className="rounded-full border border-[var(--gray-200)] bg-[var(--gray-100)] px-2.5 py-0.5 text-xs"
         >
           {a.posisiKode ?? 'Tanpa rak'}: {a.qty}
         </li>
