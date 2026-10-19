@@ -25,6 +25,14 @@ export function Footer() {
           <Link to="/" className="hover:underline">
             Katalog buku
           </Link>
+          <a
+            href="https://filsafatui.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            Departemen Filsafat UI
+          </a>
           <Link to="/informasi" className="hover:underline">
             Informasi Biblioteka Filsafat UI
           </Link>
@@ -49,12 +57,13 @@ export function Footer() {
           </span>
           <span>
             Created by{' '}
-            <a href="https://itbamuhammad.me"
+            <a
+              href="https://crkstudio.com"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-[var(--accent)] hover:underline"
             >
-              Hexadev Technologies
+              crkstudio
             </a>
           </span>
         </div>

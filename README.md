@@ -142,4 +142,4 @@ Detail audit ada di `docs/v1-audit-notes.md`.
 
 ## Kontribusi, Lisensi dan Kredit
 
-Proyek ini dikelola dan dikembangkan oleh [Itba Muhammad Kamil](https://github.com/dahanlapuk) dibawah [Hexadev Technologies](https://www.itbamuhammad.me/) untuk Departemen Filsafat Fakultas Ilmu Pengetahuan Budaya Universitas Indonesia.
+Proyek ini dikelola dan dikembangkan oleh [Itba Muhammad Kamil](https://github.com/dahanlapuk) di bawah [crkstudio](https://crkstudio.com) untuk Departemen Filsafat Fakultas Ilmu Pengetahuan Budaya Universitas Indonesia.
