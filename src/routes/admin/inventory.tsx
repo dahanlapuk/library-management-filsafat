@@ -53,6 +53,7 @@ function InventoryCheckPage() {
   const [urutan, setUrutan] = useState<'rak' | 'jumlah'>('rak')
   const [hanyaBelum, setHanyaBelum] = useState(false)
   const [detailOpen, setDetailOpen] = useState<Record<number, boolean>>({})
+  const [rakSheetOpen, setRakSheetOpen] = useState(false)
 
   // Search lintas semua rak, independen dari rak yang dipilih.
   const [searchInput, setSearchInput] = useState('')
@@ -151,80 +152,118 @@ function InventoryCheckPage() {
     })
   }
 
+  const selectedLabel =
+    selection === 'none'
+      ? 'Pilih rak'
+      : selection === 'unpositioned'
+        ? 'Belum Ditempatkan'
+        : (posisiProgress.find((p) => p.id === selection)?.kode ?? 'Pilih rak')
+  const selectedProgress =
+    selection === 'none'
+      ? null
+      : posisiProgress.find((p) => (selection === 'unpositioned' ? p.id === null : p.id === selection))
+
+  const rakPicker = (
+    <>
+      <div className="mb-3 flex gap-2">
+        {(
+          [
+            ['rak', 'Urutan rak'],
+            ['jumlah', 'Jumlah'],
+          ] as const
+        ).map(([value, label]) => (
+          <Chip
+            key={value}
+            active={urutan === value}
+            onClick={() => setUrutan(value)}
+            className="text-xs"
+          >
+            {label}
+          </Chip>
+        ))}
+      </div>
+      {posisiProgressQuery.isLoading && <p className="text-sm text-[var(--muted)]">Memuat...</p>}
+      <ul className="space-y-1.5 md:max-h-[70vh] md:overflow-y-auto">
+        {posisiProgressList.map((p) => {
+          const belum = p.totalBuku - p.sudahDicek
+          const isUnpositioned = p.id === null
+          const isSelected = isUnpositioned ? selection === 'unpositioned' : selection === p.id
+          return (
+            <li key={p.id ?? 'unpositioned'}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelection(isUnpositioned ? 'unpositioned' : (p.id as number))
+                  setRakSheetOpen(false)
+                }}
+                className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                  isSelected
+                    ? 'border-[var(--sun)] bg-[var(--pale)]'
+                    : isUnpositioned
+                      ? 'border-dashed border-[var(--muted)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
+                      : 'border-[var(--rule)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
+                }`}
+              >
+                <span>
+                  {p.kode}
+                  {!isUnpositioned && <span className="ml-1 text-[var(--muted)]">({p.rak})</span>}
+                </span>
+                <span className={`text-xs ${belum > 0 ? 'font-semibold' : 'text-[var(--muted)]'}`}>
+                  {p.sudahDicek}/{p.totalBuku}
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </>
+  )
+
   const smallBtn =
     'rounded-full border border-[var(--rule)] px-2.5 py-1 text-xs text-[var(--muted)] transition-colors hover:bg-[var(--pale-soft)]'
 
   return (
     <AdminPage>
       <div className="flex flex-col gap-6 md:flex-row">
-        <aside className="w-full shrink-0 md:w-64">
+        <aside className="hidden w-64 shrink-0 md:block">
           <h2 className="mb-2 text-sm font-medium text-[var(--muted)]">Posisi Rak</h2>
-          <div className="mb-3 flex gap-2">
-            {(
-              [
-                ['rak', 'Urutan rak'],
-                ['jumlah', 'Jumlah'],
-              ] as const
-            ).map(([value, label]) => (
-              <Chip
-                key={value}
-                active={urutan === value}
-                onClick={() => setUrutan(value)}
-                className="text-xs"
-              >
-                {label}
-              </Chip>
-            ))}
-          </div>
-          {posisiProgressQuery.isLoading && (
-            <p className="text-sm text-[var(--muted)]">Memuat...</p>
-          )}
-          <ul className="max-h-64 space-y-1.5 overflow-y-auto md:max-h-[70vh]">
-            {posisiProgressList.map((p) => {
-              const belum = p.totalBuku - p.sudahDicek
-              const isUnpositioned = p.id === null
-              const isSelected = isUnpositioned
-                ? selection === 'unpositioned'
-                : selection === p.id
-              return (
-                <li key={p.id ?? 'unpositioned'}>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSelection(isUnpositioned ? 'unpositioned' : (p.id as number))
-                    }
-                    className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                      isSelected
-                        ? 'border-[var(--sun)] bg-[var(--pale)]'
-                        : isUnpositioned
-                          ? 'border-dashed border-[var(--muted)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
-                          : 'border-[var(--rule)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
-                    }`}
-                  >
-                    <span>
-                      {p.kode}
-                      {!isUnpositioned && (
-                        <span className="ml-1 text-[var(--muted)]">({p.rak})</span>
-                      )}
-                    </span>
-                    <span
-                      className={`text-xs ${
-                        belum > 0 ? 'font-semibold' : 'text-[var(--muted)]'
-                      }`}
-                    >
-                      {p.sudahDicek}/{p.totalBuku}
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
+          {rakPicker}
         </aside>
 
         <section className="min-w-0 flex-1">
           <h1 className="mb-4 text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
             Inventory Check
           </h1>
+
+          <div className="sticky top-[var(--admin-header-h,3.5rem)] z-30 -mx-5 mb-3 border-b border-[var(--rule)] bg-[var(--cream)] px-5 py-2 sm:-mx-8 sm:px-8 md:hidden">
+            <button
+              type="button"
+              onClick={() => setRakSheetOpen(true)}
+              className="flex w-full items-center justify-between rounded-lg border border-[var(--rule)] bg-[var(--white)] px-3 py-2.5 text-left text-sm"
+            >
+              <span>
+                Rak: <span className="font-semibold">{selectedLabel}</span>
+                {selectedProgress && (
+                  <span className="ml-2 text-xs text-[var(--muted)]">
+                    {selectedProgress.sudahDicek}/{selectedProgress.totalBuku} dicek
+                  </span>
+                )}
+              </span>
+              <span aria-hidden className="text-[var(--muted)]">
+                ▾
+              </span>
+            </button>
+            {selectedProgress && selectedProgress.totalBuku > 0 && (
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full border border-[var(--rule)] bg-[var(--pale-soft)]">
+                <div
+                  className="h-full bg-[var(--sun)] transition-all"
+                  style={{
+                    width: `${Math.round((selectedProgress.sudahDicek / selectedProgress.totalBuku) * 100)}%`,
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
           <Input
             type="search"
@@ -236,7 +275,7 @@ function InventoryCheckPage() {
 
           {!showList && (
             <p className="text-sm text-[var(--muted)]">
-              Pilih rak (atau "Belum Ditempatkan") di samping, atau cari nama/kode buku di atas
+              Pilih rak (atau "Belum Ditempatkan"), atau cari nama/kode buku di atas
               untuk mulai checklist.
             </p>
           )}
@@ -304,7 +343,11 @@ function InventoryCheckPage() {
                   return (
                     <li
                       key={book.id}
-                      className="rounded-xl border border-[var(--rule)] bg-[var(--white)] p-4 shadow-[0_1px_2px_rgba(24,22,0,0.05)]"
+                      className={`rounded-xl border border-l-[6px] p-4 shadow-[0_1px_2px_rgba(24,22,0,0.05)] ${
+                        belumPernahDicek
+                          ? 'border-[var(--rule)] border-l-[color:var(--sun)] bg-[var(--white)]'
+                          : 'border-emerald-200 border-l-emerald-600 bg-emerald-50'
+                      }`}
                     >
                       <div className="flex min-w-0 flex-col gap-1">
                         <p className="break-words font-semibold">{book.judul}</p>
@@ -321,12 +364,17 @@ function InventoryCheckPage() {
                         </p>
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
                           {belumPernahDicek ? (
-                            <Badge tone="soft">Belum pernah dicek</Badge>
+                            <Badge tone="soft">Belum dicek</Badge>
                           ) : (
-                            <span>
-                              Terakhir dicek {formatTanggal(book.lastChecked)}
-                              {book.checkedBy ? ` oleh ${book.checkedBy}` : ''}
-                            </span>
+                            <>
+                              <span className="inline-flex items-center rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">
+                                ✓ Sudah dicek
+                              </span>
+                              <span>
+                                {formatTanggal(book.lastChecked)}
+                                {book.checkedBy ? ` oleh ${book.checkedBy}` : ''}
+                              </span>
+                            </>
                           )}
                         </div>
                         {book.lastCheckCatatan && (
@@ -451,6 +499,28 @@ function InventoryCheckPage() {
           )}
         </section>
       </div>
+
+      {rakSheetOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <button
+            type="button"
+            aria-label="Tutup"
+            onClick={() => setRakSheetOpen(false)}
+            className="absolute inset-0 bg-black/40"
+          />
+          <div className="sheet-in absolute inset-x-0 bottom-0 flex max-h-[80vh] flex-col rounded-t-2xl bg-[var(--cream)] shadow-xl">
+            <div className="flex items-center justify-between border-b border-[var(--rule)] px-5 py-3">
+              <h2 className="text-base font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
+                Pilih rak
+              </h2>
+              <Button variant="quiet" onClick={() => setRakSheetOpen(false)}>
+                Tutup
+              </Button>
+            </div>
+            <div className="overflow-y-auto px-5 py-4">{rakPicker}</div>
+          </div>
+        </div>
+      )}
     </AdminPage>
   )
 }
