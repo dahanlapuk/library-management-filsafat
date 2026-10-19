@@ -20,7 +20,7 @@ export function BookCard({ book }: { book: BookRow }) {
           <span className="font-[var(--font-heading)] text-base font-semibold leading-snug sm:text-lg text-[var(--ink)]">
             {book.judul}
           </span>
-          <StatusBadge isDipinjam={book.isDipinjam} />
+          <StatusBadge isDipinjam={book.isDipinjam} tidakTersedia={book.tidakTersedia} />
         </div>
 
         {book.penulis && (

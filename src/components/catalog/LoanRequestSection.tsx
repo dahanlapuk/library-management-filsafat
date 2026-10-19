@@ -30,7 +30,7 @@ const emptyLoanRequestForm: LoanRequestFormState = {
 export function LoanRequestSection({
   book,
 }: {
-  book: { id: number; judul: string; isDipinjam: boolean }
+  book: { id: number; judul: string; isDipinjam: boolean; tidakTersedia: boolean }
 }) {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<LoanRequestFormState>(emptyLoanRequestForm)
@@ -38,7 +38,7 @@ export function LoanRequestSection({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  if (book.isDipinjam) {
+  if (book.isDipinjam || book.tidakTersedia) {
     return (
       <p className="text-sm text-[var(--gray-600)] border-t border-[var(--rule)] pt-4">
         Buku ini sedang tidak tersedia untuk diajukan peminjamannya.

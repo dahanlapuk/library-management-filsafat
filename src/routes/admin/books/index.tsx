@@ -208,7 +208,7 @@ function AdminBooksPage() {
                     <span className="text-sm text-[var(--gray-600)]">
                       {book.kode || '(tanpa kode)'} · {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ?? book.kategoriNama ?? '-'} ·
                       qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'} ·{' '}
-                      {book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
+                      {book.tidakTersedia ? 'Tidak tersedia' : book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

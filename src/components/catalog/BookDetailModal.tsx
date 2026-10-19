@@ -71,7 +71,7 @@ export function BookDetailModal({
         ) : (
           <>
             <div className="flex flex-col items-start gap-3 pr-10">
-              <StatusBadge isDipinjam={book.isDipinjam} />
+              <StatusBadge isDipinjam={book.isDipinjam} tidakTersedia={book.tidakTersedia} />
               <div className="flex flex-col gap-1">
                 <h2 className="font-[var(--font-heading)] text-xl font-semibold leading-snug text-[var(--ink)] sm:text-[1.7rem]">
                   {book.judul}
@@ -120,7 +120,7 @@ export function BookDetailModal({
             )}
 
             <LoanRequestSection
-              book={{ id: book.id, judul: book.judul, isDipinjam: book.isDipinjam }}
+              book={{ id: book.id, judul: book.judul, isDipinjam: book.isDipinjam, tidakTersedia: book.tidakTersedia }}
             />
 
             <Link

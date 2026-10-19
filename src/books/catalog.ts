@@ -12,12 +12,14 @@ import {
 } from '../db/schema'
 
 // Katalog publik (tanpa login). Identitas peminjam tidak pernah diekspos:
-// yang keluar hanya sisa eksemplar dan isDipinjam (true kalau sisa habis).
+// yang keluar hanya sisa eksemplar, isDipinjam (qty > 0 dan sisa habis), dan
+// tidakTersedia (qty <= 0: eksemplar tidak tercatat atau tidak ditemukan).
 const sisaExpr = sql<number>`(${books.qty} - (
   SELECT count(*)::int FROM loans l
   WHERE l.book_id = ${books.id} AND l.tanggal_kembali IS NULL
 ))`
-const isDipinjamExpr = sql<boolean>`(${sisaExpr} <= 0)`
+const tidakTersediaExpr = sql<boolean>`(${books.qty} <= 0)`
+const isDipinjamExpr = sql<boolean>`(${books.qty} > 0 AND ${sisaExpr} <= 0)`
 
 const PATH_TTL_MS = 30_000
 let pathCache: { map: Map<number, string>; expires: number } | null = null
@@ -88,7 +90,7 @@ const bookFilterSchema = paginationSchema.extend({
 
 function statusCondition(status: 'dipinjam' | 'tersedia' | undefined) {
   if (status === 'dipinjam') return isDipinjamExpr
-  if (status === 'tersedia') return sql`NOT (${isDipinjamExpr})`
+  if (status === 'tersedia') return sql`(${books.qty} > 0 AND ${sisaExpr} > 0)`
   return undefined
 }
 
@@ -142,6 +144,7 @@ export const getBooks = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        tidakTersedia: tidakTersediaExpr,
         sisa: sisaExpr,
       })
       .from(books)
@@ -223,6 +226,7 @@ export const searchBooks = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        tidakTersedia: tidakTersediaExpr,
         sisa: sisaExpr,
       })
       .from(books)
@@ -263,6 +267,7 @@ export const getBook = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        tidakTersedia: tidakTersediaExpr,
         sisa: sisaExpr,
       })
       .from(books)
