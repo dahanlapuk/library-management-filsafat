@@ -16,7 +16,7 @@ export const Route = createFileRoute('/admin/feedback')({
 })
 
 const JENIS = [
-  { value: 'saran', label: 'Saran' },
+  { value: 'saran', label: 'Kritik dan saran' },
   { value: 'koreksi_buku', label: 'Koreksi data buku' },
   { value: 'usul_buku', label: 'Usul buku' },
 ] as const
@@ -320,7 +320,7 @@ function FeedbackPage() {
           Feedback Publik
         </h1>
         <p className="text-[var(--gray-600)] mb-6">
-          Kiriman pengunjung katalog. Saran yang didukung dua admin naik menjadi perlu perhatian,
+          Kiriman pengunjung katalog. Kritik dan saran yang didukung dua admin naik menjadi perlu perhatian,
           lalu superadmin dapat meneruskannya sebagai request fitur.
         </p>
 

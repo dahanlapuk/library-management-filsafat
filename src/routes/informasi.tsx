@@ -79,7 +79,7 @@ function InformasiPage() {
           <iframe
             src={EMBED_URL}
             title="Peta lokasi Departemen Filsafat FIB UI"
-            className="mt-2 h-[350px] w-full rounded-xl border-2 border-[var(--ink)] shadow-sm"
+            className="mt-2 h-[350px] w-full rounded-xl border-2 border-[var(--sun)] shadow-[0_0_0_4px_rgba(226,185,0,0.2),0_10px_32px_-6px_rgba(226,185,0,0.6)]"
             allowFullScreen
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
