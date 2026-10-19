@@ -40,7 +40,7 @@ export function LoanRequestSection({
 
   if (book.isDipinjam) {
     return (
-      <p className="text-sm text-[var(--gray-600)] border-t-2 border-[var(--black)] pt-4">
+      <p className="text-sm text-[var(--gray-600)] border-t border-[var(--rule)] pt-4">
         Buku ini sedang tidak tersedia untuk diajukan peminjamannya.
       </p>
     )
@@ -48,7 +48,7 @@ export function LoanRequestSection({
 
   if (success) {
     return (
-      <div className="border-t-2 border-[var(--black)] pt-4 flex flex-col gap-2">
+      <div className="border-t border-[var(--rule)] pt-4 flex flex-col gap-2">
         <p className="text-sm font-medium text-[var(--text-primary)]">
           Pengajuan terkirim.
         </p>
@@ -101,11 +101,11 @@ export function LoanRequestSection({
 
   if (!showForm) {
     return (
-      <div className="border-t-2 border-[var(--black)] pt-4">
+      <div className="border-t border-[var(--rule)] pt-4">
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="w-full px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)]"
+          className="w-full px-3 py-2 border border-[var(--sun)] bg-[var(--sun-bright)] text-[var(--ink)] text-sm font-semibold uppercase tracking-wide hover:bg-[var(--sun)]"
         >
           Ajukan Peminjaman
         </button>
@@ -116,7 +116,7 @@ export function LoanRequestSection({
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-t-2 border-[var(--black)] pt-4 flex flex-col gap-3"
+      className="border-t border-[var(--rule)] pt-4 flex flex-col gap-3"
     >
       <h3 className="text-sm font-semibold text-[var(--text-primary)]">
         Ajukan Peminjaman
@@ -133,7 +133,7 @@ export function LoanRequestSection({
         placeholder="Nama lengkap"
         value={form.namaPeminjam}
         onChange={(e) => setForm((f) => ({ ...f, namaPeminjam: e.target.value }))}
-        className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <div className="flex gap-2">
@@ -147,7 +147,7 @@ export function LoanRequestSection({
               angkatan: '',
             }))
           }
-          className="flex-1 text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className="flex-1 text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
         >
           <option value="mahasiswa">Mahasiswa</option>
           <option value="dosen">Dosen</option>
@@ -162,7 +162,7 @@ export function LoanRequestSection({
                 jenjang: e.target.value as 'S1' | 'S2' | 'S3' | '',
               }))
             }
-            className="flex-1 text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className="flex-1 text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
           >
             <option value="">Jenjang</option>
             <option value="S1">S1</option>
@@ -178,7 +178,7 @@ export function LoanRequestSection({
           placeholder="Angkatan (mis. 2023)"
           value={form.angkatan}
           onChange={(e) => setForm((f) => ({ ...f, angkatan: e.target.value }))}
-          className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
         />
       )}
 
@@ -187,7 +187,7 @@ export function LoanRequestSection({
         placeholder="Nomor WhatsApp"
         value={form.whatsapp}
         onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-        className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <input
@@ -195,7 +195,7 @@ export function LoanRequestSection({
         placeholder="Email (opsional)"
         value={form.email}
         onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-        className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
       />
 
       <textarea
@@ -203,7 +203,7 @@ export function LoanRequestSection({
         value={form.keperluan}
         onChange={(e) => setForm((f) => ({ ...f, keperluan: e.target.value }))}
         rows={2}
-        className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] resize-none"
+        className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] resize-none"
       />
 
       <div className="flex gap-2">
@@ -217,7 +217,7 @@ export function LoanRequestSection({
         <button
           type="button"
           onClick={() => setShowForm(false)}
-          className="px-3 py-2 border-2 border-[var(--gray-200)] text-sm text-[var(--gray-600)]"
+          className="px-3 py-2 border border-[var(--gray-200)] text-sm text-[var(--gray-600)]"
         >
           Batal
         </button>

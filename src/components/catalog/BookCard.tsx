@@ -1,80 +1,46 @@
 import { Link } from '@tanstack/react-router'
+import { BookTags } from './BookTags'
+import { StatusBadge } from './StatusBadge'
 import type { BookRow } from './types'
 
-export function BookCard({ book }: { book: BookRow }) {
-  const orderedTags =
-    book.kategoriId != null
-      ? [...book.tags].sort((a, b) =>
-          a.id === book.kategoriId ? -1 : b.id === book.kategoriId ? 1 : 0,
-        )
-      : book.tags
+export function eksLabel(qty: number, sisa: number) {
+  return qty > 1 ? `${sisa} dari ${qty} Eks tersedia` : `${qty} Eks`
+}
 
+export function BookCard({ book }: { book: BookRow }) {
   return (
     <Link
       to="/"
       search={{ book: book.id }}
-      className="text-left border-2 border-[var(--black)] bg-[var(--white)] flex flex-col h-full hover:bg-[var(--gray-100)] transition-colors overflow-hidden"
+      className="flex h-full flex-col overflow-hidden border border-[var(--rule)] bg-[var(--white)] text-left transition-colors hover:border-[var(--ink)]"
     >
-      <div className="flex-1 flex flex-col p-4">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-2">
-            <span className="font-semibold text-[var(--text-primary)] leading-snug">
-              {book.judul}
-            </span>
-            <span
-              className={`shrink-0 text-xs font-medium px-2 py-0.5 ${
-                book.isDipinjam
-                  ? 'bg-[var(--black)] text-[var(--white)]'
-                  : 'border-2 border-[var(--accent)] text-[var(--text-primary)]'
-              }`}
-            >
-              {book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
-            </span>
-          </div>
-
-          {book.penulis && (
-            <p className="text-sm text-[var(--gray-600)] -mt-1.5">
-              {book.penulis}
-              {book.tahun ? `, ${book.tahun}` : ''}
-            </p>
-          )}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <span className="font-[var(--font-heading)] text-lg font-semibold leading-snug text-[var(--ink)]">
+            {book.judul}
+          </span>
+          <StatusBadge isDipinjam={book.isDipinjam} />
         </div>
 
-        {/* Grup bawah: kode/eks + tag -- mt-auto biar SELALU nempel di
-            posisi yang sama (rapat ke footer rak), gak peduli judulnya
-            pendek atau panjang. Ini yang bikin proporsi antar kartu
-            konsisten/seragam. */}
-        <div className="mt-auto flex flex-col gap-3 pt-4">
-          <div className="flex items-center justify-between gap-3 py-2 border-y-2 border-[var(--black)]">
-            <span className="font-mono text-sm font-semibold text-[var(--text-primary)]">
-              {book.kode ?? ''}
-            </span>
-            <span className="shrink-0 text-sm font-semibold text-[var(--text-primary)]">
-              {book.qty} Eks
-            </span>
-          </div>
+        {book.penulis && (
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            {book.penulis}
+            {book.tahun ? `, ${book.tahun}` : ''}
+          </p>
+        )}
 
-          {orderedTags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {orderedTags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className={
-                    tag.id === book.kategoriId
-                      ? 'text-xs font-medium px-2 py-0.5 border-2 border-[var(--accent)] text-[var(--text-primary)]'
-                      : 'text-xs rounded-full border border-[var(--gray-200)] px-2 py-0.5 text-[var(--gray-600)]'
-                  }
-                >
-                  {tag.nama}
-                </span>
-              ))}
-            </div>
-          )}
+        {/* mt-auto: kode dan tag selalu rapat ke bilah rak, berapa pun panjang judul. */}
+        <div className="mt-auto flex flex-col gap-3 pt-4">
+          <div className="flex items-center justify-between gap-3 border-t border-[var(--rule)] pt-3 text-sm">
+            <span className="font-mono font-semibold text-[var(--ink)]">{book.kode ?? ''}</span>
+            <span className="shrink-0 text-[var(--muted)]">{eksLabel(book.qty, book.sisa)}</span>
+          </div>
+          <BookTags tags={book.tags} kategoriId={book.kategoriId} />
         </div>
       </div>
 
       {book.posisiKode && (
-        <div className="bg-[var(--black)] text-[var(--white)] text-center font-bold tracking-widest py-2 text-sm">
+        <div className="bg-[var(--ink)] py-2 text-center text-xs font-semibold tracking-widest text-[var(--cream)]">
           {book.posisiKode.replace(/-/g, ' - ')}
         </div>
       )}

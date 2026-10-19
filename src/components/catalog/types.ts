@@ -18,6 +18,7 @@ export type BookRow = {
   posisiKode: string | null
   posisiRak: string | null
   isDipinjam: boolean
+  sisa: number
   tags: BookTag[]
 }
 
