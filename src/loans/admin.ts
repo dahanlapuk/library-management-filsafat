@@ -123,10 +123,13 @@ export const approveLoanRequest = createServerFn({ method: 'POST' })
         throw new Error('Buku yang diajukan sudah tidak ada (mungkin sudah dihapus).')
       }
 
+      // Kunci baris buku sampai transaksi selesai, supaya dua approval
+      // bersamaan untuk eksemplar terakhir tidak sama-sama lolos.
       const [book] = await tx
         .select({ qty: books.qty })
         .from(books)
         .where(eq(books.id, request.bookId))
+        .for('update')
         .limit(1)
       if (!book) {
         throw new Error('Buku yang diajukan sudah tidak ada (mungkin sudah dihapus).')
