@@ -11,13 +11,13 @@ import {
   bookStockLocations,
 } from '../db/schema'
 
-// Katalog publik (tanpa login). isDipinjam sengaja boolean: nama peminjam tidak
-// pernah diekspos. Dihitung dengan EXISTS supaya buku multi-copy tidak menggandakan baris.
-
-const isDipinjamExpr = sql<boolean>`EXISTS (
-  SELECT 1 FROM loans l
+// Katalog publik (tanpa login). Identitas peminjam tidak pernah diekspos:
+// yang keluar hanya sisa eksemplar dan isDipinjam (true kalau sisa habis).
+const sisaExpr = sql<number>`(${books.qty} - (
+  SELECT count(*)::int FROM loans l
   WHERE l.book_id = ${books.id} AND l.tanggal_kembali IS NULL
-)`
+))`
+const isDipinjamExpr = sql<boolean>`(${sisaExpr} <= 0)`
 
 const PATH_TTL_MS = 30_000
 let pathCache: { map: Map<number, string>; expires: number } | null = null
@@ -142,6 +142,7 @@ export const getBooks = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        sisa: sisaExpr,
       })
       .from(books)
       .leftJoin(categories, eq(books.kategoriId, categories.id))
@@ -222,6 +223,7 @@ export const searchBooks = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        sisa: sisaExpr,
       })
       .from(books)
       .leftJoin(categories, eq(books.kategoriId, categories.id))
@@ -261,6 +263,7 @@ export const getBook = createServerFn({ method: 'GET' })
         posisiKode: posisi.kode,
         posisiRak: posisi.rak,
         isDipinjam: isDipinjamExpr,
+        sisa: sisaExpr,
       })
       .from(books)
       .leftJoin(categories, eq(books.kategoriId, categories.id))
