@@ -197,7 +197,7 @@ function WhatsAppMessageBox({
               setOpen(false)
             }
           }}
-          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--accent)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
+          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
         >
           {sending ? '...' : 'Kirim via WhatsApp'}
         </button>
@@ -453,7 +453,7 @@ function LoanRequestsPage() {
                           <button
                             onClick={() => handleApprove(req.id)}
                             disabled={processingId === req.id}
-                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--accent)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
+                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                           >
                             {processingId === req.id ? '...' : 'Approve'}
                           </button>
@@ -530,7 +530,7 @@ function LoanRequestsPage() {
                           <button
                             onClick={() => handleReturn(loan.id)}
                             disabled={processingId === loan.id}
-                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--accent)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
+                            className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                           >
                             {processingId === loan.id ? '...' : 'Pengembalian'}
                           </button>
@@ -604,7 +604,7 @@ function LoanRequestsPage() {
                         ) : isOverdue(row.dueAt) ? (
                           <span className="text-[#c00] font-medium">Aktif · TERLAMBAT</span>
                         ) : (
-                          <span className="text-[var(--accent)] font-medium">Aktif</span>
+                          <span className="text-[var(--text-primary)] font-medium">Aktif</span>
                         )}
                       </td>
                       <td className="p-2 text-[var(--gray-600)]">{row.dicatatOlehNama ?? '-'}</td>

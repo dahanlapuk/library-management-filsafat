@@ -115,7 +115,7 @@ function CategoryRequestsPage() {
                     <button
                       onClick={() => handleApprove(req.id)}
                       disabled={processingId === req.id}
-                      className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--accent)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
+                      className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                     >
                       {processingId === req.id ? '...' : 'Approve'}
                     </button>

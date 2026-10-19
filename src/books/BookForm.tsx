@@ -276,7 +276,7 @@ export function BookForm({
         </select>
 
         {categoryRequestSuccess && (
-          <p className="text-xs text-[var(--accent)]">{categoryRequestSuccess}</p>
+          <p className="text-xs text-[var(--text-primary)]">{categoryRequestSuccess}</p>
         )}
 
         {!showCategoryRequest ? (

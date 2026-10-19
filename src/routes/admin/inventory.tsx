@@ -205,7 +205,7 @@ function InventoryCheckPage() {
                     </span>
                     <span
                       className={`text-xs ${
-                        belum > 0 ? 'font-semibold text-[var(--accent)]' : 'text-[var(--gray-600)]'
+                        belum > 0 ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--gray-600)]'
                       }`}
                     >
                       {p.sudahDicek}/{p.totalBuku}
@@ -280,7 +280,7 @@ function InventoryCheckPage() {
                             </p>
                           )}
                           {belumPernahDicek ? (
-                            <span className="mt-1 inline-block border border-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--accent)]">
+                            <span className="mt-1 inline-block border border-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--text-primary)]">
                               Belum pernah dicek
                             </span>
                           ) : (
@@ -290,7 +290,7 @@ function InventoryCheckPage() {
                             </p>
                           )}
                           {book.lastCheckCatatan && (
-                            <p className="mt-1 text-xs italic text-[var(--accent)]">
+                            <p className="mt-1 text-xs italic text-[var(--text-primary)]">
                               Catatan sebelumnya: {book.lastCheckCatatan}
                             </p>
                           )}

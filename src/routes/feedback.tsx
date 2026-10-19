@@ -224,7 +224,7 @@ function FeedbackPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full border-2 border-[var(--accent)] px-3 py-2 text-sm font-medium uppercase tracking-wide text-[var(--accent)] hover:bg-[var(--accent-soft)] disabled:opacity-50 sm:w-auto"
+              className="w-full border-2 border-[var(--accent)] px-3 py-2 text-sm font-medium uppercase tracking-wide text-[var(--text-primary)] hover:bg-[var(--accent-soft)] disabled:opacity-50 sm:w-auto"
             >
               {submitting ? 'Mengirim...' : 'Kirim'}
             </button>
