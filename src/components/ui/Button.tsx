@@ -5,6 +5,10 @@ const VARIANTS = {
     'bg-[var(--ink)] text-[var(--cream)] border border-[var(--ink)] hover:bg-[var(--muted)]',
   secondary:
     'bg-[var(--white)] text-[var(--ink)] border border-[var(--rule)] hover:bg-[var(--pale-soft)]',
+  accent:
+    'bg-[var(--pale)] text-[var(--ink)] border border-[var(--sun)] hover:bg-[var(--sun-bright)]',
+  quiet:
+    'bg-transparent text-[var(--muted)] border border-[var(--rule)] hover:bg-[var(--pale-soft)]',
 }
 
 export function Button({

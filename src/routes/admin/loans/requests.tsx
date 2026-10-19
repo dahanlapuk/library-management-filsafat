@@ -2,6 +2,9 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AdminPage } from '../../../components/ui/AdminPage'
+import { Badge } from '../../../components/ui/Badge'
+import { Button } from '../../../components/ui/Button'
+import { Textarea } from '../../../components/ui/Field'
 import { getCurrentAdmin } from '../../../admin/auth'
 import {
   getPendingLoanRequests,
@@ -23,8 +26,7 @@ export const Route = createFileRoute('/admin/loans/requests')({
 const LIBRARY_ADDRESS =
   'Perpustakaan Departemen Filsafat\nFakultas Ilmu Pengetahuan Budaya Universitas Indonesia\nKampus UI Depok, Pondok Cina, Kecamatan Beji, Kota Depok, Jawa Barat 16424'
 
-// wa.me butuh nomor tanpa +/0 di depan (format internasional polos) --
-// normalize dari input bebas yang diisi peminjam/member sendiri.
+// wa.me butuh nomor format internasional polos (tanpa + atau 0 di depan).
 function normalizeWhatsapp(whatsapp: string): string {
   const digitsOnly = whatsapp.replace(/[^0-9+]/g, '')
   if (digitsOnly.startsWith('+')) return digitsOnly.slice(1)
@@ -41,9 +43,7 @@ function formatDate(value: string | Date | null): string {
   return new Date(value).toLocaleString('id-ID')
 }
 
-// Jam WIB dari sebuah dueAt -- dipakai di template mahasiswa, karena jam
-// tutup beda tiap hari (Kamis 14.00, hari lain 16.00), jadi tidak boleh
-// di-hardcode di teks pesan.
+// Jam tutup beda tiap hari, jadi jam diambil dari dueAt, bukan di-hardcode.
 function formatWIBTime(value: string | Date | null): string {
   if (!value) return '-'
   return new Date(value).toLocaleTimeString('id-ID', {
@@ -53,8 +53,6 @@ function formatWIBTime(value: string | Date | null): string {
   })
 }
 
-// Tanggal+jam WIB lengkap -- dipakai di template dosen (durasi 14 hari,
-// jadi tanggalnya yang penting, bukan cuma jam).
 function formatWIBDateTime(value: string | Date | null): string {
   if (!value) return '-'
   return new Date(value).toLocaleString('id-ID', {
@@ -66,11 +64,6 @@ function formatWIBDateTime(value: string | Date | null): string {
 
 type ActiveLoan = Awaited<ReturnType<typeof getActiveLoans>>[number]
 
-// ── Template pesan WhatsApp ─────────────────────────────────────
-// 4 varian (pickup/reminder x mahasiswa/dosen), disusun dari draft resmi
-// perpustakaan. $peminjam/$buku/$admin diisi otomatis; jam/tanggal batas
-// waktu diambil dari dueAt asli si loan (bukan angka tetap), supaya tetap
-// benar walau jam tutup beda tiap hari.
 function buildPickupMessage(loan: ActiveLoan, adminNama: string): string {
   if (loan.role === 'dosen') {
     return `Peminjaman Buku Disetujui
@@ -133,13 +126,9 @@ Apabila belum selesai membaca dan ingin melanjutkan di hari berikutnya, silakan 
 Perpustakaan Departemen Filsafat`
 }
 
-// ── Kotak pesan WhatsApp yang bisa diedit ──────────────────────────
-// Dipakai untuk semua jenis chat (pickup / reminder pengembalian /
-// reject): klik tombol label -> muncul textarea prefilled -> admin
-// boleh edit -> "Kirim via WhatsApp" buka wa.me pakai teks final +
-// panggil onSent (mark timestamp terkait di server). "Batal" nutup
-// kotak tanpa efek apa pun -- TIDAK ada verifikasi WA beneran
-// terkirim/dibaca, murni catatan klik di sisi admin.
+// Klik tombol -> textarea berisi pesan -> admin boleh edit -> "Kirim via WhatsApp"
+// membuka wa.me lalu memanggil onSent (menandai waktu di server). Tidak ada
+// verifikasi pesan benar-benar terkirim; ini hanya catatan klik admin.
 function WhatsAppMessageBox({
   label,
   whatsapp,
@@ -157,35 +146,26 @@ function WhatsAppMessageBox({
   const [text, setText] = useState(defaultMessage)
   const [sending, setSending] = useState(false)
 
-  const borderClass =
-    variant === 'muted'
-      ? 'border-[var(--gray-600)] text-[var(--gray-600)] hover:bg-[var(--gray-100)]'
-      : 'border-[var(--black)] hover:bg-[var(--gray-100)]'
-
   if (!open) {
     return (
-      <button
+      <Button
+        variant={variant === 'muted' ? 'quiet' : 'secondary'}
         onClick={() => {
           setText(defaultMessage)
           setOpen(true)
         }}
-        className={`px-3 py-2 border-2 text-sm font-medium uppercase tracking-wide ${borderClass}`}
       >
         {label}
-      </button>
+      </Button>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2 p-3 border-2 border-[var(--black)] bg-[var(--gray-100)] w-full">
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={8}
-        className="w-full p-2 border border-[var(--gray-600)] text-sm bg-[var(--white)] whitespace-pre-wrap"
-      />
-      <div className="flex gap-2">
-        <button
+    <div className="flex w-full flex-col gap-2 rounded-lg border border-[var(--rule)] bg-[var(--pale-soft)] p-3">
+      <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} />
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="accent"
           disabled={sending}
           onClick={async () => {
             setSending(true)
@@ -197,25 +177,19 @@ function WhatsAppMessageBox({
               setOpen(false)
             }
           }}
-          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
         >
           {sending ? '...' : 'Kirim via WhatsApp'}
-        </button>
-        <button
-          onClick={() => setOpen(false)}
-          className="px-3 py-2 border border-[var(--gray-600)] text-[var(--gray-600)] text-sm uppercase tracking-wide hover:bg-[var(--white)]"
-        >
+        </Button>
+        <Button variant="quiet" onClick={() => setOpen(false)}>
           Batal
-        </button>
+        </Button>
       </div>
     </div>
   )
 }
 
-// ── Kotak alasan reject ────────────────────────────────────────────
-// Beda dari WhatsAppMessageBox: ini submit LANGSUNG ke server
-// (rejectLoanRequest), belum ada WA sama sekali di sini -- WA baru
-// muncul setelah status jadi 'rejected' (lihat render di bawah).
+// Submit langsung ke server (rejectLoanRequest); WhatsApp baru muncul
+// setelah status pengajuan menjadi 'rejected'.
 function RejectBox({ onSubmit }: { onSubmit: (alasan: string) => Promise<void> }) {
   const [open, setOpen] = useState(false)
   const [alasan, setAlasan] = useState('')
@@ -224,27 +198,24 @@ function RejectBox({ onSubmit }: { onSubmit: (alasan: string) => Promise<void> }
 
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)]"
-      >
+      <Button variant="quiet" onClick={() => setOpen(true)}>
         Reject
-      </button>
+      </Button>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2 p-3 border-2 border-[var(--black)] bg-[var(--gray-100)] w-full">
-      <textarea
+    <div className="flex w-full flex-col gap-2 rounded-lg border border-[var(--rule)] bg-[var(--pale-soft)] p-3">
+      <Textarea
         value={alasan}
         onChange={(e) => setAlasan(e.target.value)}
         placeholder="Alasan penolakan (min. 5 karakter)..."
         rows={2}
-        className="w-full p-2 border border-[var(--gray-600)] text-sm bg-[var(--white)]"
       />
-      {localError && <span className="text-sm text-[#c00]">{localError}</span>}
-      <div className="flex gap-2">
-        <button
+      {localError && <span className="text-sm text-red-700">{localError}</span>}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="secondary"
           disabled={submitting}
           onClick={async () => {
             if (alasan.trim().length < 5) {
@@ -262,18 +233,34 @@ function RejectBox({ onSubmit }: { onSubmit: (alasan: string) => Promise<void> }
               setSubmitting(false)
             }
           }}
-          className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--white)] disabled:opacity-50"
         >
           {submitting ? '...' : 'Submit Penolakan'}
-        </button>
-        <button
-          onClick={() => setOpen(false)}
-          className="px-3 py-2 border border-[var(--gray-600)] text-[var(--gray-600)] text-sm uppercase tracking-wide hover:bg-[var(--white)]"
-        >
+        </Button>
+        <Button variant="quiet" onClick={() => setOpen(false)}>
           Batal
-        </button>
+        </Button>
       </div>
     </div>
+  )
+}
+
+function Panel({ children, scroll = false }: { children: React.ReactNode; scroll?: boolean }) {
+  return (
+    <div
+      className={`rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)] ${
+        scroll ? 'overflow-x-auto' : 'overflow-hidden'
+      }`}
+    >
+      {children}
+    </div>
+  )
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
+      {children}
+    </h2>
   )
 }
 
@@ -377,21 +364,20 @@ function LoanRequestsPage() {
 
   return (
     <AdminPage className="flex flex-col gap-8">
-
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
           Peminjaman
         </h1>
         <Link
           to="/admin"
-          className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]"
+          className="text-sm text-[var(--muted)] underline underline-offset-2 hover:text-[var(--ink)]"
         >
           ← Kembali ke dashboard
         </Link>
       </div>
 
       {(error || requestsError || activeError || historyError) && (
-        <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error ||
             (requestsError ? 'Gagal memuat pengajuan peminjaman.' : '') ||
             (activeError ? 'Gagal memuat peminjaman aktif.' : '') ||
@@ -399,16 +385,13 @@ function LoanRequestsPage() {
         </div>
       )}
 
-      {/* ── Pengajuan Masuk ── */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-          Pengajuan Masuk
-        </h2>
-        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+        <SectionTitle>Pengajuan Masuk</SectionTitle>
+        <Panel>
           {requestsLoading ? (
-            <p className="text-center py-8">Memuat...</p>
+            <p className="py-10 text-center text-[var(--muted)]">Memuat...</p>
           ) : requests.length === 0 ? (
-            <p className="text-center py-8 text-[var(--gray-600)]">
+            <p className="py-10 text-center text-[var(--muted)]">
               Tidak ada pengajuan yang menunggu.
             </p>
           ) : (
@@ -416,45 +399,41 @@ function LoanRequestsPage() {
               {requests.map((req) => (
                 <div
                   key={req.id}
-                  className="flex flex-col gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+                  className="flex flex-col gap-3 border-b border-[var(--rule)] p-4 last:border-b-0"
                 >
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <span className="font-semibold text-[var(--text-primary)]">
-                      {req.bookJudul}
-                    </span>
-                    <span className="text-sm text-[var(--text-primary)]">
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="break-words font-semibold">{req.bookJudul}</span>
+                    <span className="break-words text-sm">
                       {req.namaPeminjam} ·{' '}
                       {req.role === 'dosen'
                         ? 'Dosen'
                         : `Mahasiswa ${req.jenjang ?? ''} ${req.angkatan ?? ''}`}
                     </span>
-                    <span className="text-sm text-[var(--gray-600)]">
+                    <span className="break-words text-sm text-[var(--muted)]">
                       {req.whatsapp}
                       {req.email ? ` · ${req.email}` : ''}
                     </span>
                     {req.keperluan && (
-                      <span className="text-sm text-[var(--text-primary)]">
-                        Keperluan: {req.keperluan}
-                      </span>
+                      <span className="break-words text-sm">Keperluan: {req.keperluan}</span>
                     )}
                     {req.status === 'rejected' && req.rejectionAlasan && (
-                      <span className="text-sm text-[#c00]">Ditolak: {req.rejectionAlasan}</span>
+                      <span className="break-words text-sm text-red-700">
+                        Ditolak: {req.rejectionAlasan}
+                      </span>
                     )}
-                    <span className="text-xs text-[var(--gray-600)]">
-                      {formatDate(req.createdAt)}
-                    </span>
+                    <span className="text-xs text-[var(--muted)]">{formatDate(req.createdAt)}</span>
                   </div>
 
                   <div className="flex flex-wrap items-start gap-2">
                     {req.status === 'pending' ? (
                       <>
-                        <button
+                        <Button
+                          variant="accent"
                           onClick={() => handleApprove(req.id)}
                           disabled={processingId === req.id}
-                          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                         >
                           {processingId === req.id ? '...' : 'Approve'}
-                        </button>
+                        </Button>
                         <RejectBox onSubmit={(alasan) => handleReject(req.id, alasan)} />
                       </>
                     ) : (
@@ -473,19 +452,16 @@ function LoanRequestsPage() {
               ))}
             </div>
           )}
-        </div>
+        </Panel>
       </section>
 
-      {/* ── Peminjaman Aktif ── */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-          Peminjaman Aktif
-        </h2>
-        <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+        <SectionTitle>Peminjaman Aktif</SectionTitle>
+        <Panel>
           {activeLoading ? (
-            <p className="text-center py-8">Memuat...</p>
+            <p className="py-10 text-center text-[var(--muted)]">Memuat...</p>
           ) : activeLoans.length === 0 ? (
-            <p className="text-center py-8 text-[var(--gray-600)]">Tidak ada peminjaman aktif.</p>
+            <p className="py-10 text-center text-[var(--muted)]">Tidak ada peminjaman aktif.</p>
           ) : (
             <div className="flex flex-col">
               {activeLoans.map((loan) => {
@@ -493,23 +469,23 @@ function LoanRequestsPage() {
                 return (
                   <div
                     key={loan.id}
-                    className="flex flex-col gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+                    className="flex flex-col gap-3 border-b border-[var(--rule)] p-4 last:border-b-0"
                   >
-                    <div className="flex flex-col gap-1 min-w-0">
-                      <span className="font-semibold text-[var(--text-primary)]">
-                        {loan.bookJudul}
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="break-words font-semibold">{loan.bookJudul}</span>
+                        {overdue && <Badge tone="solid">Terlambat</Badge>}
                       </span>
-                      <span className="text-sm text-[var(--text-primary)]">
+                      <span className="break-words text-sm">
                         {loan.memberNama} · {loan.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
                       </span>
-                      <span className="text-sm text-[var(--gray-600)]">
+                      <span className="text-sm text-[var(--muted)]">
                         Dipinjam: {formatDate(loan.tanggalPinjam)}
                       </span>
                       <span
-                        className={`text-sm font-medium ${overdue ? 'text-[#c00]' : 'text-[var(--gray-600)]'}`}
+                        className={`text-sm ${overdue ? 'font-medium text-red-700' : 'text-[var(--muted)]'}`}
                       >
                         Jatuh tempo: {formatDate(loan.dueAt)}
-                        {overdue ? ' · TERLAMBAT' : ''}
                       </span>
                     </div>
 
@@ -525,13 +501,13 @@ function LoanRequestsPage() {
                       />
 
                       {loan.returnNotifiedAt ? (
-                        <button
+                        <Button
+                          variant="accent"
                           onClick={() => handleReturn(loan.id)}
                           disabled={processingId === loan.id}
-                          className="px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)] disabled:opacity-50"
                         >
                           {processingId === loan.id ? '...' : 'Pengembalian'}
-                        </button>
+                        </Button>
                       ) : loan.returnReminderStartedAt ? (
                         <WhatsAppMessageBox
                           label="Chat WhatsApp - Reminder"
@@ -544,13 +520,13 @@ function LoanRequestsPage() {
                           }}
                         />
                       ) : (
-                        <button
+                        <Button
+                          variant="quiet"
                           onClick={() => handleStartReturnReminder(loan.id)}
                           disabled={processingId === loan.id}
-                          className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
                         >
                           {processingId === loan.id ? '...' : 'Konfirmasi Pengembalian'}
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -558,60 +534,55 @@ function LoanRequestsPage() {
               })}
             </div>
           )}
-        </div>
+        </Panel>
       </section>
 
-      {/* ── Riwayat Peminjaman ── */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold tracking-wide text-[var(--text-primary)]">
-          Riwayat Peminjaman
-        </h2>
-        <p className="text-sm text-[var(--gray-600)] -mt-2">
+        <SectionTitle>Riwayat Peminjaman</SectionTitle>
+        <p className="-mt-2 text-sm text-[var(--muted)]">
           50 aktivitas peminjaman terbaru (aktif maupun sudah dikembalikan), beserta admin yang
           memprosesnya.
         </p>
-        <div className="bg-[var(--white)] border-2 border-[var(--black)] overflow-x-auto">
+        <Panel scroll>
           {historyLoading ? (
-            <p className="text-center py-8">Memuat...</p>
+            <p className="py-10 text-center text-[var(--muted)]">Memuat...</p>
           ) : loanHistory.length === 0 ? (
-            <p className="text-center py-8 text-[var(--gray-600)]">Belum ada riwayat peminjaman.</p>
+            <p className="py-10 text-center text-[var(--muted)]">Belum ada riwayat peminjaman.</p>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[720px] text-sm">
               <thead>
-                <tr className="border-b-2 border-[var(--black)] text-left">
-                  <th className="p-2 font-semibold">Buku</th>
-                  <th className="p-2 font-semibold">Peminjam</th>
-                  <th className="p-2 font-semibold">Dipinjam</th>
-                  <th className="p-2 font-semibold">Status</th>
-                  <th className="p-2 font-semibold">Admin</th>
+                <tr className="border-b border-[var(--rule)] bg-[var(--pale-soft)] text-left text-[var(--muted)]">
+                  <th className="p-3 font-medium">Buku</th>
+                  <th className="p-3 font-medium">Peminjam</th>
+                  <th className="p-3 font-medium">Dipinjam</th>
+                  <th className="p-3 font-medium">Status</th>
+                  <th className="p-3 font-medium">Admin</th>
                 </tr>
               </thead>
               <tbody>
                 {loanHistory.map((row) => (
-                  <tr key={row.id} className="border-b border-[var(--gray-200)] last:border-b-0">
-                    <td className="p-2">{row.bookJudul}</td>
-                    <td className="p-2">
+                  <tr key={row.id} className="border-b border-[var(--rule)] last:border-b-0">
+                    <td className="p-3">{row.bookJudul}</td>
+                    <td className="p-3">
                       {row.memberNama} · {row.role === 'dosen' ? 'Dosen' : 'Mahasiswa'}
                     </td>
-                    <td className="p-2 text-[var(--gray-600)]">{formatDate(row.tanggalPinjam)}</td>
-                    <td className="p-2">
+                    <td className="p-3 text-[var(--muted)]">{formatDate(row.tanggalPinjam)}</td>
+                    <td className="p-3">
                       {row.tanggalKembali ? (
-                        <span className="text-[var(--gray-600)]">
-                          Dikembalikan {formatDate(row.tanggalKembali)}
-                        </span>
+                        <Badge>Dikembalikan {formatDate(row.tanggalKembali)}</Badge>
                       ) : isOverdue(row.dueAt) ? (
-                        <span className="text-[#c00] font-medium">Aktif · TERLAMBAT</span>
+                        <Badge tone="solid">Aktif · Terlambat</Badge>
                       ) : (
-                        <span className="text-[var(--text-primary)] font-medium">Aktif</span>
+                        <Badge tone="soft">Aktif</Badge>
                       )}
                     </td>
-                    <td className="p-2 text-[var(--gray-600)]">{row.dicatatOlehNama ?? '-'}</td>
+                    <td className="p-3 text-[var(--muted)]">{row.dicatatOlehNama ?? '-'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </div>
+        </Panel>
       </section>
     </AdminPage>
   )
