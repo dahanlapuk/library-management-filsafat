@@ -214,13 +214,13 @@ function PublicCatalogPage() {
   const totalPages = result?.totalPages ?? 1
 
   function closeModal() {
-    navigate({ to: '/', search: {}, replace: true })
+    navigate({ to: '/', search: {}, replace: true, resetScroll: false })
   }
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
       <header className="border-b border-[var(--rule)] bg-[var(--sun-bright)] px-5 sm:px-8 py-8 sm:py-10">
-        <div className="max-w-[1440px] mx-auto grid gap-1 lg:grid-cols-[1fr_26rem] lg:gap-x-10">
+        <div className="max-w-[1280px] mx-auto grid gap-1 lg:grid-cols-[1fr_26rem] lg:gap-x-10">
           <h1 className="font-[var(--font-heading)] text-3xl sm:text-4xl font-semibold leading-tight text-[var(--ink)]">
             Biblioteka Departemen Filsafat UI
           </h1>
@@ -238,7 +238,7 @@ function PublicCatalogPage() {
         </div>
       </header>
 
-      <main className="max-w-[1440px] mx-auto px-5 sm:px-8 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
+      <main className="max-w-[1280px] mx-auto px-5 sm:px-8 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
         <aside className="lg:w-[260px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-4">
           <div className="flex flex-col gap-2">
             <button

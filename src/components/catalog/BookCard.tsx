@@ -12,6 +12,7 @@ export function BookCard({ book }: { book: BookRow }) {
     <Link
       to="/"
       search={{ book: book.id }}
+      resetScroll={false}
       className="card-lift flex h-full flex-col overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] text-left"
     >
       <div className="flex flex-1 flex-col p-3 sm:p-4">

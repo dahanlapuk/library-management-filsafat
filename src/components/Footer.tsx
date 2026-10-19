@@ -7,7 +7,7 @@ export function Footer() {
 
   return (
     <footer className="mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)]">
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-5 py-8 sm:px-8 sm:flex-row sm:justify-between">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-5 py-8 sm:px-8 sm:flex-row sm:justify-between">
         <div className="max-w-sm">
           <p className="font-[var(--font-heading)] text-base font-semibold">
             Biblioteka Departemen <span className="text-[var(--accent)]">Filsafat</span> UI
@@ -51,7 +51,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-1 px-5 py-4 sm:px-8 text-xs sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-1 px-5 py-4 sm:px-8 text-xs sm:flex-row sm:items-center sm:justify-between">
           <span className="opacity-70">
             © {year} Biblioteka Departemen Filsafat UI
           </span>
