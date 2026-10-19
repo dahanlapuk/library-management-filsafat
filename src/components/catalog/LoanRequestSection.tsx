@@ -105,7 +105,7 @@ export function LoanRequestSection({
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="w-full px-3 py-2 border-2 border-[var(--accent)] text-[var(--accent)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)]"
+          className="w-full px-3 py-2 border-2 border-[var(--accent)] text-[var(--text-primary)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--accent-soft)]"
         >
           Ajukan Peminjaman
         </button>

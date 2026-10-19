@@ -273,7 +273,7 @@ function PublicCatalogPage() {
                 }}
                 className={`text-left px-3 py-2 border-2 transition-colors ${
                   selectedKategoriId === null
-                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
                     : 'border-[var(--gray-200)]'
                 }`}
               >
@@ -309,7 +309,7 @@ function PublicCatalogPage() {
                     }}
                     className={`flex-1 text-left px-3 py-2 border-2 transition-colors flex items-center justify-between gap-2 ${
                       selectedKategoriId === cat.id
-                        ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] font-medium'
+                        ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
                         : 'border-[var(--gray-200)]'
                     }`}
                   >

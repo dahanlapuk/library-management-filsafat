@@ -1,29 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/source-serif-4';
 @import "tailwindcss";
 
+/* Palet dan huruf mengikuti filsafatui.app. Nama variabel lama dipertahankan
+   supaya komponen yang ada ikut berubah tanpa disentuh. */
 :root {
-  --bg-page: #FAFAFA;
-  --bg-surface: #FFFFFF;
-  --bg-elevated: #F5F5F5;
+  --cream: #fffdf2;
+  --ink: #181600;
+  --sun: #e2b900;
+  --sun-bright: #ffe45c;
+  --pale: #fff3ad;
+  --pale-soft: #fff8d5;
+  --rule: #e7d98b;
+  --muted: #69613a;
 
-  --text-primary: #0A0A0A;
-  --text-secondary: #525252;
-  --text-muted: #737373;
+  --bg-page: var(--cream);
+  --bg-surface: #ffffff;
+  --bg-elevated: var(--pale-soft);
 
-  --border: #E5E5E5;
-  --border-medium: #D4D4D4;
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --text-muted: var(--muted);
 
-  --black: #0A0A0A;
-  --white: #FFFFFF;
-  --gray-100: #F5F5F5;
-  --gray-200: #E5E5E5;
-  --gray-600: #525252;
+  --border: var(--rule);
+  --border-medium: var(--rule);
 
-  --accent: #8A6D3B;
-  --accent-soft: #F4EEE3;
+  --black: var(--ink);
+  --white: #ffffff;
+  --gray-100: var(--pale-soft);
+  --gray-200: var(--rule);
+  --gray-600: var(--muted);
 
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  /* Kuning untuk garis, latar, dan teks di atas ink. Bukan teks di atas terang. */
+  --accent: var(--sun);
+  --accent-soft: var(--pale);
+
+  --font-heading: 'Source Serif 4 Variable', Georgia, serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;

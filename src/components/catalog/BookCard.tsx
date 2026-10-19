@@ -25,7 +25,7 @@ export function BookCard({ book }: { book: BookRow }) {
               className={`shrink-0 text-xs font-medium px-2 py-0.5 ${
                 book.isDipinjam
                   ? 'bg-[var(--black)] text-[var(--white)]'
-                  : 'border-2 border-[var(--accent)] text-[var(--accent)]'
+                  : 'border-2 border-[var(--accent)] text-[var(--text-primary)]'
               }`}
             >
               {book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
@@ -61,7 +61,7 @@ export function BookCard({ book }: { book: BookRow }) {
                   key={tag.id}
                   className={
                     tag.id === book.kategoriId
-                      ? 'text-xs font-medium px-2 py-0.5 border-2 border-[var(--accent)] text-[var(--accent)]'
+                      ? 'text-xs font-medium px-2 py-0.5 border-2 border-[var(--accent)] text-[var(--text-primary)]'
                       : 'text-xs rounded-full border border-[var(--gray-200)] px-2 py-0.5 text-[var(--gray-600)]'
                   }
                 >
