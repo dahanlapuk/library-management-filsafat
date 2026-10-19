@@ -8,8 +8,8 @@ type Jenis = 'saran' | 'koreksi_buku' | 'usul_buku'
 const JENIS_OPTIONS: { value: Jenis; label: string; petunjuk: string }[] = [
   {
     value: 'saran',
-    label: 'Saran',
-    petunjuk: 'Masukan umum untuk perpustakaan atau situs ini.',
+    label: 'Kritik dan saran',
+    petunjuk: 'Kritik atau saran umum untuk perpustakaan atau situs ini.',
   },
   {
     value: 'koreksi_buku',
@@ -107,7 +107,7 @@ function FeedbackPage() {
             Kirim Feedback
           </h1>
           <p className="text-sm text-[var(--ink)]/75">
-            Saran, koreksi data, atau usul buku
+            Kritik, saran, koreksi data, atau usul buku
           </p>
         </div>
       </header>
