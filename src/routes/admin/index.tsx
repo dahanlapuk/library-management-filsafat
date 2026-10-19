@@ -24,8 +24,8 @@ function Row({ title, meta, right }: { title: string; meta?: string; right?: Rea
   return (
     <li className="flex items-start justify-between gap-3 border-b border-[var(--rule)] py-2.5 last:border-b-0">
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium">{title}</p>
-        {meta && <p className="text-xs text-[var(--muted)]">{meta}</p>}
+        <p className="break-words text-sm font-medium">{title}</p>
+        {meta && <p className="break-words text-xs text-[var(--muted)]">{meta}</p>}
       </div>
       {right}
     </li>
@@ -125,7 +125,7 @@ function AdminDashboard() {
         )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card
           title="Pengajuan pinjam masuk"
           action={
