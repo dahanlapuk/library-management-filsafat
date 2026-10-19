@@ -17,3 +17,12 @@ export function Textarea({ className = '', ...props }: ComponentProps<'textarea'
     />
   )
 }
+
+export function Select({ className = '', ...props }: ComponentProps<'select'>) {
+  return (
+    <select
+      className={`rounded-lg border border-[var(--rule)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--sun)] focus:outline-none ${className}`}
+      {...props}
+    />
+  )
+}

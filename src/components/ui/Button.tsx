@@ -9,6 +9,8 @@ const VARIANTS = {
     'bg-[var(--pale)] text-[var(--ink)] border border-[var(--sun)] hover:bg-[var(--sun-bright)]',
   quiet:
     'bg-transparent text-[var(--muted)] border border-[var(--rule)] hover:bg-[var(--pale-soft)]',
+  danger:
+    'bg-[var(--white)] text-red-700 border border-red-200 hover:bg-red-50',
 }
 
 export function Button({
@@ -44,4 +46,8 @@ export function Chip({
       {...props}
     />
   )
+}
+
+export function buttonClass(variant: keyof typeof VARIANTS = 'secondary', extra = '') {
+  return `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors ${VARIANTS[variant]} ${extra}`
 }

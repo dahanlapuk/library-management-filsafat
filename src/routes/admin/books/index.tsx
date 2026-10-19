@@ -11,6 +11,9 @@ import {
   getPendingCategoryRequests,
 } from '../../../books/admin'
 import { AdminPage } from '../../../components/ui/AdminPage'
+import { Badge } from '../../../components/ui/Badge'
+import { Button, buttonClass } from '../../../components/ui/Button'
+import { Input, Select } from '../../../components/ui/Field'
 
 export const Route = createFileRoute('/admin/books/')({
   component: AdminBooksPage,
@@ -113,68 +116,54 @@ function AdminBooksPage() {
 
   return (
     <AdminPage>
-
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
           Kelola Buku
         </h1>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2">
           {currentAdmin?.isSuperadmin && (
-            <Link
-              to="/admin/books/category-requests"
-              className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
-            >
+            <Link to="/admin/books/category-requests" className={buttonClass('secondary')}>
               Pengajuan Kategori
               {pendingCategoryRequests.length > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
-                  {pendingCategoryRequests.length}
-                </span>
+                <Badge tone="solid">{pendingCategoryRequests.length}</Badge>
               )}
             </Link>
           )}
           {currentAdmin?.isSuperadmin && (
-            <Link
-              to="/admin/books/delete-requests"
-              className="px-4 py-3 border-2 border-[var(--black)] font-semibold uppercase tracking-wide text-sm hover:bg-[var(--gray-100)] relative whitespace-nowrap"
-            >
+            <Link to="/admin/books/delete-requests" className={buttonClass('secondary')}>
               Pengajuan Hapus
               {pendingDeleteRequests.length > 0 && (
-                <span className="ml-2 inline-flex items-center justify-center bg-[#c00] text-[var(--white)] rounded-full w-5 h-5 text-xs">
-                  {pendingDeleteRequests.length}
-                </span>
+                <Badge tone="solid">{pendingDeleteRequests.length}</Badge>
               )}
             </Link>
           )}
-          <Link
-            to="/admin/books/new"
-            className="px-4 py-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm whitespace-nowrap"
-          >
+          <Link to="/admin/books/new" className={buttonClass('primary')}>
             + Tambah Buku
           </Link>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      <div className="flex gap-3 mb-4 flex-wrap">
-        <input
-          type="text"
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row">
+        <Input
+          type="search"
           value={rawSearch}
           onChange={(e) => setRawSearch(e.target.value)}
           placeholder="Cari judul, kode, keterangan..."
-          className="flex-1 min-w-[220px] p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+          className="flex-1"
         />
-        <select
+        <Select
           value={kategoriId ?? ''}
           onChange={(e) => {
             setKategoriId(e.target.value ? Number(e.target.value) : undefined)
             setPage(1)
           }}
-          className="p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] bg-[var(--white)]"
+          className="sm:w-64"
         >
           <option value="">Semua kategori</option>
           {kategoriOptions(categories).map((o) => (
@@ -182,57 +171,64 @@ function AdminBooksPage() {
               {o.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
-      <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+      <div className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]">
         {isLoading ? (
-          <p className="text-center py-8">Memuat...</p>
+          <p className="py-10 text-center text-[var(--muted)]">Memuat...</p>
         ) : books.length === 0 ? (
-          <p className="text-center py-8 text-[var(--gray-600)]">
-            Tidak ada buku ditemukan.
-          </p>
+          <p className="py-10 text-center text-[var(--muted)]">Tidak ada buku ditemukan.</p>
         ) : (
           <div className="flex flex-col">
             {books.map((book) => (
               <div
                 key={book.id}
-                className="flex items-center justify-between gap-3 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+                className="flex flex-col gap-3 border-b border-[var(--rule)] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex flex-col gap-1 min-w-0">
-                  <span className="font-semibold text-[var(--text-primary)] truncate">
-                    {book.judul}
-                  </span>
-                  <span className="text-sm text-[var(--gray-600)]">
-                    {book.kode || '(tanpa kode)'} · {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ?? book.kategoriNama ?? '-'} ·
-                    qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'} ·{' '}
-                    {book.tidakTersedia ? 'Tidak tersedia' : book.isDipinjam ? 'Dipinjam' : 'Tersedia'}
-                  </span>
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <span className="break-words font-semibold">{book.judul}</span>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--muted)]">
+                    {book.tidakTersedia ? (
+                      <Badge tone="solid">Tidak tersedia</Badge>
+                    ) : book.isDipinjam ? (
+                      <Badge tone="soft">Dipinjam</Badge>
+                    ) : (
+                      <Badge>Tersedia</Badge>
+                    )}
+                    <span>
+                      {book.kode || '(tanpa kode)'} ·{' '}
+                      {(book.kategoriId ? kategoriLabel.get(book.kategoriId) : null) ??
+                        book.kategoriNama ??
+                        '-'}{' '}
+                      · qty {book.qty} · {book.posisiKode ?? 'belum ada posisi'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex shrink-0 items-center gap-2">
                   <Link
                     to="/admin/books/$bookId/edit"
                     params={{ bookId: String(book.id) }}
-                    className="px-3 py-2 border-2 border-[var(--black)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)]"
+                    className={buttonClass('secondary')}
                   >
                     Edit
                   </Link>
                   {currentAdmin?.isSuperadmin ? (
-                    <button
+                    <Button
+                      variant="danger"
                       onClick={() => handleDelete(book.id, book.judul)}
                       disabled={deletingId === book.id}
-                      className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
                     >
                       {deletingId === book.id ? '...' : 'Hapus'}
-                    </button>
+                    </Button>
                   ) : (
-                    <button
+                    <Button
+                      variant="quiet"
                       onClick={() => handleRequestDelete(book.id, book.judul)}
                       disabled={requestingId === book.id}
-                      className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
                     >
                       {requestingId === book.id ? '...' : 'Ajukan Hapus'}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -242,24 +238,19 @@ function AdminBooksPage() {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-            className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
-          >
+        <div className="mt-4 flex items-center justify-center gap-4">
+          <Button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
             ← Prev
-          </button>
-          <span className="text-[var(--gray-600)]">
-            Halaman {page} / {totalPages}
+          </Button>
+          <span className="text-sm text-[var(--muted)]">
+            Hal. {page} dari {totalPages}
           </span>
-          <button
+          <Button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="px-4 py-2 border-2 border-[var(--black)] font-medium disabled:opacity-40"
           >
             Next →
-          </button>
+          </Button>
         </div>
       )}
     </AdminPage>
