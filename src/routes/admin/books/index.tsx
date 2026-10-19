@@ -29,6 +29,7 @@ function AdminBooksPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [requestingId, setRequestingId] = useState<number | null>(null)
   const [error, setError] = useState('')
+  const [fabOpen, setFabOpen] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -115,12 +116,12 @@ function AdminBooksPage() {
   }
 
   return (
-    <AdminPage>
+    <AdminPage className="pb-28 sm:pb-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
           Kelola Buku
         </h1>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="hidden flex-wrap items-center gap-2 sm:flex">
           {currentAdmin?.isSuperadmin && (
             <Link to="/admin/books/category-requests" className={buttonClass('secondary')}>
               Pengajuan Kategori
@@ -253,6 +254,74 @@ function AdminBooksPage() {
           </Button>
         </div>
       )}
+      <div
+        className="fixed right-5 z-30 flex flex-col items-end gap-3 sm:hidden"
+        style={{ bottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+        {currentAdmin?.isSuperadmin ? (
+          <>
+            {fabOpen && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Tutup menu"
+                  onClick={() => setFabOpen(false)}
+                  className="fixed inset-0 -z-10 bg-[var(--ink)]/25"
+                />
+                <Link
+                  to="/admin/books/delete-requests"
+                  onClick={() => setFabOpen(false)}
+                  className={buttonClass('secondary', 'shadow-lg')}
+                >
+                  Pengajuan Hapus
+                  {pendingDeleteRequests.length > 0 && (
+                    <Badge tone="solid">{pendingDeleteRequests.length}</Badge>
+                  )}
+                </Link>
+                <Link
+                  to="/admin/books/category-requests"
+                  onClick={() => setFabOpen(false)}
+                  className={buttonClass('secondary', 'shadow-lg')}
+                >
+                  Pengajuan Kategori
+                  {pendingCategoryRequests.length > 0 && (
+                    <Badge tone="solid">{pendingCategoryRequests.length}</Badge>
+                  )}
+                </Link>
+                <Link
+                  to="/admin/books/new"
+                  onClick={() => setFabOpen(false)}
+                  className={buttonClass('primary', 'shadow-lg')}
+                >
+                  + Tambah Buku
+                </Link>
+              </>
+            )}
+            <button
+              type="button"
+              aria-label={fabOpen ? 'Tutup menu' : 'Buka menu aksi'}
+              aria-expanded={fabOpen}
+              onClick={() => setFabOpen((o) => !o)}
+              className="relative flex h-14 w-14 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--ink)] text-3xl leading-none text-[var(--cream)] shadow-lg"
+            >
+              <span className={`transition-transform ${fabOpen ? 'rotate-45' : ''}`}>+</span>
+              {!fabOpen && pendingDeleteRequests.length + pendingCategoryRequests.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-[var(--sun)] bg-[var(--pale)] px-1 text-xs font-medium text-[var(--ink)]">
+                  {pendingDeleteRequests.length + pendingCategoryRequests.length}
+                </span>
+              )}
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/admin/books/new"
+            aria-label="Tambah buku"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--ink)] text-3xl leading-none text-[var(--cream)] shadow-lg"
+          >
+            +
+          </Link>
+        )}
+      </div>
     </AdminPage>
   )
 }
