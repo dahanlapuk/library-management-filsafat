@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getBooks, searchBooks, getBook, getCategories } from '../books/catalog'
 import { BookCard } from '../components/catalog/BookCard'
 import { BookDetailModal } from '../components/catalog/BookDetailModal'
-import { buildCategoryRows, TOP_CATEGORY_COUNT } from '../components/catalog/categories'
+import { CategorySheet, CategoryTree } from '../components/catalog/CategoryTree'
 import type {
   BookDetail,
   BookRow,
-  CategoryNode,
   CategoryRow,
 } from '../components/catalog/types'
 
@@ -121,10 +120,7 @@ function PublicCatalogPage() {
   const [pageSize, setPageSize] = useState<number>(20)
   const [page, setPage] = useState(1)
 
-  const [categoryFilter, setCategoryFilter] = useState('')
-  const [showAllCategories, setShowAllCategories] = useState(false)
-  const [mobileCatOpen, setMobileCatOpen] = useState(false)
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+  const [catSheetOpen, setCatSheetOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -170,45 +166,6 @@ function PublicCatalogPage() {
           }),
   })
 
-  const { rows: allCategoryRows, totals: categoryTotals } = useMemo(
-    () => buildCategoryRows(categories, () => true),
-    [categories],
-  )
-  const treeCategoryRows = useMemo(
-    () => buildCategoryRows(categories, (id) => expandedIds.has(id)).rows,
-    [categories, expandedIds],
-  )
-
-  const filteredCategories = useMemo(() => {
-    const term = categoryFilter.trim().toLowerCase()
-    return allCategoryRows.filter((r) => r.path.toLowerCase().includes(term))
-  }, [allCategoryRows, categoryFilter])
-
-  const isFilteringCategories = categoryFilter.trim().length > 0
-  const rootCategoryCount = treeCategoryRows.filter((r) => r.depth === 0).length
-  const visibleCategories = useMemo(() => {
-    if (isFilteringCategories) return filteredCategories
-    if (showAllCategories) return treeCategoryRows
-    const out: CategoryNode[] = []
-    let roots = 0
-    for (const row of treeCategoryRows) {
-      if (row.depth === 0) roots++
-      if (roots > TOP_CATEGORY_COUNT) break
-      out.push(row)
-    }
-    return out
-  }, [isFilteringCategories, showAllCategories, filteredCategories, treeCategoryRows])
-  const hiddenCategoryCount = Math.max(0, rootCategoryCount - TOP_CATEGORY_COUNT)
-
-  function toggleExpanded(id: number) {
-    setExpandedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
   const books: BookRow[] = result?.data ?? []
   const total = result?.total ?? 0
   const totalPages = result?.totalPages ?? 1
@@ -239,108 +196,33 @@ function PublicCatalogPage() {
       </header>
 
       <main className="max-w-[1280px] mx-auto px-5 sm:px-8 py-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-        <aside className="lg:w-[260px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-4">
-          <div className="flex flex-col gap-2">
+        <aside className="hidden lg:block lg:w-[260px] shrink-0 lg:sticky lg:top-4">
+          <h2 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">
+            Kategori
+          </h2>
+          <CategoryTree
+            categories={categories}
+            selectedId={selectedKategoriId}
+            onSelect={setSelectedKategoriId}
+            listClassName="max-h-[calc(100vh-14rem)] overflow-y-auto pr-1"
+          />
+        </aside>
+
+        <section className="flex-1 flex flex-col gap-4">
+          <div className="lg:hidden">
             <button
               type="button"
-              onClick={() => setMobileCatOpen((v) => !v)}
-              aria-expanded={mobileCatOpen}
-              className="lg:hidden flex items-center justify-between gap-2 w-full text-left text-sm font-semibold text-[var(--text-primary)] rounded-lg bg-[var(--white)] px-3 py-2 border border-[var(--gray-200)]"
+              onClick={() => setCatSheetOpen(true)}
+              aria-haspopup="dialog"
+              className="flex w-full items-center justify-between gap-2 rounded-full border border-[var(--gray-200)] bg-[var(--white)] px-4 py-2.5 text-left text-sm font-medium text-[var(--ink)]"
             >
               <span>
                 Kategori: {categories.find((c) => c.id === selectedKategoriId)?.nama ?? 'Semua Buku'}
               </span>
-              <span aria-hidden>{mobileCatOpen ? '▴' : '▾'}</span>
+              <span aria-hidden>▾</span>
             </button>
-            <h2 className="hidden lg:block text-sm font-semibold text-[var(--text-primary)]">
-              Kategori
-            </h2>
-
-            <input
-              type="search"
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              placeholder="Cari kategori..."
-              className={`w-full text-xs rounded-lg bg-[var(--white)] px-3 py-1.5 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] ${mobileCatOpen ? '' : 'hidden'} lg:block`}
-            />
-
-            <div className={`flex-col gap-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto pr-1 ${mobileCatOpen ? 'flex' : 'hidden lg:flex'}`}>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedKategoriId(null)
-                  setMobileCatOpen(false)
-                }}
-                className={`text-left rounded-lg px-3 py-2 border transition-colors ${
-                  selectedKategoriId === null
-                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
-                    : 'border-[var(--gray-200)]'
-                }`}
-              >
-                Semua Buku
-              </button>
-
-              {visibleCategories.map(({ cat, depth, path, hasChildren }) => (
-                <div
-                  key={cat.id}
-                  className="flex items-stretch gap-1"
-                  style={{ marginLeft: isFilteringCategories ? 0 : depth * 16 }}
-                >
-                  {!isFilteringCategories &&
-                    (hasChildren ? (
-                      <button
-                        type="button"
-                        aria-label={
-                          expandedIds.has(cat.id) ? 'Tutup subkategori' : 'Buka subkategori'
-                        }
-                        onClick={() => toggleExpanded(cat.id)}
-                        className="w-7 shrink-0 rounded-lg border border-[var(--gray-200)] text-xs text-[var(--gray-600)]"
-                      >
-                        {expandedIds.has(cat.id) ? '−' : '+'}
-                      </button>
-                    ) : (
-                      <span className="w-7 shrink-0" />
-                    ))}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedKategoriId(cat.id)
-                      setMobileCatOpen(false)
-                    }}
-                    className={`flex-1 text-left rounded-lg px-3 py-2 border transition-colors flex items-center justify-between gap-2 ${
-                      selectedKategoriId === cat.id
-                        ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
-                        : 'border-[var(--gray-200)]'
-                    }`}
-                  >
-                    <span>{isFilteringCategories ? path : cat.nama}</span>
-                    <span className="text-xs text-[var(--gray-600)]">
-                      {categoryTotals.get(cat.id) ?? cat.bookCount}
-                    </span>
-                  </button>
-                </div>
-              ))}
-
-              {!isFilteringCategories && hiddenCategoryCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setShowAllCategories((v) => !v)}
-                  className="text-left px-3 py-2 text-sm text-[var(--gray-600)] underline underline-offset-2"
-                >
-                  {showAllCategories ? 'Sembunyikan' : `Lainnya (${hiddenCategoryCount})`}
-                </button>
-              )}
-
-              {isFilteringCategories && filteredCategories.length === 0 && (
-                <p className="text-xs text-[var(--gray-600)] px-1">
-                  Tidak ada kategori yang cocok.
-                </p>
-              )}
-            </div>
           </div>
-        </aside>
 
-        <section className="flex-1 flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex gap-2">
               {statusOptions.map((opt) => (
@@ -430,6 +312,18 @@ function PublicCatalogPage() {
           )}
         </section>
       </main>
+
+      {catSheetOpen && (
+        <CategorySheet
+          categories={categories}
+          selectedId={selectedKategoriId}
+          onSelect={(id) => {
+            setSelectedKategoriId(id)
+            setCatSheetOpen(false)
+          }}
+          onClose={() => setCatSheetOpen(false)}
+        />
+      )}
 
       {selectedBookId !== undefined && (
         <BookDetailModal
