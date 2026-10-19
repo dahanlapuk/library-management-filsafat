@@ -237,7 +237,7 @@ function PublicCatalogPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Cari judul, kode..."
-            className="w-full text-sm p-2 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+            className="w-full rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--black)]"
           />
 
           <div className="flex flex-col gap-2">
@@ -245,7 +245,7 @@ function PublicCatalogPage() {
               type="button"
               onClick={() => setMobileCatOpen((v) => !v)}
               aria-expanded={mobileCatOpen}
-              className="lg:hidden flex items-center justify-between gap-2 w-full text-left text-sm font-semibold text-[var(--text-primary)] px-3 py-2 border border-[var(--gray-200)]"
+              className="lg:hidden flex items-center justify-between gap-2 w-full text-left text-sm font-semibold text-[var(--text-primary)] rounded-lg bg-[var(--white)] px-3 py-2 border border-[var(--gray-200)]"
             >
               <span>
                 Kategori: {categories.find((c) => c.id === selectedKategoriId)?.nama ?? 'Semua Buku'}
@@ -261,7 +261,7 @@ function PublicCatalogPage() {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               placeholder="Cari kategori..."
-              className={`w-full text-xs p-1.5 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] ${mobileCatOpen ? '' : 'hidden'} lg:block`}
+              className={`w-full text-xs rounded-lg bg-[var(--white)] px-3 py-1.5 border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)] ${mobileCatOpen ? '' : 'hidden'} lg:block`}
             />
 
             <div className={`flex-col gap-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto pr-1 ${mobileCatOpen ? 'flex' : 'hidden lg:flex'}`}>
@@ -271,7 +271,7 @@ function PublicCatalogPage() {
                   setSelectedKategoriId(null)
                   setMobileCatOpen(false)
                 }}
-                className={`text-left px-3 py-2 border transition-colors ${
+                className={`text-left rounded-lg px-3 py-2 border transition-colors ${
                   selectedKategoriId === null
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
                     : 'border-[var(--gray-200)]'
@@ -294,7 +294,7 @@ function PublicCatalogPage() {
                           expandedIds.has(cat.id) ? 'Tutup subkategori' : 'Buka subkategori'
                         }
                         onClick={() => toggleExpanded(cat.id)}
-                        className="w-7 shrink-0 border border-[var(--gray-200)] text-xs text-[var(--gray-600)]"
+                        className="w-7 shrink-0 rounded-lg border border-[var(--gray-200)] text-xs text-[var(--gray-600)]"
                       >
                         {expandedIds.has(cat.id) ? '−' : '+'}
                       </button>
@@ -307,7 +307,7 @@ function PublicCatalogPage() {
                       setSelectedKategoriId(cat.id)
                       setMobileCatOpen(false)
                     }}
-                    className={`flex-1 text-left px-3 py-2 border transition-colors flex items-center justify-between gap-2 ${
+                    className={`flex-1 text-left rounded-lg px-3 py-2 border transition-colors flex items-center justify-between gap-2 ${
                       selectedKategoriId === cat.id
                         ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text-primary)] font-medium'
                         : 'border-[var(--gray-200)]'
@@ -348,7 +348,7 @@ function PublicCatalogPage() {
                   key={opt.label}
                   type="button"
                   onClick={() => setStatus(opt.value)}
-                  className={`px-3 py-2 border text-sm transition-colors ${
+                  className={`rounded-full px-4 py-2 border text-sm transition-colors ${
                     status === opt.value
                       ? 'border-[var(--sun)] bg-[var(--accent-soft)]'
                       : 'border-[var(--gray-200)]'
@@ -365,7 +365,7 @@ function PublicCatalogPage() {
                 id="page-size"
                 value={pageSize}
                 onChange={(e) => setPageSize(Number(e.target.value))}
-                className="border border-[var(--gray-200)] px-2 py-1 focus:outline-none focus:border-[var(--black)]"
+                className="rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-2 py-1 focus:outline-none focus:border-[var(--black)]"
               >
                 {PAGE_SIZE_OPTIONS.map((n) => (
                   <option key={n} value={n}>
@@ -385,7 +385,7 @@ function PublicCatalogPage() {
               Memuat katalog...
             </p>
           ) : books.length === 0 ? (
-            <div className="border border-[var(--gray-200)] p-8 text-center text-[var(--gray-600)]">
+            <div className="rounded-xl border border-[var(--gray-200)] p-8 text-center text-[var(--gray-600)]">
               Tidak ada buku yang cocok dengan pencarian ini.
             </div>
           ) : (

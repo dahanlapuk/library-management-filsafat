@@ -21,7 +21,7 @@ export function BookTags({
           key={tag.id}
           className={
             tag.id === kategoriId
-              ? 'border border-[var(--sun)] bg-[var(--pale)] px-2 py-0.5 text-xs font-medium text-[var(--ink)]'
+              ? 'rounded-full border border-[var(--sun)] bg-[var(--pale)] px-2.5 py-0.5 text-xs font-medium text-[var(--ink)]'
               : 'rounded-full border border-[var(--rule)] px-2 py-0.5 text-xs text-[var(--muted)]'
           }
         >
