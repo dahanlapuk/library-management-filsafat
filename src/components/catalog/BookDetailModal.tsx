@@ -44,13 +44,13 @@ export function BookDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[var(--ink)]/50 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex overflow-y-auto bg-[var(--ink)]/50 p-3 sm:p-4"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="relative my-8 flex w-full max-w-[640px] flex-col gap-5 overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--white)] p-6 shadow-[0_24px_60px_-20px_rgba(24,22,0,0.45)] sm:my-0 sm:p-7"
+        className="relative m-auto flex w-full max-w-[640px] flex-col gap-4 sm:gap-5 overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--white)] p-5 shadow-[0_24px_60px_-20px_rgba(24,22,0,0.45)] sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -73,7 +73,7 @@ export function BookDetailModal({
             <div className="flex flex-col items-start gap-3 pr-10">
               <StatusBadge isDipinjam={book.isDipinjam} />
               <div className="flex flex-col gap-1">
-                <h2 className="font-[var(--font-heading)] text-2xl font-semibold leading-snug text-[var(--ink)] sm:text-[1.7rem]">
+                <h2 className="font-[var(--font-heading)] text-xl font-semibold leading-snug text-[var(--ink)] sm:text-[1.7rem]">
                   {book.judul}
                 </h2>
                 {book.penulis && (
@@ -85,7 +85,7 @@ export function BookDetailModal({
               </div>
             </div>
 
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl bg-[var(--pale-soft)] p-4 text-sm">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl bg-[var(--pale-soft)] p-3 text-sm sm:gap-y-3 sm:p-4">
               <div className="flex flex-col gap-0.5">
                 <dt className="text-xs text-[var(--muted)]">Kode</dt>
                 <dd className="font-mono font-semibold text-[var(--ink)]">{book.kode || '—'}</dd>
