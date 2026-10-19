@@ -99,7 +99,7 @@ function FeedbackPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
       <header className="border-b border-[var(--rule)] bg-[var(--sun-bright)] px-5 py-8 sm:py-10">
-        <div className="mx-auto flex max-w-[800px] flex-col gap-2">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 sm:px-3">
           <Link to="/" className="text-sm text-[var(--ink)]/75 hover:text-[var(--ink)] hover:underline">
             ← Kembali ke katalog
           </Link>
@@ -112,7 +112,7 @@ function FeedbackPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[800px] px-5 py-6">
+      <main className="mx-auto max-w-[1280px] px-5 py-6 sm:px-8">
         {success ? (
           <div className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-[var(--white)] p-5">
             <p className="text-sm font-medium text-[var(--text-primary)]">
@@ -126,7 +126,7 @@ function FeedbackPage() {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex max-w-2xl flex-col gap-4">
             {buku && jenis === 'koreksi_buku' && (
               <p className="rounded-xl bg-[var(--pale-soft)] p-3 text-sm">
                 Koreksi untuk buku: <span className="font-semibold">{buku.judul}</span>

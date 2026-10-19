@@ -32,8 +32,8 @@ export const Route = createFileRoute('/informasi')({
 
 function Blok({ judul, children }: { judul: string; children: React.ReactNode }) {
   return (
-    <section className="border-t border-[var(--gray-200)] pt-6">
-      <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[var(--gray-600)]">
+    <section className="mb-6 break-inside-avoid border-t border-[var(--gray-200)] pt-6">
+      <h2 className="mb-3 font-[var(--font-heading)] text-lg font-semibold text-[var(--ink)]">
         {judul}
       </h2>
       <div className="flex flex-col gap-2 text-sm leading-relaxed">{children}</div>
@@ -47,21 +47,21 @@ function InformasiPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
-      <header className="border-b-4 border-[var(--black)] bg-[var(--white)] px-5 pt-10 pb-6">
-        <div className="mx-auto flex max-w-[800px] flex-col gap-2">
-          <Link to="/" className="text-xs uppercase tracking-[0.2em] hover:underline">
+      <header className="border-b border-[var(--rule)] bg-[var(--sun-bright)] px-5 py-8 sm:py-10">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 sm:px-3">
+          <Link to="/" className="text-sm text-[var(--ink)]/75 hover:text-[var(--ink)] hover:underline">
             ← Kembali ke katalog
           </Link>
-          <h1 className="text-3xl font-bold uppercase tracking-[0.08em] sm:text-4xl">
+          <h1 className="font-[var(--font-heading)] text-3xl font-semibold leading-tight text-[var(--ink)] sm:text-4xl">
             Informasi Biblioteka Filsafat UI
           </h1>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--gray-600)]">
+          <p className="text-sm text-[var(--ink)]/75">
             Perpustakaan Departemen Filsafat UI
           </p>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-[800px] flex-col gap-6 px-5 py-6">
+      <main className="mx-auto max-w-[1280px] px-5 py-6 sm:px-8 lg:columns-2 lg:gap-12">
 
         <Blok judul="Tentang">
           <p>
@@ -79,7 +79,7 @@ function InformasiPage() {
           <iframe
             src={EMBED_URL}
             title="Peta lokasi Departemen Filsafat FIB UI"
-            className="mt-2 h-[350px] w-full"
+            className="mt-2 h-[350px] w-full rounded-xl"
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
@@ -151,8 +151,8 @@ function InformasiPage() {
         </Blok>
 
         {bertugas.length > 0 && (
-          <section className="border-l-4 border-[var(--accent)] bg-[var(--accent-soft)] p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+          <section className="mb-6 break-inside-avoid rounded-xl border border-[var(--sun)] bg-[var(--pale)] p-4">
+            <p className="text-sm font-semibold">
               Hubungi petugas · bertugas hari {hari}
             </p>
             <div className="mt-2 flex flex-col gap-1.5">

@@ -55,12 +55,12 @@ function Judul({ r, live, sembunyiFitur }: { r: Rilis; live: boolean; sembunyiFi
       <span className="text-base font-bold">v{r.versi}</span>
       <span className="text-sm font-normal">{r.judul}</span>
       {r.fitur && !sembunyiFitur && (
-        <span className="bg-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
+        <span className="rounded-full bg-[var(--black)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
           Fitur baru
         </span>
       )}
       {live && (
-        <span className="border border-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em]">
+        <span className="rounded-full border border-[var(--black)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em]">
           Current version
         </span>
       )}
@@ -135,27 +135,27 @@ function ChangelogPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
-      <header className="border-b-4 border-[var(--black)] bg-[var(--white)] px-5 pt-10 pb-6">
-        <div className="mx-auto flex max-w-[800px] flex-col gap-2">
-          <Link to="/" className="text-xs uppercase tracking-[0.2em] hover:underline">
+      <header className="border-b border-[var(--rule)] bg-[var(--sun-bright)] px-5 py-8 sm:py-10">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 sm:px-3">
+          <Link to="/" className="text-sm text-[var(--ink)]/75 hover:text-[var(--ink)] hover:underline">
             ← Kembali ke katalog
           </Link>
-          <h1 className="text-3xl font-bold uppercase tracking-[0.08em] sm:text-4xl">Changelog</h1>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--gray-600)]">
+          <h1 className="font-[var(--font-heading)] text-3xl font-semibold leading-tight text-[var(--ink)] sm:text-4xl">Changelog</h1>
+          <p className="text-sm text-[var(--ink)]/75">
             Riwayat perubahan Biblioteka Departemen Filsafat UI
           </p>
         </div>
       </header>
-      <main className="mx-auto flex max-w-[800px] flex-col gap-4 px-5 py-8">
+      <main className="mx-auto flex max-w-[1280px] flex-col gap-4 px-5 py-8 sm:px-8">
         {simpul.map((s) => {
           const terbuka = s.induk.versi === live || s.anak.some((a) => a.versi === live)
           const jumlahFitur = [s.induk, ...s.anak].filter((r) => r.fitur).length
           return (
-            <details key={s.induk.versi} open={terbuka} className="border border-[var(--gray-200)] bg-[var(--white)] p-4">
+            <details key={s.induk.versi} open={terbuka} className="rounded-xl border border-[var(--gray-200)] bg-[var(--white)] p-4">
               <summary className="cursor-pointer">
                 <Judul r={s.induk} live={terbuka} sembunyiFitur />
                 {jumlahFitur > 0 && (
-                  <span className="ml-3 bg-[var(--black)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
+                  <span className="ml-3 rounded-full bg-[var(--black)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">
                     {jumlahFitur} fitur baru
                   </span>
                 )}
@@ -174,7 +174,7 @@ function ChangelogPage() {
           )
         })}
         {pra.length > 0 && (
-          <details className="border border-[var(--gray-200)] bg-[var(--white)] p-4">
+          <details className="rounded-xl border border-[var(--gray-200)] bg-[var(--white)] p-4">
             <summary className="cursor-pointer text-sm font-bold uppercase tracking-[0.15em]">
               Pra-rilis
               <span className="ml-2 text-xs font-normal normal-case tracking-normal text-[var(--gray-600)]">
