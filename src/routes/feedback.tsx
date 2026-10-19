@@ -98,15 +98,15 @@ function FeedbackPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
-      <header className="border-b-4 border-[var(--black)] bg-[var(--white)] px-5 pt-10 pb-6">
+      <header className="border-b border-[var(--rule)] bg-[var(--sun-bright)] px-5 py-8 sm:py-10">
         <div className="mx-auto flex max-w-[800px] flex-col gap-2">
-          <Link to="/" className="text-xs uppercase tracking-[0.2em] hover:underline">
+          <Link to="/" className="text-sm text-[var(--ink)]/75 hover:text-[var(--ink)] hover:underline">
             ← Kembali ke katalog
           </Link>
-          <h1 className="text-3xl font-bold uppercase tracking-[0.08em] sm:text-4xl">
+          <h1 className="font-[var(--font-heading)] text-3xl font-semibold leading-tight text-[var(--ink)] sm:text-4xl">
             Kirim Feedback
           </h1>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--gray-600)]">
+          <p className="text-sm text-[var(--ink)]/75">
             Saran, koreksi data, atau usul buku
           </p>
         </div>
@@ -114,7 +114,7 @@ function FeedbackPage() {
 
       <main className="mx-auto max-w-[800px] px-5 py-6">
         {success ? (
-          <div className="flex flex-col gap-3 border-t-2 border-[var(--black)] pt-4">
+          <div className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-[var(--white)] p-5">
             <p className="text-sm font-medium text-[var(--text-primary)]">
               Terima kasih, feedback Anda sudah kami terima.
             </p>
@@ -128,23 +128,23 @@ function FeedbackPage() {
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {buku && jenis === 'koreksi_buku' && (
-              <p className="border-2 border-[var(--gray-200)] bg-[var(--white)] p-3 text-sm">
+              <p className="rounded-xl bg-[var(--pale-soft)] p-3 text-sm">
                 Koreksi untuk buku: <span className="font-semibold">{buku.judul}</span>
               </p>
             )}
 
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-[var(--gray-600)]">
+              <legend className="mb-1 text-sm font-semibold text-[var(--ink)]">
                 Jenis
               </legend>
               <div className="flex flex-wrap gap-2">
                 {JENIS_OPTIONS.map((o) => (
                   <label
                     key={o.value}
-                    className={`cursor-pointer border-2 px-3 py-2 text-sm ${
+                    className={`cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--ink)] ${
                       jenis === o.value
-                        ? 'border-[var(--black)] bg-[var(--black)] text-[var(--white)]'
-                        : 'border-[var(--gray-200)] bg-[var(--white)]'
+                        ? 'border-[var(--sun)] bg-[var(--sun-bright)] font-medium text-[var(--ink)]'
+                        : 'border-[var(--gray-200)] bg-[var(--white)] hover:bg-[var(--pale-soft)]'
                     }`}
                   >
                     <input
@@ -163,7 +163,7 @@ function FeedbackPage() {
             </fieldset>
 
             {error && (
-              <div className="border border-[#fcc] bg-[#fee] p-2 text-xs text-[#c00]">
+              <div className="rounded-lg border border-[#fcc] bg-[#fee] p-2 text-xs text-[#c00]">
                 {error}
               </div>
             )}
@@ -171,7 +171,7 @@ function FeedbackPage() {
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="pesan"
-                className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--gray-600)]"
+                className="text-sm font-semibold text-[var(--ink)]"
               >
                 Pesan
               </label>
@@ -181,7 +181,7 @@ function FeedbackPage() {
                 onChange={(e) => setPesan(e.target.value)}
                 maxLength={MAX_PESAN}
                 rows={6}
-                className="w-full border-2 border-[var(--gray-200)] p-2 text-sm focus:border-[var(--black)] focus:outline-none"
+                className="w-full rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-3 py-2 text-base sm:text-sm"
               />
               <p className="text-right text-xs text-[var(--gray-600)]">
                 {pesan.length}/{MAX_PESAN}
@@ -191,7 +191,7 @@ function FeedbackPage() {
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="kontak"
-                className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--gray-600)]"
+                className="text-sm font-semibold text-[var(--ink)]"
               >
                 Kontak (opsional)
               </label>
@@ -201,7 +201,7 @@ function FeedbackPage() {
                 value={kontak}
                 onChange={(e) => setKontak(e.target.value)}
                 maxLength={100}
-                className="w-full border-2 border-[var(--gray-200)] p-2 text-sm focus:border-[var(--black)] focus:outline-none"
+                className="w-full rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-3 py-2 text-base sm:text-sm"
               />
               <p className="text-xs text-[var(--gray-600)]">
                 Email atau WhatsApp. Hanya dilihat pengelola perpustakaan dan dipakai bila kami
@@ -224,7 +224,7 @@ function FeedbackPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full border-2 border-[var(--accent)] px-3 py-2 text-sm font-medium uppercase tracking-wide text-[var(--text-primary)] hover:bg-[var(--accent-soft)] disabled:opacity-50 sm:w-auto"
+              className="w-full rounded-lg border border-[var(--sun)] bg-[var(--sun-bright)] px-5 py-2.5 text-sm font-semibold text-[var(--ink)] hover:bg-[var(--sun)] disabled:opacity-50 sm:w-auto"
             >
               {submitting ? 'Mengirim...' : 'Kirim'}
             </button>

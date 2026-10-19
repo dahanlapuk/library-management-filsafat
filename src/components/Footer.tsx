@@ -6,10 +6,10 @@ export function Footer() {
   const isAdminArea = pathname.startsWith('/admin')
 
   return (
-    <footer className="mt-12 bg-[var(--black)] text-[var(--white)]">
+    <footer className="mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)]">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:flex-row sm:justify-between">
         <div className="max-w-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.15em]">
+          <p className="font-[var(--font-heading)] text-base font-semibold">
             Biblioteka Departemen <span className="text-[var(--accent)]">Filsafat</span> UI
           </p>
           <p className="mt-2 text-xs opacity-70">
