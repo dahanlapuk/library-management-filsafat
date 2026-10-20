@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { getActivityLogs } from '../../admin/activity-log'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { OptionPicker } from '../../components/ui/OptionPicker'
 import { errorMessage } from '../../lib/error-message'
 import { actionLabel } from '../../admin/action-labels'
 
@@ -53,18 +54,17 @@ function AdminActivityPage() {
         <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
           Activity Log
         </h1>
-        <select
+        <OptionPicker
+          title="Filter aksi"
+          placeholder="Semua aksi"
           value={action}
-          onChange={(e) => handleActionChange(e.target.value)}
-          className="p-2 border-2 border-[var(--gray-200)] text-sm"
-        >
-          <option value="">Semua aksi</option>
-          {data?.actions.map((a) => (
-            <option key={a} value={a}>
-              {actionLabel(a)}
-            </option>
-          ))}
-        </select>
+          onChange={handleActionChange}
+          options={[
+            { value: '', label: 'Semua aksi' },
+            ...(data?.actions ?? []).map((a) => ({ value: a, label: actionLabel(a) })),
+          ]}
+          className="w-full sm:w-64"
+        />
       </div>
 
       {error && (

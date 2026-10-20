@@ -13,7 +13,8 @@ import {
 import { AdminPage } from '../../../components/ui/AdminPage'
 import { Badge } from '../../../components/ui/Badge'
 import { Button, buttonClass } from '../../../components/ui/Button'
-import { Input, Select } from '../../../components/ui/Field'
+import { Input } from '../../../components/ui/Field'
+import { OptionPicker } from '../../../components/ui/OptionPicker'
 
 export const Route = createFileRoute('/admin/books/')({
   component: AdminBooksPage,
@@ -158,21 +159,23 @@ function AdminBooksPage() {
           placeholder="Cari judul, kode, keterangan..."
           className="flex-1"
         />
-        <Select
-          value={kategoriId ?? ''}
-          onChange={(e) => {
-            setKategoriId(e.target.value ? Number(e.target.value) : undefined)
+        <OptionPicker
+          title="Pilih kategori"
+          placeholder="Semua kategori"
+          value={kategoriId === undefined ? '' : String(kategoriId)}
+          onChange={(v) => {
+            setKategoriId(v ? Number(v) : undefined)
             setPage(1)
           }}
+          options={[
+            { value: '', label: 'Semua kategori' },
+            ...kategoriOptions(categories).map((o) => ({
+              value: String(o.id),
+              label: o.label,
+            })),
+          ]}
           className="sm:w-64"
-        >
-          <option value="">Semua kategori</option>
-          {kategoriOptions(categories).map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </Select>
+        />
       </div>
 
       <div className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]">
