@@ -5,6 +5,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getCurrentAdmin, logout } from './auth'
 import { PeranBadge } from './PeranBadge'
 import { getNavCounts } from './nav-counts'
+import { Tutorial } from './Tutorial'
+import { markTutorialSeen } from './tutorial'
 
 type NavLink = { to: string; label: string; superadminOnly?: boolean }
 type NavGroup = { label: string; links: NavLink[]; superadminOnly?: boolean }
@@ -95,13 +97,22 @@ export function AdminHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetGroup, setSheetGroup] = useState<string | null>(null)
   const barRef = useRef<HTMLElement>(null)
+  const [tutorial, setTutorial] = useState<null | 'auto' | 'manual'>(null)
+  const autoShown = useRef(false)
 
   const { data: currentAdmin } = useQuery({
     queryKey: ['current-admin'],
     queryFn: () => getCurrentAdmin(),
   })
   const isSuperadmin = !!currentAdmin?.isSuperadmin
+
+  useEffect(() => {
+    if (!currentAdmin?.isApproved || currentAdmin.tutorialSelesaiAt || autoShown.current) return
+    autoShown.current = true
+    setTutorial('auto')
+  }, [currentAdmin])
 
   const { data: counts = {} as Record<string, number> } = useQuery({
     queryKey: ['nav-counts'],
@@ -127,6 +138,35 @@ export function AdminHeader() {
     queryClient.invalidateQueries({ queryKey: ['nav-counts'] })
   }, [pathname, queryClient])
 
+  async function closeTutorial() {
+    const wasAuto = tutorial === 'auto'
+    setTutorial(null)
+    setSheetOpen(false)
+    if (!wasAuto) return
+    try {
+      await markTutorialSeen()
+      await queryClient.invalidateQueries({ queryKey: ['current-admin'] })
+    } catch (e) {
+      console.error('Gagal menyimpan status tutorial', e)
+    }
+  }
+
+  function tourTarget(target: string | null) {
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+    if (!target) {
+      setSheetOpen(false)
+      return
+    }
+    setSheetOpen(true)
+    setSheetGroup(target.startsWith('grup-') ? target.slice(5) : null)
+  }
+
+  function openTutorial() {
+    setOpenMenu(null)
+    setSheetOpen(false)
+    setTutorial('manual')
+  }
+
   async function handleLogout() {
     await logout()
     queryClient.clear()
@@ -141,6 +181,7 @@ export function AdminHeader() {
     groups.flatMap((g) => g.links.map((l) => l.to)),
   )
   const totalCount = groups.reduce((sum, g) => sum + groupCount(g.links), 0)
+  const activeGroup = groups.find((g) => g.links.some((l) => l.to === activeTo))?.label ?? null
 
   return (
     <header ref={barRef} className="sticky top-0 z-40 bg-[var(--ink)] text-[var(--cream)]">
@@ -153,7 +194,7 @@ export function AdminHeader() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav data-tour="nav" className="hidden items-center gap-1 md:flex">
             <Link to="/admin" className={pill(pathname === '/admin')}>
               Dashboard
             </Link>
@@ -161,7 +202,7 @@ export function AdminHeader() {
               if (group.links.length === 1) {
                 const link = group.links[0]
                 return (
-                  <Link key={link.to} to={link.to} className={pill(activeTo === link.to)}>
+                  <Link key={link.to} to={link.to} data-tour={`grup-${group.label}`} className={pill(activeTo === link.to)}>
                     <span className="inline-flex items-center gap-1.5">
                       {link.label}
                       <CountBubble
@@ -180,6 +221,7 @@ export function AdminHeader() {
                     type="button"
                     aria-expanded={isOpen}
                     onClick={() => setOpenMenu(isOpen ? null : group.label)}
+                    data-tour={`grup-${group.label}`}
                     className={pill(groupActive)}
                   >
                     <span className="inline-flex items-center gap-1">
@@ -209,6 +251,7 @@ export function AdminHeader() {
             type="button"
             aria-expanded={openMenu === 'user'}
             onClick={() => setOpenMenu(openMenu === 'user' ? null : 'user')}
+            data-tour="user"
             className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm hover:bg-white/10"
           >
             <span>{currentAdmin?.nama ?? '...'}</span>
@@ -220,6 +263,9 @@ export function AdminHeader() {
               <Link to="/admin/profile" className={item(pathname === '/admin/profile')}>
                 Profil Saya
               </Link>
+              <button type="button" onClick={openTutorial} className={`${item(false)} w-full text-left`}>
+                Tutorial
+              </button>
               <button type="button" onClick={handleLogout} className={`${item(false)} w-full text-left`}>
                 Keluar
               </button>
@@ -230,7 +276,11 @@ export function AdminHeader() {
         <button
           type="button"
           aria-label="Buka menu"
-          onClick={() => setSheetOpen(true)}
+          data-tour="nav"
+          onClick={() => {
+            setSheetGroup(activeGroup)
+            setSheetOpen(true)
+          }}
           className="rounded-full border border-white/30 px-3 py-1.5 text-sm md:hidden"
         >
           <span className="inline-flex items-center gap-1.5">
@@ -248,7 +298,9 @@ export function AdminHeader() {
             onClick={() => setSheetOpen(false)}
             className="absolute inset-0 bg-black/40"
           />
-          <div className="sheet-in relative mt-auto max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-[var(--white)] p-5 text-[var(--ink)]">
+          <div className={`sheet-in relative mt-auto w-full overflow-y-auto rounded-t-2xl bg-[var(--white)] p-5 text-[var(--ink)] ${
+              tutorial ? 'max-h-[50vh]' : 'max-h-[85vh]'
+            }`}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <span>{currentAdmin?.nama ?? '...'}</span>
@@ -265,29 +317,70 @@ export function AdminHeader() {
             <Link to="/admin" className={item(pathname === '/admin')}>
               Dashboard
             </Link>
-            {groups.map((group) => (
-              <div key={group.label} className="mt-4">
-                <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-                  {group.label}
-                </p>
-                {group.links.map((link) => (
-                  <Link key={link.to} to={link.to} className={item(activeTo === link.to)}>
+            {groups.map((group) => {
+              if (group.links.length === 1) {
+                const link = group.links[0]
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    data-tour={`grup-${group.label}`}
+                    className={`${item(activeTo === link.to)} mt-1`}
+                  >
                     {link.label}
                     <CountBubble n={countOf(link.to)} tone="ink" />
                   </Link>
-                ))}
-              </div>
-            ))}
-            <div className="mt-4 border-t border-[var(--rule)] pt-3">
+                )
+              }
+              const open = sheetGroup === group.label
+              return (
+                <div key={group.label} data-tour={`grup-${group.label}`} className="mt-1">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setSheetGroup(open ? null : group.label)}
+                    className={`${item(false)} w-full text-left font-semibold`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      {group.label}
+                      {!open && <CountBubble n={groupCount(group.links)} tone="ink" />}
+                    </span>
+                    <Chevron className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  </button>
+                  {open && (
+                    <div className="ml-3 border-l border-[var(--rule)] pl-2">
+                      {group.links.map((link) => (
+                        <Link key={link.to} to={link.to} className={item(activeTo === link.to)}>
+                          {link.label}
+                          <CountBubble n={countOf(link.to)} tone="ink" />
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <div data-tour="user" className="mt-3 border-t border-[var(--rule)] pt-2">
               <Link to="/admin/profile" className={item(pathname === '/admin/profile')}>
                 Profil Saya
               </Link>
+              <button type="button" onClick={openTutorial} className={`${item(false)} w-full text-left`}>
+                Tutorial
+              </button>
               <button type="button" onClick={handleLogout} className={`${item(false)} w-full text-left`}>
                 Keluar
               </button>
             </div>
           </div>
         </div>
+      )}
+      {tutorial && currentAdmin && (
+        <Tutorial
+          who={currentAdmin}
+          manual={tutorial === 'manual'}
+          onClose={closeTutorial}
+          onTarget={tourTarget}
+        />
       )}
     </header>
   )
