@@ -53,10 +53,6 @@ function MaintenancePage() {
           {isCatalog ? 'Pembaruan & Perbaikan Data' : 'Pemeliharaan Sistem Berkala'}
         </h1>
 
-        <p className="mb-5 rounded-lg border border-[var(--sun)] bg-[var(--pale)] px-4 py-3 text-sm font-medium">
-          Biblioteka akan tampil dengan wajah baru.
-        </p>
-
         <p className="text-sm text-[var(--muted)]">
           {isCatalog
             ? 'Kami sedang melakukan validasi dan pembaruan data agar informasi yang disajikan selalu akurat dan mutakhir. Akses data akan segera normal kembali dalam beberapa saat. Mohon maaf atas ketidaknyamanannya.'

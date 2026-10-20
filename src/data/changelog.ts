@@ -29,7 +29,7 @@ export const RILIS: Rilis[] = [
       'Header admin di src/admin/AdminHeader.tsx ditulis ulang. Angka antrean dihitung fungsi ringan getNavCounts (src/admin/nav-counts.ts), terpisah dari statistik dashboard (src/admin/dashboard.ts).',
       'Tutorial: kolom admin_profiles.tutorial_selesai_at (nullable, migrasi 0018), server function markTutorialSeen dengan guard requireApprovedAdmin dan id dari sesi, serta komponen Tutorial dengan sorotan elemen.',
       'Lebar tata letak admin 1280px. Halaman auth dan form buku memakai lebar sempit.',
-      'Kelas selalu jalan Tailwind dipakai ulang antar halaman, tanpa perubahan logika server selain fungsi baru di atas.',
+      'Logika server tidak berubah selain fungsi baru di atas. Template pesan WhatsApp ada di src/routes/admin/loans/requests.tsx.',
     ],
   },
   {
