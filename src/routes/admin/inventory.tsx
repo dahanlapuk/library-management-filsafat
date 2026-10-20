@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AdminPage } from '../../components/ui/AdminPage'
 import { Badge } from '../../components/ui/Badge'
 import { Button, Chip } from '../../components/ui/Button'
-import { Input, Select } from '../../components/ui/Field'
+import { Input } from '../../components/ui/Field'
+import { OptionPicker } from '../../components/ui/OptionPicker'
 import { getPosisiList } from '../../books/admin'
 import {
   getPosisiWithProgress,
@@ -400,31 +401,30 @@ function InventoryCheckPage() {
                                 }
                                 className="w-24"
                               />
-                              <Select
+                              <OptionPicker
+                                title="Posisi rak"
+                                placeholder="Pilih posisi"
                                 value={
-                                  draft.posisiId === null ? UNPOSITIONED_VALUE : draft.posisiId
+                                  draft.posisiId === null
+                                    ? UNPOSITIONED_VALUE
+                                    : String(draft.posisiId)
                                 }
-                                onChange={(e) =>
+                                onChange={(v) =>
                                   setDraft(
                                     book.id,
-                                    {
-                                      posisiId:
-                                        e.target.value === UNPOSITIONED_VALUE
-                                          ? null
-                                          : Number(e.target.value),
-                                    },
+                                    { posisiId: v === UNPOSITIONED_VALUE ? null : Number(v) },
                                     draft,
                                   )
                                 }
+                                options={[
+                                  { value: UNPOSITIONED_VALUE, label: 'Belum Ditempatkan' },
+                                  ...posisiList.map((p) => ({
+                                    value: String(p.id),
+                                    label: `${p.kode} (${p.rak})`,
+                                  })),
+                                ]}
                                 className="min-w-0 flex-1 sm:flex-none"
-                              >
-                                <option value={UNPOSITIONED_VALUE}>Belum Ditempatkan</option>
-                                {posisiList.map((p) => (
-                                  <option key={p.id} value={p.id}>
-                                    {p.kode} ({p.rak})
-                                  </option>
-                                ))}
-                              </Select>
+                              />
                             </div>
                             <div className="flex flex-wrap gap-2">
                               <button

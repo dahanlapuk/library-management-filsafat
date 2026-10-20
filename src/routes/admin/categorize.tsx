@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AdminPage } from '../../components/ui/AdminPage'
 import { Badge } from '../../components/ui/Badge'
 import { Button, Chip } from '../../components/ui/Button'
-import { Input, Select } from '../../components/ui/Field'
+import { Input } from '../../components/ui/Field'
 import { OptionPicker } from '../../components/ui/OptionPicker'
 import { getCategories } from '../../books/catalog'
 import { bulkCategorize, getBooksForCategorizing } from '../../books/categorize'
@@ -346,6 +346,7 @@ function CategorizePage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <OptionPicker
               title="Pilih kategori utama"
+              up
               placeholder="Pilih kategori utama..."
               value={kategoriTarget}
               onChange={setKategoriTarget}
@@ -366,18 +367,15 @@ function CategorizePage() {
 
           {SHOW_TAG_ACTIONS && (
             <div className="flex flex-col gap-2 sm:flex-row">
-              <Select
+              <OptionPicker
+                title="Pilih tag"
+                placeholder="Tag..."
+                up
                 value={tagTarget}
-                onChange={(e) => setTagTarget(e.target.value)}
-                className="min-w-0 flex-1"
-              >
-                <option value="">Tag...</option>
-                {tagOptions.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.label}
-                  </option>
-                ))}
-              </Select>
+                onChange={setTagTarget}
+                options={tagOptions.map((o) => ({ value: String(o.id), label: o.label }))}
+                className="flex-1"
+              />
               <Button
                 variant="secondary"
                 onClick={() => handleTag('tambah')}

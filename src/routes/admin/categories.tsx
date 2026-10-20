@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AdminPage } from '../../components/ui/AdminPage'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
-import { Select } from '../../components/ui/Field'
+import { OptionPicker } from '../../components/ui/OptionPicker'
 import {
   getCategoryTree,
   createCategory,
@@ -205,10 +205,11 @@ function CategoriesPage() {
               </p>
             )}
             {movingId === row.id && (
-              <Select
-                defaultValue=""
-                onChange={(e) => {
-                  const v = e.target.value
+              <OptionPicker
+                title="Pindah ke"
+                placeholder="Pindah ke..."
+                value=""
+                onChange={(v) => {
                   setMovingId(null)
                   run(
                     () =>
@@ -218,20 +219,16 @@ function CategoriesPage() {
                     'Gagal memindahkan.',
                   )
                 }}
-                className="w-full min-w-0 sm:w-80"
-              >
-                <option value="" disabled>
-                  Pindah ke...
-                </option>
-                {row.parentId !== null && <option value="root">(tingkat teratas)</option>}
-                {tree
-                  .filter((r) => !blocked.has(r.id) && r.id !== row.parentId)
-                  .map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {pathOf(r.id)}
-                    </option>
-                  ))}
-              </Select>
+                options={[
+                  ...(row.parentId !== null
+                    ? [{ value: 'root', label: '(tingkat teratas)' }]
+                    : []),
+                  ...tree
+                    .filter((r) => !blocked.has(r.id) && r.id !== row.parentId)
+                    .map((r) => ({ value: String(r.id), label: pathOf(r.id) })),
+                ]}
+                className="w-full sm:w-80"
+              />
             )}
           </div>
         )}
@@ -242,7 +239,7 @@ function CategoriesPage() {
 
   const roots = byParent.get(null) ?? []
   const panel =
-    'overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]'
+    'rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]'
 
   return (
     <AdminPage>

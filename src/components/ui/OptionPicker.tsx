@@ -13,6 +13,7 @@ export function OptionPicker({
   prefix,
   id,
   disabled,
+  up = false,
 }: {
   title: string
   placeholder: string
@@ -24,6 +25,7 @@ export function OptionPicker({
   prefix?: string
   id?: string
   disabled?: boolean
+  up?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
@@ -37,7 +39,7 @@ export function OptionPicker({
   }
 
   return (
-    <div className={`min-w-0 ${className}`}>
+    <div className={`relative min-w-0 ${className}`}>
       <button
         id={id}
         type="button"
@@ -54,15 +56,19 @@ export function OptionPicker({
         </span>
       </button>
       {open && (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center md:items-center">
+        <div className="fixed inset-0 z-[70] flex items-end justify-center md:contents">
           <button
             type="button"
             aria-label="Tutup"
             onClick={close}
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 md:fixed md:z-[65] md:bg-transparent"
           />
-          <div className="sheet-in relative flex max-h-[80vh] w-full flex-col rounded-t-2xl bg-[var(--cream)] shadow-xl md:max-w-lg md:rounded-2xl">
-            <div className="flex items-center justify-between border-b border-[var(--rule)] px-5 py-3">
+          <div
+            className={`sheet-in relative flex max-h-[80vh] w-full flex-col rounded-t-2xl bg-[var(--cream)] shadow-xl md:absolute md:left-0 md:z-[70] md:max-h-80 md:w-full md:min-w-[18rem] md:rounded-xl md:border md:border-[var(--rule)] md:[animation:none] ${
+              up ? 'md:bottom-full md:mb-1' : 'md:top-full md:mt-1'
+            }`}
+          >
+            <div className="flex items-center justify-between border-b border-[var(--rule)] px-5 py-3 md:hidden">
               <h2 className="text-base font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
                 {title}
               </h2>
@@ -71,7 +77,7 @@ export function OptionPicker({
               </Button>
             </div>
             {searchable && (
-              <div className="px-5 pt-3">
+              <div className="px-5 pt-3 md:px-2 md:pt-2">
                 <Input
                   type="search"
                   value={q}
@@ -81,7 +87,7 @@ export function OptionPicker({
                 />
               </div>
             )}
-            <ul className="overflow-y-auto px-5 py-3">
+            <ul className="overflow-y-auto px-5 py-3 md:px-2 md:py-2">
               {shown.length === 0 && (
                 <li className="py-4 text-center text-sm text-[var(--muted)]">Tidak ada yang cocok.</li>
               )}
