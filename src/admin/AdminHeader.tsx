@@ -4,6 +4,7 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getCurrentAdmin, logout } from './auth'
 import { PeranBadge } from './PeranBadge'
+import { getNavCounts } from './nav-counts'
 
 type NavLink = { to: string; label: string; superadminOnly?: boolean }
 type NavGroup = { label: string; links: NavLink[]; superadminOnly?: boolean }
@@ -50,6 +51,21 @@ const NAV: NavGroup[] = [
   },
 ]
 
+function CountBubble({ n, tone }: { n: number; tone: 'ink' | 'sun' }) {
+  if (n <= 0) return null
+  return (
+    <span
+      className={`inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-xs font-semibold leading-5 ${
+        tone === 'ink'
+          ? 'bg-[var(--ink)] text-[var(--cream)]'
+          : 'bg-[var(--sun-bright)] text-[var(--ink)]'
+      }`}
+    >
+      {n > 99 ? '99+' : n}
+    </span>
+  )
+}
+
 function pickActive(pathname: string, tos: string[]) {
   let best: string | null = null
   for (const to of tos) {
@@ -66,7 +82,7 @@ const pill = (active: boolean) =>
   }`
 
 const item = (active: boolean) =>
-  `block rounded-lg px-3 py-2 text-sm ${
+  `flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm ${
     active ? 'bg-[var(--pale)] font-semibold' : 'hover:bg-[var(--pale-soft)]'
   }`
 
@@ -87,6 +103,16 @@ export function AdminHeader() {
   })
   const isSuperadmin = !!currentAdmin?.isSuperadmin
 
+  const { data: counts = {} as Record<string, number> } = useQuery({
+    queryKey: ['nav-counts'],
+    queryFn: () => getNavCounts(),
+    enabled: !!currentAdmin?.isApproved,
+    refetchInterval: 60_000,
+  })
+  const countOf = (to: string) => counts[to] ?? 0
+  const groupCount = (links: { to: string }[]) =>
+    links.reduce((sum, l) => sum + countOf(l.to), 0)
+
   useEffect(() => {
     function onDown(e: MouseEvent) {
       if (barRef.current && !barRef.current.contains(e.target as Node)) setOpenMenu(null)
@@ -98,7 +124,8 @@ export function AdminHeader() {
   useEffect(() => {
     setOpenMenu(null)
     setSheetOpen(false)
-  }, [pathname])
+    queryClient.invalidateQueries({ queryKey: ['nav-counts'] })
+  }, [pathname, queryClient])
 
   async function handleLogout() {
     await logout()
@@ -113,6 +140,7 @@ export function AdminHeader() {
     pathname,
     groups.flatMap((g) => g.links.map((l) => l.to)),
   )
+  const totalCount = groups.reduce((sum, g) => sum + groupCount(g.links), 0)
 
   return (
     <header ref={barRef} className="sticky top-0 z-40 bg-[var(--ink)] text-[var(--cream)]">
@@ -134,7 +162,13 @@ export function AdminHeader() {
                 const link = group.links[0]
                 return (
                   <Link key={link.to} to={link.to} className={pill(activeTo === link.to)}>
-                    {link.label}
+                    <span className="inline-flex items-center gap-1.5">
+                      {link.label}
+                      <CountBubble
+                        n={countOf(link.to)}
+                        tone={activeTo === link.to ? 'ink' : 'sun'}
+                      />
+                    </span>
                   </Link>
                 )
               }
@@ -150,6 +184,7 @@ export function AdminHeader() {
                   >
                     <span className="inline-flex items-center gap-1">
                       {group.label}
+                      <CountBubble n={groupCount(group.links)} tone={groupActive ? 'ink' : 'sun'} />
                       <Chevron className="h-3.5 w-3.5" />
                     </span>
                   </button>
@@ -158,6 +193,7 @@ export function AdminHeader() {
                       {group.links.map((link) => (
                         <Link key={link.to} to={link.to} className={item(activeTo === link.to)}>
                           {link.label}
+                          <CountBubble n={countOf(link.to)} tone="ink" />
                         </Link>
                       ))}
                     </div>
@@ -197,7 +233,10 @@ export function AdminHeader() {
           onClick={() => setSheetOpen(true)}
           className="rounded-full border border-white/30 px-3 py-1.5 text-sm md:hidden"
         >
-          Menu
+          <span className="inline-flex items-center gap-1.5">
+            Menu
+            <CountBubble n={totalCount} tone="sun" />
+          </span>
         </button>
       </div>
 
@@ -234,6 +273,7 @@ export function AdminHeader() {
                 {group.links.map((link) => (
                   <Link key={link.to} to={link.to} className={item(activeTo === link.to)}>
                     {link.label}
+                    <CountBubble n={countOf(link.to)} tone="ink" />
                   </Link>
                 ))}
               </div>
