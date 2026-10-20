@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { getPendingAdmins, approveAdmin } from '../../admin/approval'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
 
 export const Route = createFileRoute('/admin/approvals')({
   component: AdminApprovalsPage,
@@ -49,48 +51,43 @@ function AdminApprovalsPage() {
 
   return (
     <AdminPage>
-      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-6">
-        Persetujuan Admin Baru
-      </h1>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-semibold sm:text-3xl" style={{ fontFamily: 'var(--font-heading)' }}>
+          Persetujuan Admin Baru
+        </h1>
+        {pending.length > 0 && <Badge tone="solid">{pending.length} menunggu</Badge>}
+      </div>
 
       {error && (
-        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
-          {error}
-        </div>
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
       )}
 
-      <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
+      <div className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]">
         {loadingCurrent || loadingPending ? (
-          <p className="text-center py-4">Memuat...</p>
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">Memuat...</p>
         ) : pending.length === 0 ? (
-          <p className="text-center py-4 text-[var(--gray-600)]">
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">
             Tidak ada admin yang menunggu persetujuan.
           </p>
         ) : (
-          <div className="flex flex-col gap-3">
-            {pending.map((admin) => (
-              <div
-                key={admin.id}
-                className="flex items-center justify-between gap-3 p-4 border-2 border-[var(--gray-200)]"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {admin.nama}
-                  </span>
-                  <span className="text-sm text-[var(--gray-600)]">
-                    {admin.email}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleApprove(admin.id)}
-                  disabled={approvingId === admin.id}
-                  className="p-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm disabled:opacity-50"
-                >
-                  {approvingId === admin.id ? 'Memproses...' : 'Approve'}
-                </button>
+          pending.map((admin) => (
+            <div
+              key={admin.id}
+              className="flex flex-col gap-3 border-b border-[var(--rule)] p-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="break-words font-semibold">{admin.nama}</span>
+                <span className="break-all text-sm text-[var(--muted)]">{admin.email}</span>
               </div>
-            ))}
-          </div>
+              <Button
+                variant="accent"
+                onClick={() => handleApprove(admin.id)}
+                disabled={approvingId === admin.id}
+              >
+                {approvingId === admin.id ? 'Memproses...' : 'Setujui'}
+              </Button>
+            </div>
+          ))
         )}
       </div>
     </AdminPage>
