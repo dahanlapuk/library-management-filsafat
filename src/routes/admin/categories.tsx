@@ -2,6 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
+import { Select } from '../../components/ui/Field'
 import {
   getCategoryTree,
   createCategory,
@@ -19,36 +22,12 @@ type Row = Awaited<ReturnType<typeof getCategoryTree>>[number]
 
 const MAX_DEPTH = 3
 
-function Btn({
-  onClick,
-  disabled,
-  danger,
-  children,
-}: {
-  onClick: () => void
-  disabled?: boolean
-  danger?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`border px-2 py-0.5 text-xs disabled:opacity-40 ${
-        danger ? 'border-[#c00] text-[#c00]' : 'border-[var(--gray-600)] text-[var(--gray-600)]'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}
-
 function CategoriesPage() {
   const queryClient = useQueryClient()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [movingId, setMovingId] = useState<number | null>(null)
+  const [openId, setOpenId] = useState<number | null>(null)
 
   const {
     data: rows = [],
@@ -139,69 +118,121 @@ function CategoriesPage() {
   function renderNode(row: Row, depth: number, index: number, total: number) {
     const children = byParent.get(row.id) ?? []
     const blocked = movingId === row.id ? descendantIds(row.id) : new Set<number>()
-    const indent = 12 + depth * 24
+    const indent = 16 + depth * 20
+    const open = openId === row.id
+
+    function toggleOpen() {
+      setOpenId(open ? null : row.id)
+      setMovingId(null)
+    }
 
     return (
       <div key={row.id}>
         <div
-          className="flex flex-wrap items-center gap-2 border-b border-[var(--gray-200)] py-2 pr-3"
+          className={`flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--rule)] py-3 pr-4 ${
+            open ? 'bg-[var(--pale-soft)]' : ''
+          } ${depth > 0 ? 'border-l-2 border-l-[var(--rule)]' : ''}`}
           style={{ paddingLeft: indent }}
         >
-          <span className="font-medium text-[var(--text-primary)]">{row.nama}</span>
-          <span className="text-xs text-[var(--gray-600)]">{row.bookCount} buku</span>
-          <span className="ml-auto flex flex-wrap gap-1">
-            <Btn onClick={() => handleAdd('kategori', row.id)} disabled={busy || depth + 1 >= MAX_DEPTH}>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            <span className="break-words font-medium">{row.nama}</span>
+            <Badge tone="neutral">{row.bookCount} buku</Badge>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => handleAdd('kategori', row.id)}
+              disabled={busy || depth + 1 >= MAX_DEPTH}
+            >
               + Sub
-            </Btn>
-            <Btn onClick={() => handleRename(row)} disabled={busy}>
-              Ganti nama
-            </Btn>
-            <Btn onClick={() => setMovingId(movingId === row.id ? null : row.id)} disabled={busy}>
-              Pindah
-            </Btn>
-            <Btn
-              onClick={() => run(() => reorderCategory({ data: { id: row.id, arah: 'naik' } }), 'Gagal mengurutkan.')}
-              disabled={busy || index === 0}
-            >
-              ↑
-            </Btn>
-            <Btn
-              onClick={() => run(() => reorderCategory({ data: { id: row.id, arah: 'turun' } }), 'Gagal mengurutkan.')}
-              disabled={busy || index === total - 1}
-            >
-              ↓
-            </Btn>
-            <Btn onClick={() => handleDelete(row)} disabled={busy || children.length > 0} danger>
-              Hapus
-            </Btn>
-          </span>
+            </Button>
+            <Button variant={open ? 'accent' : 'quiet'} onClick={toggleOpen}>
+              Kelola
+            </Button>
+          </div>
         </div>
-        {movingId === row.id && (
-          <div className="border-b border-[var(--gray-200)] py-2 pr-3" style={{ paddingLeft: indent }}>
-            <select
-              defaultValue=""
-              onChange={(e) => {
-                const v = e.target.value
-                setMovingId(null)
-                run(
-                  () => moveCategory({ data: { id: row.id, parentId: v === 'root' ? null : Number(v) } }),
-                  'Gagal memindahkan.',
-                )
-              }}
-              className="border border-[var(--gray-200)] px-2 py-1 text-sm"
-            >
-              <option value="" disabled>
-                Pindah ke...
-              </option>
-              {row.parentId !== null && <option value="root">(tingkat teratas)</option>}
-              {tree
-                .filter((r) => !blocked.has(r.id) && r.id !== row.parentId)
-                .map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {pathOf(r.id)}
-                  </option>
-                ))}
-            </select>
+        {open && (
+          <div
+            className="flex flex-col gap-3 border-b border-[var(--rule)] bg-[var(--pale-soft)] py-3 pr-4"
+            style={{ paddingLeft: indent }}
+          >
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" onClick={() => handleRename(row)} disabled={busy}>
+                Ganti nama
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setMovingId(movingId === row.id ? null : row.id)}
+                disabled={busy}
+              >
+                Pindah
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  run(
+                    () => reorderCategory({ data: { id: row.id, arah: 'naik' } }),
+                    'Gagal mengurutkan.',
+                  )
+                }
+                disabled={busy || index === 0}
+              >
+                ↑ Naik
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  run(
+                    () => reorderCategory({ data: { id: row.id, arah: 'turun' } }),
+                    'Gagal mengurutkan.',
+                  )
+                }
+                disabled={busy || index === total - 1}
+              >
+                ↓ Turun
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => handleDelete(row)}
+                disabled={busy || children.length > 0}
+              >
+                Hapus
+              </Button>
+            </div>
+            {children.length > 0 && (
+              <p className="text-xs text-[var(--muted)]">
+                Hapus nonaktif: kategori ini masih punya subkategori.
+              </p>
+            )}
+            {movingId === row.id && (
+              <Select
+                defaultValue=""
+                onChange={(e) => {
+                  const v = e.target.value
+                  setMovingId(null)
+                  run(
+                    () =>
+                      moveCategory({
+                        data: { id: row.id, parentId: v === 'root' ? null : Number(v) },
+                      }),
+                    'Gagal memindahkan.',
+                  )
+                }}
+                className="w-full min-w-0 sm:w-80"
+              >
+                <option value="" disabled>
+                  Pindah ke...
+                </option>
+                {row.parentId !== null && <option value="root">(tingkat teratas)</option>}
+                {tree
+                  .filter((r) => !blocked.has(r.id) && r.id !== row.parentId)
+                  .map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {pathOf(r.id)}
+                    </option>
+                  ))}
+              </Select>
+            )}
           </div>
         )}
         {children.map((c, i) => renderNode(c, depth + 1, i, children.length))}
@@ -210,72 +241,65 @@ function CategoriesPage() {
   }
 
   const roots = byParent.get(null) ?? []
+  const panel =
+    'overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]'
 
   return (
     <AdminPage>
-
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
           Kelola Kategori
         </h1>
-        <button
-          type="button"
-          onClick={() => handleAdd('kategori', null)}
-          disabled={busy}
-          className="bg-[var(--black)] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[var(--white)] disabled:opacity-50"
-        >
+        <Button variant="accent" onClick={() => handleAdd('kategori', null)} disabled={busy}>
           + Kategori teratas
-        </button>
+        </Button>
       </div>
 
       {(error || loadError) && (
-        <div className="mb-4 border border-[#fcc] bg-[#fee] p-3 text-[#c00]">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error || 'Gagal memuat kategori.'}
         </div>
       )}
 
-      <div className="mb-8 border-2 border-[var(--black)] bg-[var(--white)]">
+      <div className={`mb-10 ${panel}`}>
         {isLoading ? (
-          <p className="py-8 text-center">Memuat...</p>
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">Memuat...</p>
         ) : roots.length === 0 ? (
-          <p className="py-8 text-center text-[var(--gray-600)]">Belum ada kategori.</p>
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">Belum ada kategori.</p>
         ) : (
           roots.map((r, i) => renderNode(r, 0, i, roots.length))
         )}
       </div>
 
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
           Tag
         </h2>
-        <button
-          type="button"
-          onClick={() => handleAdd('tag', null)}
-          disabled={busy}
-          className="border-2 border-[var(--black)] px-3 py-1 text-xs font-semibold uppercase tracking-wide disabled:opacity-50"
-        >
+        <Button variant="secondary" onClick={() => handleAdd('tag', null)} disabled={busy}>
           + Tag
-        </button>
+        </Button>
       </div>
-      <div className="border-2 border-[var(--black)] bg-[var(--white)]">
+      <div className={panel}>
         {tags.length === 0 ? (
-          <p className="py-6 text-center text-[var(--gray-600)]">Belum ada tag.</p>
+          <p className="px-4 py-8 text-center text-sm text-[var(--muted)]">Belum ada tag.</p>
         ) : (
           tags.map((t) => (
             <div
               key={t.id}
-              className="flex flex-wrap items-center gap-2 border-b border-[var(--gray-200)] px-3 py-2 last:border-b-0"
+              className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--rule)] px-4 py-3 last:border-b-0"
             >
-              <span className="font-medium text-[var(--text-primary)]">{t.nama}</span>
-              <span className="text-xs text-[var(--gray-600)]">{t.tagCount} buku</span>
-              <span className="ml-auto flex gap-1">
-                <Btn onClick={() => handleRename(t)} disabled={busy}>
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                <span className="break-words font-medium">{t.nama}</span>
+                <Badge tone="neutral">{t.tagCount} buku</Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => handleRename(t)} disabled={busy}>
                   Ganti nama
-                </Btn>
-                <Btn onClick={() => handleDelete(t)} disabled={busy} danger>
+                </Button>
+                <Button variant="danger" onClick={() => handleDelete(t)} disabled={busy}>
                   Hapus
-                </Btn>
-              </span>
+                </Button>
+              </div>
             </div>
           ))
         )}
