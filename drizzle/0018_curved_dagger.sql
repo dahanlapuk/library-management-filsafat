@@ -1,0 +1,1 @@
+ALTER TABLE "admin_profiles" ADD COLUMN "tutorial_selesai_at" timestamp;

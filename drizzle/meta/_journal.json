@@ -127,6 +127,13 @@
       "when": 1792399583714,
       "tag": "0017_chubby_lake",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792474711761,
+      "tag": "0018_curved_dagger",
+      "breakpoints": true
     }
   ]
 }
