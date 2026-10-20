@@ -23,8 +23,12 @@ export const Route = createFileRoute('/admin/loans/requests')({
   component: LoanRequestsPage,
 })
 
-const LIBRARY_ADDRESS =
-  'Perpustakaan Departemen Filsafat\nFakultas Ilmu Pengetahuan Budaya Universitas Indonesia\nKampus UI Depok, Pondok Cina, Kecamatan Beji, Kota Depok, Jawa Barat 16424'
+const LIBRARY_ADDRESS = [
+  'Biblioteka Departemen Filsafat UI',
+  'Gedung VII Anton M. Moeliono, Fakultas Ilmu Pengetahuan Budaya, Universitas Indonesia',
+  'Ruang Departemen Filsafat, Lantai 2',
+  'Kampus UI Depok, Pondok Cina, Beji, Kota Depok, Jawa Barat 16424',
+].join('\n')
 
 // wa.me butuh nomor format internasional polos (tanpa + atau 0 di depan).
 function normalizeWhatsapp(whatsapp: string): string {
@@ -66,66 +70,72 @@ type ActiveLoan = Awaited<ReturnType<typeof getActiveLoans>>[number]
 
 function buildPickupMessage(loan: ActiveLoan, adminNama: string): string {
   if (loan.role === 'dosen') {
-    return `Peminjaman Buku Disetujui
+    return `Yth. Bapak/Ibu ${loan.memberNama},
 
-Yth. Bapak/Ibu ${loan.memberNama},
-Peminjaman buku "${loan.bookJudul}" telah disetujui oleh Perpustakaan Departemen Filsafat.
+Peminjaman buku berikut sudah disetujui:
+*${loan.bookJudul}*
 
-Buku dapat diambil melalui:
-Admin yang bertugas: ${adminNama}
+Silakan ambil di:
 ${LIBRARY_ADDRESS}
+Petugas: ${adminNama}
 
-Khusus dosen, buku diperbolehkan untuk dibawa pulang dengan masa peminjaman maksimal 14 hari sejak tanggal peminjaman. Mohon memperhatikan batas waktu pengembalian yang telah ditentukan (hingga ${formatWIBDateTime(loan.dueAt)} WIB).
+Dosen boleh membawa pulang buku, dengan masa peminjaman maksimal 14 hari. Batas pengembalian: ${formatWIBDateTime(loan.dueAt)} WIB.
 
-Perpustakaan Departemen Filsafat
+Terima kasih.
+Biblioteka Departemen Filsafat UI
 Viva Philosophia!`
   }
 
   return `Halo, ${loan.memberNama}.
 
-Peminjaman buku "${loan.bookJudul}" telah disetujui oleh Perpustakaan Departemen Filsafat.
+Peminjaman buku berikut sudah disetujui:
+*${loan.bookJudul}*
 
-Silakan mengambil buku tersebut di:
+Silakan temui petugas untuk mengambil buku:
+Petugas: ${adminNama}
 ${LIBRARY_ADDRESS}
 
-Admin yang bertugas: ${adminNama}
+Buku hanya dapat dibaca di tempat dan tidak boleh dibawa pulang. Batas penggunaan: pukul ${formatWIBTime(loan.dueAt)} WIB pada hari peminjaman.
 
-Mohon menemui admin yang bersangkutan untuk mengambil buku.
-
-Khusus mahasiswa, buku hanya dapat digunakan untuk dibaca di tempat dan tidak diperkenankan dibawa pulang. Batas waktu penggunaan buku adalah pukul ${formatWIBTime(loan.dueAt)} WIB pada hari peminjaman.
-
-Perpustakaan Departemen Filsafat
+Terima kasih.
+Biblioteka Departemen Filsafat UI
 Viva Philosophia!`
 }
 
 function buildReturnReminderMessage(loan: ActiveLoan, adminNama: string): string {
   if (loan.role === 'dosen') {
-    return `Pengingat Pengembalian Buku
+    return `Yth. Bapak/Ibu ${loan.memberNama},
 
-Yth. Bapak/Ibu ${loan.memberNama},
-Kami mengingatkan bahwa masa peminjaman buku "${loan.bookJudul}" di Perpustakaan Departemen Filsafat akan segera berakhir (batas waktu: ${formatWIBDateTime(loan.dueAt)} WIB).
+Kami mengingatkan bahwa masa peminjaman buku berikut akan segera berakhir:
+*${loan.bookJudul}*
+Batas pengembalian: ${formatWIBDateTime(loan.dueAt)} WIB (maksimal 14 hari sejak peminjaman).
 
-Masa peminjaman buku bagi dosen adalah maksimal 14 hari sejak tanggal peminjaman. Mohon mengembalikan buku kepada admin/petugas perpustakaan sebelum batas waktu peminjaman berakhir.
-
-Admin yang dapat ditemui: ${adminNama}
+Mohon kembalikan buku kepada petugas sebelum batas waktu tersebut.
+Petugas: ${adminNama}
 ${LIBRARY_ADDRESS}
 
-Perpustakaan Departemen Filsafat
+Terima kasih.
+Biblioteka Departemen Filsafat UI
 Viva Philosophia!`
   }
 
-  return `Pengingat Pengembalian Buku
+  return `Halo, ${loan.memberNama}.
 
-Halo, ${loan.memberNama}.
-Waktu penggunaan buku "${loan.bookJudul}" di Perpustakaan Departemen Filsafat hampir berakhir.
-Mohon segera mengembalikan buku kepada admin yang bertugas.
-Batas akhir pengembalian: pukul ${formatWIBTime(loan.dueAt)} WIB.
-Admin yang bertugas: ${adminNama}
-Apabila belum selesai membaca dan ingin melanjutkan di hari berikutnya, silakan menyampaikan halaman terakhir yang telah dibaca kepada admin untuk dicatat.
+Waktu penggunaan buku berikut hampir berakhir:
+*${loan.bookJudul}*
+Batas pengembalian: pukul ${formatWIBTime(loan.dueAt)} WIB.
 
-Perpustakaan Departemen Filsafat`
+Mohon kembalikan buku kepada petugas.
+Petugas: ${adminNama}
+
+Kalau belum selesai membaca dan ingin melanjutkan di hari berikutnya, sampaikan halaman terakhir yang dibaca kepada petugas untuk dicatat.
+
+Terima kasih.
+Biblioteka Departemen Filsafat UI
+Viva Philosophia!`
 }
 
+// onSent hanya mencatat klik admin, bukan bukti pesan terkirim.
 // Klik tombol -> textarea berisi pesan -> admin boleh edit -> "Kirim via WhatsApp"
 // membuka wa.me lalu memanggil onSent (menandai waktu di server). Tidak ada
 // verifikasi pesan benar-benar terkirim; ini hanya catatan klik admin.
@@ -273,7 +283,7 @@ function LoanRequestsPage() {
     queryKey: ['current-admin'],
     queryFn: () => getCurrentAdmin(),
   })
-  const adminNama = currentAdmin?.nama ?? 'Admin Perpustakaan'
+  const adminNama = currentAdmin?.nama ?? 'Petugas Biblioteka'
 
   const {
     data: requests = [],
