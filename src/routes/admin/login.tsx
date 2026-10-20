@@ -3,6 +3,15 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getAdminList, getCurrentAdmin, login } from '../../admin/auth'
 import { PeranBadge } from '../../admin/PeranBadge'
+import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Field'
+import {
+  AdminRadioList,
+  AuthError,
+  AuthShell,
+  AuthTitle,
+  authLink,
+} from '../../components/ui/AuthShell'
 
 export const Route = createFileRoute('/admin/login')({
   // Sudah login (sesi valid) → langsung ke dashboard.
@@ -55,122 +64,81 @@ function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-[480px]">
-        <div className="text-center mb-6">
-          <h1 className="text-[1.5rem] leading-tight font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-            BIBLIOTEKA FILSAFAT UI
-          </h1>
-          <p className="text-[var(--gray-600)]">
-            Sistem Pengelolaan Katalog dan Peminjaman
-          </p>
-        </div>
+    <AuthShell
+      subtitle="Sistem Pengelolaan Katalog dan Peminjaman"
+      footer={
+        <Link to="/" className={authLink}>
+          ← Kembali ke Katalog Publik
+        </Link>
+      }
+    >
+      <AuthTitle>Masuk sebagai Admin</AuthTitle>
 
-        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6">
-          <h2 className="text-xl mb-5 text-center">Masuk sebagai Admin</h2>
+      {error && <AuthError>{error}</AuthError>}
 
-          {error && (
-            <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
-              {error}
-            </div>
-          )}
+      {adminListError && (
+        <AuthError>
+          Gagal memuat daftar admin.{' '}
+          <button type="button" onClick={() => refetch()} className="underline">
+            Coba lagi
+          </button>
+        </AuthError>
+      )}
 
-          {adminListError && (
-            <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
-              Gagal memuat daftar admin.{' '}
-              <button type="button" onClick={() => refetch()} className="underline">
-                Coba lagi
-              </button>
-            </div>
-          )}
+      {loadingAdmins ? (
+        <p className="py-4 text-center text-sm text-[var(--muted)]">Memuat...</p>
+      ) : (
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">Pilih admin</span>
+            <AdminRadioList
+              admins={adminList}
+              selectedId={selectedAdminId}
+              onSelect={setSelectedAdminId}
+              renderBadge={(admin) => <PeranBadge admin={admin} />}
+            />
+          </div>
 
-          {loadingAdmins ? (
-            <p className="text-center py-4">Memuat...</p>
-          ) : (
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="font-medium">Pilih Admin:</label>
-                <div className="flex flex-col gap-3 mb-1">
-                  {adminList.map((admin) => (
-                    <label
-                      key={admin.id}
-                      className={`flex items-center gap-3 p-4 border-2 cursor-pointer transition-colors ${
-                        selectedAdminId === admin.id
-                          ? 'border-[var(--black)] bg-[var(--gray-100)]'
-                          : 'border-[var(--gray-200)]'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="admin"
-                        value={admin.id}
-                        checked={selectedAdminId === admin.id}
-                        onChange={() => setSelectedAdminId(admin.id)}
-                        className="w-5 h-5 accent-[var(--black)]"
-                      />
-                      <div className="flex flex-col gap-1 flex-1">
-                        <span className="font-semibold text-[var(--text-primary)]">
-                          {admin.nama}
-                        </span>
-                        {admin.title && (
-                          <span className="text-sm text-[var(--gray-600)]">
-                            {admin.title}
-                          </span>
-                        )}
-                        <PeranBadge admin={admin} />
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label htmlFor="password" className="font-medium">
-                  Password:
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Masukkan password"
-                    autoComplete="current-password"
-                    className="w-full p-3 pr-12 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--gray-600)]"
-                  >
-                    {showPassword ? 'Sembunyikan' : 'Lihat'}
-                  </button>
-                </div>
-              </div>
-
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="password" className="text-sm font-medium">
+              Password
+            </label>
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan password"
+                autoComplete="current-password"
+                className="w-full pr-24"
+              />
               <button
-                type="submit"
-                disabled={!selectedAdminId || !password || loading}
-                className="w-full p-4 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide disabled:opacity-50"
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--muted)] hover:text-[var(--ink)]"
               >
-                {loading ? 'Memproses...' : 'Masuk'}
+                {showPassword ? 'Sembunyikan' : 'Lihat'}
               </button>
+            </div>
+          </div>
 
-              <div className="text-center">
-                <Link to="/admin/forgot-password" className="text-sm underline text-[var(--gray-600)] hover:text-[var(--text-primary)]">
-                  Lupa password?
-                </Link>
-              </div>
-            </form>
-          )}
-        </div>
+          <Button
+            type="submit"
+            variant="accent"
+            disabled={!selectedAdminId || !password || loading}
+            className="w-full"
+          >
+            {loading ? 'Memproses...' : 'Masuk'}
+          </Button>
 
-        <div className="text-center mt-5">
-          <Link to="/" className="text-sm text-[var(--gray-600)] hover:text-[var(--text-primary)]">
-            ← Kembali ke Katalog Publik
-          </Link>
-        </div>
-      </div>
-    </div>
+          <div className="text-center">
+            <Link to="/admin/forgot-password" className={authLink}>
+              Lupa password?
+            </Link>
+          </div>
+        </form>
+      )}
+    </AuthShell>
   )
 }

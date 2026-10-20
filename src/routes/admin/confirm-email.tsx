@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { completeEmailChange } from '../../admin/email-change'
+import { Button, buttonClass } from '../../components/ui/Button'
+import { AuthError, AuthShell } from '../../components/ui/AuthShell'
 import { errorMessage } from '../../lib/error-message'
 
 export const Route = createFileRoute('/admin/confirm-email')({
@@ -29,58 +31,53 @@ function ConfirmEmailPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-page)] p-5">
-      <div className="w-full max-w-[480px]">
-        <div className="text-center mb-6">
-          <h1 className="text-[1.5rem] leading-tight font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-            BIBLIOTEKA FILSAFAT UI
-          </h1>
-          <p className="text-[var(--gray-600)]">Konfirmasi Email Baru</p>
-        </div>
+  const title = 'text-xl font-semibold'
+  const titleStyle = { fontFamily: 'var(--font-heading)' }
 
-        <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 text-center flex flex-col gap-3">
-          {done ? (
-            <>
-              <h2 className="text-xl font-semibold">Email Berhasil Diganti</h2>
-              <p className="text-[var(--gray-600)]">
-                Silakan masuk dengan email baru. Semua sesi lama telah dikeluarkan.
-              </p>
-              <Link
-                to="/admin/login"
-                className="block w-full p-4 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide mt-2"
-              >
-                Ke halaman login
-              </Link>
-            </>
-          ) : !tokenHash ? (
-            <>
-              <h2 className="text-xl font-semibold">Tautan Tidak Valid</h2>
-              <p className="text-[var(--gray-600)]">
-                Ajukan ganti email lagi dari halaman profil.
-              </p>
-            </>
-          ) : (
-            <>
-              <h2 className="text-xl font-semibold">Ganti Email Akun</h2>
-              <p className="text-[var(--gray-600)]">
-                Klik tombol di bawah untuk mengonfirmasi penggantian email akun Anda.
-              </p>
-              {error && (
-                <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">{error}</div>
-              )}
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={loading}
-                className="w-full p-4 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide disabled:opacity-50 mt-2"
-              >
-                {loading ? 'Memproses...' : 'Konfirmasi Email'}
-              </button>
-            </>
-          )}
-        </div>
+  return (
+    <AuthShell subtitle="Konfirmasi Email Baru">
+      <div className="flex flex-col gap-3 text-center">
+        {done ? (
+          <>
+            <h2 className={title} style={titleStyle}>
+              Email Berhasil Diganti
+            </h2>
+            <p className="text-sm text-[var(--muted)]">
+              Silakan masuk dengan email baru. Semua sesi lama telah dikeluarkan.
+            </p>
+            <Link to="/admin/login" className={`${buttonClass('accent')} w-full justify-center`}>
+              Ke halaman login
+            </Link>
+          </>
+        ) : !tokenHash ? (
+          <>
+            <h2 className={title} style={titleStyle}>
+              Tautan Tidak Valid
+            </h2>
+            <p className="text-sm text-[var(--muted)]">
+              Ajukan ganti email lagi dari halaman profil.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className={title} style={titleStyle}>
+              Ganti Email Akun
+            </h2>
+            <p className="text-sm text-[var(--muted)]">
+              Klik tombol di bawah untuk mengonfirmasi penggantian email akun Anda.
+            </p>
+            {error && <AuthError>{error}</AuthError>}
+            <Button
+              variant="accent"
+              onClick={handleConfirm}
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Memproses...' : 'Konfirmasi Email'}
+            </Button>
+          </>
+        )}
       </div>
-    </div>
+    </AuthShell>
   )
 }
