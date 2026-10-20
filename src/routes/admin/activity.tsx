@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { getActivityLogs } from '../../admin/activity-log'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
 import { OptionPicker } from '../../components/ui/OptionPicker'
 import { errorMessage } from '../../lib/error-message'
 import { actionLabel } from '../../admin/action-labels'
@@ -20,7 +22,7 @@ export const Route = createFileRoute('/admin/activity')({
   component: AdminActivityPage,
 })
 
-const cellClass = 'px-3 py-2 text-xs align-top border-b border-[var(--gray-200)]'
+const cellClass = 'px-3 py-2.5 text-xs align-top border-b border-[var(--rule)]'
 
 // created_at Supabase = UTC; render eksplisit ke WIB biar tidak salah baca
 // sebagai "sesi/orang lain" (lihat pelajaran timestamp UTC).
@@ -50,10 +52,16 @@ function AdminActivityPage() {
 
   return (
     <AdminPage>
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
-          Activity Log
-        </h1>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1
+            className="text-2xl font-semibold sm:text-3xl"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Activity Log
+          </h1>
+          {data && <Badge tone="neutral">{data.total} baris</Badge>}
+        </div>
         <OptionPicker
           title="Filter aksi"
           placeholder="Semua aksi"
@@ -68,79 +76,112 @@ function AdminActivityPage() {
       </div>
 
       {error && (
-        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {errorMessage(error, 'Gagal memuat activity log.')}
         </div>
       )}
 
       {isPending ? (
-        <p>Memuat...</p>
+        <p className="py-10 text-center text-sm text-[var(--muted)]">Memuat...</p>
       ) : (
         <>
-          <div className="bg-[var(--white)] border-2 border-[var(--black)] overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[var(--black)] text-[var(--white)]">
-                  <th className={`${cellClass} text-xs font-semibold uppercase`}>Waktu (WIB)</th>
-                  <th className={`${cellClass} text-xs font-semibold uppercase`}>Admin</th>
-                  <th className={`${cellClass} text-xs font-semibold uppercase`}>Aksi</th>
-                  <th className={`${cellClass} text-xs font-semibold uppercase`}>Entity</th>
-                  <th className={`${cellClass} text-xs font-semibold uppercase`}>Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.items.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className={`${cellClass} text-center text-[var(--gray-600)]`}>
-                      Tidak ada log.
-                    </td>
-                  </tr>
-                )}
-                {data?.items.map((log) => (
-                  <tr key={log.id}>
-                    <td className={cellClass}>{log.createdAt ? formatWaktu(log.createdAt) : '-'}</td>
-                    <td className={cellClass}>{log.adminNama}</td>
-                    <td className={cellClass}>{actionLabel(log.action)}</td>
-                    <td className={cellClass}>
-                      {log.entityType ?? '-'}
-                      {log.entityName ? ` — ${log.entityName}` : ''}
-                      {log.entityId != null ? ` (#${log.entityId})` : ''}
-                    </td>
-                    <td className={cellClass}>
-                      {log.details ? (
-                        <pre className="whitespace-pre-wrap break-all text-[11px]">
-                          {JSON.stringify(log.details)}
-                        </pre>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {data?.items.length === 0 && (
+            <p className="rounded-xl border border-[var(--rule)] bg-[var(--white)] px-4 py-10 text-center text-sm text-[var(--muted)]">
+              Tidak ada log.
+            </p>
+          )}
+
+          <div className="flex flex-col gap-3 md:hidden">
+            {data?.items.map((log) => (
+              <div
+                key={log.id}
+                className="flex flex-col gap-1.5 rounded-xl border border-[var(--rule)] bg-[var(--white)] p-3 shadow-[0_1px_2px_rgba(24,22,0,0.05)]"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone="soft">{actionLabel(log.action)}</Badge>
+                  <span className="text-xs text-[var(--muted)]">
+                    {log.createdAt ? formatWaktu(log.createdAt) : '-'}
+                  </span>
+                </div>
+                <p className="break-words text-sm">
+                  <span className="font-medium">{log.adminNama}</span>
+                </p>
+                <p className="break-words text-xs text-[var(--muted)]">
+                  {log.entityType ?? '-'}
+                  {log.entityName ? ` — ${log.entityName}` : ''}
+                  {log.entityId != null ? ` (#${log.entityId})` : ''}
+                </p>
+                {log.details ? (
+                  <details className="text-xs">
+                    <summary className="cursor-pointer text-[var(--muted)]">Detail</summary>
+                    <pre className="mt-1 whitespace-pre-wrap break-all rounded-lg bg-[var(--pale-soft)] p-2 text-[11px]">
+                      {JSON.stringify(log.details)}
+                    </pre>
+                  </details>
+                ) : null}
+              </div>
+            ))}
           </div>
 
-          <div className="flex items-center justify-between mt-4 text-sm">
-            <span className="text-[var(--gray-600)]">
-              Halaman {page} dari {totalPages} ({data?.total ?? 0} baris)
-            </span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1 border-2 border-[var(--black)] font-semibold uppercase text-xs disabled:opacity-50"
-              >
-                Sebelumnya
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="px-3 py-1 border-2 border-[var(--black)] font-semibold uppercase text-xs disabled:opacity-50"
-              >
-                Berikutnya
-              </button>
+          {data && data.items.length > 0 && (
+            <div className="hidden overflow-x-auto rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)] md:block">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="bg-[var(--ink)] text-[var(--cream)]">
+                    <th className={`${cellClass} font-semibold`}>Waktu (WIB)</th>
+                    <th className={`${cellClass} font-semibold`}>Admin</th>
+                    <th className={`${cellClass} font-semibold`}>Aksi</th>
+                    <th className={`${cellClass} font-semibold`}>Entity</th>
+                    <th className={`${cellClass} font-semibold`}>Detail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.items.map((log) => (
+                    <tr key={log.id} className="hover:bg-[var(--pale-soft)]">
+                      <td className={cellClass}>
+                        {log.createdAt ? formatWaktu(log.createdAt) : '-'}
+                      </td>
+                      <td className={cellClass}>{log.adminNama}</td>
+                      <td className={cellClass}>{actionLabel(log.action)}</td>
+                      <td className={cellClass}>
+                        {log.entityType ?? '-'}
+                        {log.entityName ? ` — ${log.entityName}` : ''}
+                        {log.entityId != null ? ` (#${log.entityId})` : ''}
+                      </td>
+                      <td className={cellClass}>
+                        {log.details ? (
+                          <pre className="whitespace-pre-wrap break-all text-[11px]">
+                            {JSON.stringify(log.details)}
+                          </pre>
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
+
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              ← Sebelumnya
+            </Button>
+            <span className="text-sm text-[var(--muted)]">
+              Hal. {page} dari {totalPages}
+            </span>
+            <Button
+              variant="secondary"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              Berikutnya →
+            </Button>
           </div>
         </>
       )}

@@ -2,6 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
+import { Textarea } from '../../components/ui/Field'
 import { getCurrentAdmin } from '../../admin/auth'
 import {
   getMaintenanceOverview,
@@ -93,131 +96,150 @@ function AdminMaintenancePage() {
     await run(() => endMaintenance({ data: { id } }), 'Gagal mengakhiri maintenance.')
   }
 
+  const panel =
+    'rounded-xl border border-[var(--rule)] bg-[var(--white)] p-4 shadow-[0_1px_2px_rgba(24,22,0,0.05)]'
+
   return (
     <AdminPage>
-
-      <h1 className="mb-6 text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <h1
+        className="mb-5 text-2xl font-semibold sm:text-3xl"
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
         Maintenance Katalog
       </h1>
 
       {(error || loadError) && (
-        <div className="p-3 mb-4 bg-[#fee] border border-[#fcc] text-[#c00]">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error || 'Gagal memuat status maintenance.'}
         </div>
       )}
 
       {data?.envFull && (
-        <div className="p-3 mb-4 border-2 border-[#c00] text-[#c00]">
+        <div className="mb-4 rounded-lg border-2 border-red-600 bg-red-50 p-3 text-sm text-red-700">
           Mode penuh sedang aktif lewat pengaturan server (MAINTENANCE_MODE). Seluruh
           situs, termasuk halaman admin, ditutup sampai pengaturan itu dimatikan.
         </div>
       )}
 
-      <div className="mb-6 bg-[var(--white)] border-2 border-[var(--black)] p-4">
+      <div
+        className={`mb-8 ${
+          active
+            ? 'rounded-xl border border-red-200 bg-red-50 p-4'
+            : panel
+        }`}
+      >
         {isLoading ? (
-          <p>Memuat...</p>
+          <p className="text-sm text-[var(--muted)]">Memuat...</p>
         ) : active ? (
           <div className="flex flex-col gap-2">
-            <span className="font-semibold text-[#c00]">
-              Katalog publik sedang ditutup
-            </span>
-            <span className="text-sm text-[var(--gray-600)]">
+            <div>
+              <Badge tone="solid">Katalog ditutup</Badge>
+            </div>
+            <span className="text-sm text-[var(--muted)]">
               Sejak {formatWaktu(active.startedAt)} · diaktifkan oleh{' '}
               {active.reviewedByNama ?? active.requestedByNama ?? '-'}
             </span>
-            <span className="text-sm text-[var(--text-primary)]">Alasan: {active.alasan}</span>
-            <span className="text-sm text-[var(--gray-600)]">
+            <span className="break-words text-sm">Alasan: {active.alasan}</span>
+            <span className="text-xs text-[var(--muted)]">
               Halaman admin tetap bisa dipakai selama mode ini aktif.
             </span>
             {isSuperadmin && (
-              <div>
-                <button
-                  onClick={() => handleEnd(active.id)}
-                  disabled={busy}
-                  className="mt-2 px-3 py-2 border-2 border-[var(--black)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
-                >
+              <div className="mt-1">
+                <Button variant="accent" onClick={() => handleEnd(active.id)} disabled={busy}>
                   {busy ? '...' : 'Akhiri maintenance'}
-                </button>
+                </Button>
               </div>
             )}
           </div>
         ) : pending ? (
           <div className="flex flex-col gap-2">
-            <span className="font-semibold text-[var(--text-primary)]">
-              Pengajuan menunggu persetujuan superadmin
-            </span>
-            <span className="text-sm text-[var(--gray-600)]">
+            <div>
+              <Badge tone="soft">Menunggu persetujuan superadmin</Badge>
+            </div>
+            <span className="text-sm text-[var(--muted)]">
               Diajukan oleh {pending.requestedByNama ?? '-'} · {formatWaktu(pending.createdAt)}
             </span>
-            <span className="text-sm text-[var(--text-primary)]">Alasan: {pending.alasan}</span>
+            <span className="break-words text-sm">Alasan: {pending.alasan}</span>
             {isSuperadmin && (
-              <div className="flex gap-2 mt-2">
-                <button
+              <div className="mt-1 flex flex-wrap gap-2">
+                <Button
+                  variant="danger"
                   onClick={() => handleApprove(pending.id)}
                   disabled={busy}
-                  className="px-3 py-2 border-2 border-[#c00] text-[#c00] text-sm font-medium uppercase tracking-wide hover:bg-[#fee] disabled:opacity-50"
                 >
                   {busy ? '...' : 'Setujui'}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="quiet"
                   onClick={() => handleReject(pending.id)}
                   disabled={busy}
-                  className="px-3 py-2 border-2 border-[var(--gray-600)] text-[var(--gray-600)] text-sm font-medium uppercase tracking-wide hover:bg-[var(--gray-100)] disabled:opacity-50"
                 >
                   {busy ? '...' : 'Tolak'}
-                </button>
+                </Button>
               </div>
             )}
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <span className="font-semibold text-[var(--text-primary)]">
-              Tidak ada maintenance yang aktif
-            </span>
-            <span className="text-sm text-[var(--gray-600)]">
+            <span className="font-semibold">Tidak ada maintenance yang aktif</span>
+            <span className="text-sm text-[var(--muted)]">
               {isSuperadmin
                 ? 'Mengaktifkan akan langsung menutup katalog publik. Halaman admin tetap bisa dipakai.'
                 : 'Pengajuanmu perlu disetujui superadmin sebelum katalog publik ditutup.'}
             </span>
-            <textarea
+            <Textarea
               value={alasan}
               onChange={(e) => setAlasan(e.target.value)}
               placeholder="Alasan (minimal 5 karakter), misalnya: penataan ulang kategori"
               rows={3}
-              className="w-full border border-[var(--gray-200)] px-3 py-2 text-sm"
+              className="w-full"
             />
             <div>
-              <button
+              <Button
+                variant={isSuperadmin ? 'danger' : 'accent'}
                 onClick={handleSubmit}
                 disabled={busy || alasan.trim().length < 5}
-                className="px-3 py-2 border-2 border-[var(--black)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
               >
-                {busy ? '...' : isSuperadmin ? 'Aktifkan maintenance katalog' : 'Ajukan maintenance katalog'}
-              </button>
+                {busy
+                  ? '...'
+                  : isSuperadmin
+                    ? 'Aktifkan maintenance katalog'
+                    : 'Ajukan maintenance katalog'}
+              </Button>
             </div>
           </div>
         )}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--gray-600)]">
+      <h2
+        className="mb-3 text-xl font-semibold"
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
         Riwayat
       </h2>
-      <div className="bg-[var(--white)] border-2 border-[var(--black)]">
+      <div className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]">
         {rows.length === 0 ? (
-          <p className="text-center py-6 text-[var(--gray-600)]">Belum ada riwayat.</p>
+          <p className="px-4 py-8 text-center text-sm text-[var(--muted)]">Belum ada riwayat.</p>
         ) : (
           rows.map((r) => (
             <div
               key={r.id}
-              className="flex flex-col gap-1 p-4 border-b border-[var(--gray-200)] last:border-b-0"
+              className="flex flex-col gap-1.5 border-b border-[var(--rule)] p-4 last:border-b-0"
             >
-              <span className="text-sm font-semibold text-[var(--text-primary)]">
-                {STATUS_LABEL[r.status]} · {r.alasan}
-              </span>
-              <span className="text-xs text-[var(--gray-600)]">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  tone={r.status === 'active' ? 'solid' : r.status === 'pending' ? 'soft' : 'neutral'}
+                >
+                  {STATUS_LABEL[r.status]}
+                </Badge>
+                <span className="break-words text-sm font-medium">{r.alasan}</span>
+              </div>
+              <span className="break-words text-xs text-[var(--muted)]">
                 Diajukan {r.requestedByNama ?? '-'} ({formatWaktu(r.createdAt)})
                 {r.reviewedByNama ? ` · ditinjau ${r.reviewedByNama}` : ''}
-                {r.endedAt ? ` · selesai ${formatWaktu(r.endedAt)} oleh ${r.endedByNama ?? '-'}` : ''}
+                {r.endedAt
+                  ? ` · selesai ${formatWaktu(r.endedAt)} oleh ${r.endedByNama ?? '-'}`
+                  : ''}
               </span>
             </div>
           ))
