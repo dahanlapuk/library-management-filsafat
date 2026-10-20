@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { getCategories } from './catalog'
 import { getPosisiList, requestCategory } from './admin'
 import { kategoriOptions, tagOptions } from './category-options'
+import { Button } from '../components/ui/Button'
+import { Input, Textarea } from '../components/ui/Field'
+import { OptionPicker } from '../components/ui/OptionPicker'
 
 export interface BookFormValues {
   kode: string
@@ -36,9 +39,6 @@ interface BookFormProps {
 }
 
 const SHOW_TAGS = false
-
-const inputClass =
-  'w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]'
 
 export function BookForm({
   initialValues,
@@ -133,238 +133,236 @@ export function BookForm({
     }
   }
 
+  const labelClass = 'text-sm font-medium'
+  const req = <span className="text-red-700">*</span>
+  const sectionTitle = 'text-lg font-semibold'
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {error && (
-        <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">{error}</div>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
       )}
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="judul" className="font-medium">
-          Judul: <span className="text-[#c00]">*</span>
+      <h2 className={sectionTitle} style={{ fontFamily: 'var(--font-heading)' }}>
+        Info buku
+      </h2>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="judul" className={labelClass}>
+          Judul {req}
         </label>
-        <input
+        <Input
           id="judul"
           type="text"
           value={values.judul}
           onChange={(e) => setValues((v) => ({ ...v, judul: e.target.value }))}
           required
-          className={inputClass}
+          className="w-full"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="penulis" className={labelClass}>
+          Penulis
+        </label>
+        <Input
+          id="penulis"
+          type="text"
+          value={values.penulis}
+          onChange={(e) => setValues((v) => ({ ...v, penulis: e.target.value }))}
+          className="w-full"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="kode" className="font-medium">
-            Kode:
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <label htmlFor="kode" className={labelClass}>
+            Kode
           </label>
-          <input
+          <Input
             id="kode"
             type="text"
             value={values.kode}
             onChange={(e) => setValues((v) => ({ ...v, kode: e.target.value }))}
             placeholder="(boleh kosong)"
-            className={inputClass}
+            className="w-full"
           />
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="tahun" className="font-medium">
-            Tahun:
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <label htmlFor="tahun" className={labelClass}>
+            Tahun
           </label>
-          <input
+          <Input
             id="tahun"
             type="number"
             value={values.tahun}
             onChange={(e) => setValues((v) => ({ ...v, tahun: e.target.value }))}
-            className={inputClass}
+            className="w-full"
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="penulis" className="font-medium">
-          Penulis:
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="keterangan" className={labelClass}>
+          Keterangan
         </label>
-        <input
-          id="penulis"
-          type="text"
-          value={values.penulis}
-          onChange={(e) => setValues((v) => ({ ...v, penulis: e.target.value }))}
-          className={inputClass}
-        />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="keterangan" className="font-medium">
-          Keterangan:
-        </label>
-        <textarea
+        <Textarea
           id="keterangan"
           value={values.keterangan}
           onChange={(e) => setValues((v) => ({ ...v, keterangan: e.target.value }))}
           rows={3}
-          className={inputClass}
+          className="w-full"
         />
       </div>
 
+      <h2
+        className={`${sectionTitle} mt-2 border-t border-[var(--rule)] pt-5`}
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
+        Penempatan
+      </h2>
+
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="qty" className="font-medium">
-            Qty: <span className="text-[#c00]">*</span>
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <label htmlFor="qty" className={labelClass}>
+            Qty {req}
           </label>
-          <input
+          <Input
             id="qty"
             type="number"
             min={1}
             value={values.qty}
             onChange={(e) => setValues((v) => ({ ...v, qty: e.target.value }))}
             required
-            className={inputClass}
+            className="w-full"
           />
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="posisi" className="font-medium">
-            Posisi Rak: <span className="text-[#c00]">*</span>
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <label htmlFor="posisi" className={labelClass}>
+            Posisi rak {req}
           </label>
-          <select
+          <OptionPicker
             id="posisi"
-            value={values.posisiId ?? ''}
-            onChange={(e) =>
-              setValues((v) => ({
-                ...v,
-                posisiId: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
+            title="Pilih posisi rak"
+            placeholder="-- Pilih posisi --"
             disabled={loadingPosisi}
-            required
-            className={`${inputClass} bg-[var(--white)]`}
-          >
-            <option value="">-- Pilih posisi --</option>
-            {posisiList.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.kode} ({p.rak})
-              </option>
-            ))}
-          </select>
+            value={values.posisiId === null ? '' : String(values.posisiId)}
+            onChange={(v) =>
+              setValues((prev) => ({ ...prev, posisiId: v ? Number(v) : null }))
+            }
+            options={posisiList.map((p) => ({
+              value: String(p.id),
+              label: `${p.kode} (${p.rak})`,
+            }))}
+          />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="kategori" className="font-medium">
-          Kategori utama:
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="kategori" className={labelClass}>
+          Kategori utama
         </label>
-        <select
+        <OptionPicker
           id="kategori"
-          value={values.kategoriId ?? ''}
-          onChange={(e) =>
-            setValues((v) => ({
-              ...v,
-              kategoriId: e.target.value ? Number(e.target.value) : null,
-            }))
-          }
+          title="Pilih kategori utama"
+          placeholder="-- Belum dikategorikan --"
           disabled={loadingCategories}
-          className={`${inputClass} bg-[var(--white)]`}
-        >
-          <option value="">-- Belum dikategorikan --</option>
-          {kategoriList.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+          value={values.kategoriId === null ? '' : String(values.kategoriId)}
+          onChange={(v) =>
+            setValues((prev) => ({ ...prev, kategoriId: v ? Number(v) : null }))
+          }
+          options={[
+            { value: '', label: '(Belum dikategorikan)' },
+            ...kategoriList.map((o) => ({ value: String(o.id), label: o.label })),
+          ]}
+        />
 
         {categoryRequestSuccess && (
-          <p className="text-xs text-[var(--text-primary)]">{categoryRequestSuccess}</p>
+          <p className="rounded-lg bg-[var(--pale-soft)] p-2 text-xs">{categoryRequestSuccess}</p>
         )}
 
         {!showCategoryRequest ? (
           <button
             type="button"
             onClick={() => setShowCategoryRequest(true)}
-            className="text-left text-xs text-[var(--text-primary)] underline underline-offset-2 w-fit"
+            className="w-fit py-1 text-left text-sm underline underline-offset-2"
           >
             + Ajukan kategori baru
           </button>
         ) : (
-          <div className="flex flex-col gap-2 border-2 border-[var(--gray-200)] p-3">
-            {categoryRequestError && (
-              <p className="text-xs text-[#c00]">{categoryRequestError}</p>
-            )}
-            <input
+          <div className="flex flex-col gap-2 rounded-lg border border-[var(--rule)] bg-[var(--pale-soft)] p-3">
+            {categoryRequestError && <p className="text-xs text-red-700">{categoryRequestError}</p>}
+            <Input
               type="text"
               value={categoryRequestNama}
               onChange={(e) => setCategoryRequestNama(e.target.value)}
               placeholder="Nama kategori baru"
-              className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+              className="w-full"
             />
-            <input
+            <Input
               type="text"
               value={categoryRequestAlasan}
               onChange={(e) => setCategoryRequestAlasan(e.target.value)}
               placeholder="Alasan (opsional)"
-              className="w-full text-sm p-2 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
+              className="w-full"
             />
             <div className="flex gap-2">
-              <button
-                type="button"
+              <Button
+                variant="accent"
                 onClick={handleSubmitCategoryRequest}
                 disabled={submittingCategoryRequest}
-                className="px-3 py-2 bg-[var(--black)] text-[var(--white)] text-sm font-medium uppercase tracking-wide disabled:opacity-50"
               >
                 {submittingCategoryRequest ? 'Mengajukan...' : 'Ajukan'}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="quiet"
                 onClick={() => {
                   setShowCategoryRequest(false)
                   setCategoryRequestError('')
                 }}
-                className="px-3 py-2 border-2 border-[var(--gray-200)] text-sm font-medium uppercase tracking-wide"
               >
                 Batal
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
 
       {SHOW_TAGS && (
-      <div className="flex flex-col gap-2">
-        <label className="font-medium">Tag:</label>
-        {loadingCategories ? (
-          <p className="text-[var(--gray-600)] text-sm">Memuat tag...</p>
-        ) : tagList.length === 0 ? (
-          <p className="text-[var(--gray-600)] text-sm">Belum ada tag.</p>
-        ) : (
-          <div className="border-2 border-[var(--gray-200)] max-h-[180px] overflow-y-auto flex flex-col">
-            {tagList.map((t) => (
-              <label
-                key={t.id}
-                className="flex items-center gap-3 px-3 py-2 border-b border-[var(--gray-100)] last:border-b-0 cursor-pointer hover:bg-[var(--gray-100)]"
-              >
-                <input
-                  type="checkbox"
-                  checked={values.tagIds.includes(t.id)}
-                  onChange={() => toggleTag(t.id)}
-                  className="w-4 h-4 accent-[var(--black)]"
-                />
-                <span>{t.label}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Tag</label>
+          {loadingCategories ? (
+            <p className="text-sm text-[var(--muted)]">Memuat tag...</p>
+          ) : tagList.length === 0 ? (
+            <p className="text-sm text-[var(--muted)]">Belum ada tag.</p>
+          ) : (
+            <div className="flex max-h-[180px] flex-col overflow-y-auto rounded-lg border border-[var(--rule)]">
+              {tagList.map((t) => (
+                <label
+                  key={t.id}
+                  className="flex cursor-pointer items-center gap-3 border-b border-[var(--rule)] px-3 py-2 last:border-b-0 hover:bg-[var(--pale-soft)]"
+                >
+                  <input
+                    type="checkbox"
+                    checked={values.tagIds.includes(t.id)}
+                    onChange={() => toggleTag(t.id)}
+                    className="h-4 w-4 accent-[var(--ink)]"
+                  />
+                  <span>{t.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full p-4 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide disabled:opacity-50"
-      >
-        {submitting ? submittingLabel : submitLabel}
-      </button>
+      <div className="sticky bottom-0 z-20 -mx-4 -mb-4 rounded-b-xl border-t border-[var(--rule)] bg-[var(--white)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:-mb-6 sm:px-6">
+        <Button type="submit" variant="accent" disabled={submitting} className="w-full">
+          {submitting ? submittingLabel : submitLabel}
+        </Button>
+      </div>
     </form>
   )
 }
