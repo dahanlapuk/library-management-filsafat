@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AdminPage } from '../../components/ui/AdminPage'
 import { Badge } from '../../components/ui/Badge'
 import { Button, Chip } from '../../components/ui/Button'
+import { Chevron } from '../../components/ui/Chevron'
 import { Input } from '../../components/ui/Field'
 import { OptionPicker } from '../../components/ui/OptionPicker'
 import { getPosisiList } from '../../books/admin'
@@ -250,9 +251,7 @@ function InventoryCheckPage() {
                   </span>
                 )}
               </span>
-              <span aria-hidden className="text-[var(--muted)]">
-                ▾
-              </span>
+              <Chevron className="text-[var(--muted)]" />
             </button>
             {selectedProgress && selectedProgress.totalBuku > 0 && (
               <div className="mt-2 h-1.5 overflow-hidden rounded-full border border-[var(--rule)] bg-[var(--pale-soft)]">

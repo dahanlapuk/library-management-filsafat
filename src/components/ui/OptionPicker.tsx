@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from './Button'
+import { Chevron } from './Chevron'
 import { Input } from './Field'
 
 export function OptionPicker({
@@ -51,9 +52,7 @@ export function OptionPicker({
           {prefix && <span className="mr-1 text-[var(--muted)]">{prefix}</span>}
           {current ? current.label : placeholder}
         </span>
-        <span aria-hidden className="text-[var(--muted)]">
-          ▾
-        </span>
+        <Chevron className="text-[var(--muted)]" />
       </button>
       {open && (
         <div className="fixed inset-0 z-[70] flex items-end justify-center md:contents">
