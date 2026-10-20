@@ -18,7 +18,7 @@ export const Route = createFileRoute('/informasi')({
   loader: () => ({ hari: hariIniJakarta() }),
   head: () => ({
     meta: [
-      { title: 'Informasi Biblioteka (Perpustakaan) Filsafat UI' },
+      { title: 'Informasi Biblioteka Filsafat UI' },
       {
         name: 'description',
         content:

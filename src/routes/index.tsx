@@ -63,7 +63,7 @@ export const Route = createFileRoute('/')({
           },
         ],
         meta: [
-          { title: 'Biblioteka (Perpustakaan) Filsafat UI — Katalog Buku' },
+          { title: 'Biblioteka Filsafat UI — Katalog Buku' },
           {
             name: 'description',
             content:

@@ -5,7 +5,7 @@ import { GIT_RILIS } from '../data/changelog-git'
 export const Route = createFileRoute('/changelog')({
   head: () => ({
     meta: [
-      { title: 'Changelog Biblioteka (Perpustakaan) Filsafat UI' },
+      { title: 'Changelog Biblioteka Filsafat UI' },
       { name: 'robots', content: 'noindex' },
     ],
   }),
