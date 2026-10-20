@@ -11,8 +11,7 @@ export type Rilis = {
 export const RILIS: Rilis[] = [
   {
     versi: '2.13.0',
-    judul: 'Tampilan admin baru, tutorial, dan alur Inventory satu ketuk',
-    fitur: true,
+    judul: 'Redesign admin: tampilan baru, tutorial, dan alur Inventory satu ketuk',
     ringkas: [
       'Seluruh halaman admin tampil dengan gaya baru yang sama dengan sisi publik. Menu disusun ulang jadi lima kelompok: Peminjaman, Koleksi, Persetujuan, Masukan, dan Sistem. Di HP, menu dibuka lewat tombol Menu dan tiap kelompok bisa dibuka atau ditutup.',
       'Dashboard kini berupa ringkasan: pengajuan pinjam menunggu, pinjaman aktif, buku yang perlu ditelusuri, feedback yang belum ditangani, total judul dan eksemplar, serta aktivitas terakhir.',
