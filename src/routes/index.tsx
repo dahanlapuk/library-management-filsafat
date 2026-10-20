@@ -1,3 +1,4 @@
+import { Chevron } from '../components/ui/Chevron'
 import { useEffect, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
@@ -219,7 +220,7 @@ function PublicCatalogPage() {
               <span>
                 Kategori: {categories.find((c) => c.id === selectedKategoriId)?.nama ?? 'Semua Buku'}
               </span>
-              <span aria-hidden>▾</span>
+              <Chevron />
             </button>
           </div>
 

@@ -1,3 +1,4 @@
+import { Chevron } from '../components/ui/Chevron'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -147,7 +148,10 @@ export function AdminHeader() {
                     onClick={() => setOpenMenu(isOpen ? null : group.label)}
                     className={pill(groupActive)}
                   >
-                    {group.label} ▾
+                    <span className="inline-flex items-center gap-1">
+                      {group.label}
+                      <Chevron className="h-3.5 w-3.5" />
+                    </span>
                   </button>
                   {isOpen && (
                     <div className={`${panel} left-0`}>
@@ -173,7 +177,7 @@ export function AdminHeader() {
           >
             <span>{currentAdmin?.nama ?? '...'}</span>
             {currentAdmin && <PeranBadge admin={currentAdmin} onDark />}
-            <span aria-hidden>▾</span>
+            <Chevron className="h-3.5 w-3.5" />
           </button>
           {openMenu === 'user' && (
             <div className={`${panel} right-0`}>

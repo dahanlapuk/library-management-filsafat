@@ -1,3 +1,4 @@
+import { Chevron } from '../../components/ui/Chevron'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -146,13 +147,11 @@ function MembersPage() {
                       {member.whatsapp && <span>{member.whatsapp}</span>}
                     </span>
                   </div>
-                  <span
-                    className={`shrink-0 text-[var(--muted)] transition-transform ${
+                  <Chevron
+                    className={`text-[var(--muted)] transition-transform duration-300 ${
                       expandedId === member.id ? 'rotate-180' : ''
                     }`}
-                  >
-                    ▾
-                  </span>
+                  />
                 </button>
                 {expandedId === member.id && <MemberLoanHistory memberId={member.id} />}
               </div>
