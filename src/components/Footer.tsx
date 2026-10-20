@@ -3,9 +3,9 @@ import { Link } from '@tanstack/react-router'
 
 const linkClass = 'block py-1.5 text-[13px] opacity-90 transition-opacity hover:underline hover:opacity-100'
 
-function Group({ title, className = '', children }: { title: string; className?: string; children: ReactNode }) {
+function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className={className}>
+    <div>
       <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--accent)]">{title}</p>
       <ul>{children}</ul>
     </div>
@@ -17,7 +17,7 @@ export function Footer() {
 
   return (
     <footer className="mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)]">
-      <div className="mx-auto grid max-w-[1280px] gap-7 px-5 pb-5 pt-7 sm:px-8 sm:pt-8 md:grid-cols-[1.3fr_2fr] md:gap-10">
+      <div className="mx-auto grid max-w-[1280px] gap-7 px-5 pb-5 pt-7 sm:px-8 sm:pt-8 md:grid-cols-[1.2fr_1fr] md:gap-10">
         <div className="max-w-sm">
           <p className="text-base font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
             Biblioteka Departemen <span className="text-[var(--accent)]">Filsafat</span> UI
@@ -25,9 +25,12 @@ export function Footer() {
           <p className="mt-2 text-xs leading-relaxed opacity-70">
             Koleksi buku Departemen Filsafat, Fakultas Ilmu Pengetahuan Budaya, Universitas Indonesia.
           </p>
+          <p lang="la" className="mt-4 text-lg text-[var(--accent)]" style={{ fontFamily: 'var(--font-heading)' }}>
+            Viva Philosophia!
+          </p>
         </div>
 
-        <nav className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
+        <nav className="grid max-w-md grid-cols-2 gap-x-8 gap-y-5">
           <Group title="Jelajahi">
             <li>
               <Link to="/" className={linkClass}>
@@ -52,7 +55,7 @@ export function Footer() {
               </Link>
             </li>
           </Group>
-          <Group title="Departemen" className="col-span-2 sm:col-span-1">
+          <Group title="Departemen">
             <li>
               <a
                 href="https://filsafatui.app"
@@ -60,27 +63,34 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className={linkClass}
               >
-                Situs Departemen Filsafat UI
+                Situs Departemen
               </a>
+            </li>
+          </Group>
+          <Group title="Admin">
+            <li>
+              <Link to="/admin/login" className={linkClass}>
+                Masuk admin
+              </Link>
             </li>
           </Group>
         </nav>
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 text-[11px] sm:px-8">
-          <span className="opacity-60">© {year} Departemen Filsafat UI</span>
-          <Link to="/admin/login" className="opacity-60 hover:underline hover:opacity-100">
-            Masuk admin
-          </Link>
-          <a
-            href="https://crkstudio.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full text-[10px] opacity-40 transition-opacity hover:opacity-80 sm:w-auto"
-          >
-            Created by crkstudio
-          </a>
+        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 sm:px-8">
+          <span className="text-[11px] opacity-60">© {year} Departemen Filsafat Universitas Indonesia</span>
+          <span className="text-[10px] opacity-40">
+            Dibuat oleh{' '}
+            <a
+              href="https://crkstudio.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:underline hover:opacity-100"
+            >
+              crkstudio
+            </a>
+          </span>
         </div>
       </div>
     </footer>
