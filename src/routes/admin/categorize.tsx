@@ -2,6 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button, Chip } from '../../components/ui/Button'
+import { Input, Select } from '../../components/ui/Field'
 import { getCategories } from '../../books/catalog'
 import { bulkCategorize, getBooksForCategorizing } from '../../books/categorize'
 
@@ -157,206 +160,234 @@ function CategorizePage() {
 
   const filterOptions = mode === 'kategori' ? kategoriOptions : tagOptions
   const tooMany = selected.size > MAX_SELECT
-  const selectClass =
-    'border-2 border-[var(--gray-200)] bg-[var(--white)] p-3 focus:outline-none focus:border-[var(--black)]'
+
+  const modeOptions: { value: Mode; label: string }[] = [
+    { value: 'tanpa', label: 'Belum dikategorikan' },
+    { value: 'semua', label: 'Semua buku' },
+    { value: 'kategori', label: 'Kategori tertentu' },
+    { value: 'tag', label: 'Tag tertentu' },
+  ]
 
   return (
     <AdminPage>
-
-      <h1 className="mb-2 text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)]">
+      <h1 className="mb-2 text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
         Kategorisasi Massal
       </h1>
-      <p className="mb-6 text-sm text-[var(--gray-600)]">
-        Centang buku, lalu pasang satu kategori utama atau tambah/hapus tag untuk semuanya
-        sekaligus.
+      <p className="mb-5 text-sm text-[var(--muted)]">
+        Centang buku, lalu pasang satu kategori utama untuk semuanya sekaligus.
       </p>
 
       {error && (
-        <div className="mb-4 border border-[#fcc] bg-[#fee] p-3 text-[#c00]">{error}</div>
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
       )}
       {info && (
-        <div className="mb-4 border border-[var(--gray-200)] bg-[var(--white)] p-3 text-sm">
+        <div className="mb-4 rounded-lg border border-[var(--rule)] bg-[var(--pale-soft)] p-3 text-sm">
           {info}
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap gap-3">
-        <select
-          value={mode}
-          onChange={(e) => {
-            setMode(e.target.value as Mode)
-            setCategoryId(undefined)
-            setPage(1)
-          }}
-          className={selectClass}
-        >
-          <option value="tanpa">Belum dikategorikan</option>
-          <option value="semua">Semua buku</option>
-          <option value="kategori">Kategori tertentu (termasuk turunannya)</option>
-          <option value="tag">Tag tertentu</option>
-        </select>
-        {needsCategory && (
-          <select
-            value={categoryId ?? ''}
-            onChange={(e) => {
-              setCategoryId(e.target.value ? Number(e.target.value) : undefined)
-              setPage(1)
-            }}
-            className={selectClass}
-          >
-            <option value="">-- pilih --</option>
-            {filterOptions.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.label}
+      <div className="mb-4 flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {modeOptions.map((o) => (
+            <Chip
+              key={o.value}
+              active={mode === o.value}
+              onClick={() => {
+                setMode(o.value)
+                setCategoryId(undefined)
+                setPage(1)
+              }}
+            >
+              {o.label}
+            </Chip>
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {needsCategory && (
+            <Select
+              value={categoryId ?? ''}
+              onChange={(e) => {
+                setCategoryId(e.target.value ? Number(e.target.value) : undefined)
+                setPage(1)
+              }}
+              className="min-w-0 sm:w-72"
+            >
+              <option value="">
+                {mode === 'kategori' ? '-- pilih kategori --' : '-- pilih tag --'}
               </option>
-            ))}
-          </select>
-        )}
-        <input
-          type="text"
-          value={rawSearch}
-          onChange={(e) => setRawSearch(e.target.value)}
-          placeholder="Cari judul, kode, penulis..."
-          className="min-w-[220px] flex-1 border-2 border-[var(--gray-200)] p-3 focus:outline-none focus:border-[var(--black)]"
-        />
+              {filterOptions.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
+            </Select>
+          )}
+          <Input
+            type="search"
+            value={rawSearch}
+            onChange={(e) => setRawSearch(e.target.value)}
+            placeholder="Cari judul, kode, penulis..."
+            className="min-w-0 flex-1"
+          />
+        </div>
       </div>
 
-      <div className="border-2 border-[var(--black)] bg-[var(--white)]">
-        <label className="flex items-center gap-3 border-b border-[var(--gray-200)] px-4 py-2 text-sm">
+      <div className="overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--white)] shadow-[0_1px_2px_rgba(24,22,0,0.05)]">
+        <label className="flex cursor-pointer items-center gap-3 border-b border-[var(--rule)] bg-[var(--pale-soft)] px-4 py-3 text-sm">
           <input
             type="checkbox"
             checked={allOnPage}
             onChange={toggleAllOnPage}
             disabled={books.length === 0}
-            className="h-4 w-4 accent-[var(--black)]"
+            className="h-5 w-5 accent-[var(--ink)]"
           />
-          Pilih semua di halaman ini ({result?.total ?? 0} buku cocok)
+          <span>
+            Pilih semua di halaman ini{' '}
+            <span className="text-[var(--muted)]">({result?.total ?? 0} buku cocok)</span>
+          </span>
         </label>
-        {isLoading ? (
-          <p className="py-8 text-center">Memuat...</p>
+        {needsCategory && categoryId === undefined ? (
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">
+            {mode === 'kategori'
+              ? 'Pilih kategori di atas untuk menampilkan bukunya.'
+              : 'Pilih tag di atas untuk menampilkan bukunya.'}
+          </p>
+        ) : isLoading ? (
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">Memuat...</p>
         ) : books.length === 0 ? (
-          <p className="py-8 text-center text-[var(--gray-600)]">Tidak ada buku.</p>
+          <p className="px-4 py-10 text-center text-sm text-[var(--muted)]">
+            {mode === 'tanpa' && !search
+              ? 'Semua buku sudah punya kategori.'
+              : 'Tidak ada buku.'}
+          </p>
         ) : (
-          books.map((b) => (
-            <label
-              key={b.id}
-              className="flex cursor-pointer items-start gap-3 border-b border-[var(--gray-200)] px-4 py-3 last:border-b-0 hover:bg-[var(--gray-100)]"
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(b.id)}
-                onChange={() => toggle(b.id)}
-                className="mt-1 h-4 w-4 accent-[var(--black)]"
-              />
-              <div className="min-w-0">
-                <div className="truncate font-medium text-[var(--text-primary)]">{b.judul}</div>
-                <div className="text-xs text-[var(--gray-600)]">
-                  {b.kode || '(tanpa kode)'} · {b.penulis || '-'}
+          books.map((b) => {
+            const checked = selected.has(b.id)
+            return (
+              <label
+                key={b.id}
+                className={`flex cursor-pointer items-start gap-3 border-b border-[var(--rule)] px-4 py-3 transition-colors last:border-b-0 ${
+                  checked ? 'bg-[var(--pale)]' : 'hover:bg-[var(--pale-soft)]'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggle(b.id)}
+                  className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--ink)]"
+                />
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <div className="break-words font-medium">{b.judul}</div>
+                  <div className="break-words text-xs text-[var(--muted)]">
+                    {b.kode || '(tanpa kode)'} · {b.penulis || '-'}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
+                    {b.kategoriId ? (
+                      <Badge tone="neutral">
+                        {labelOf.get(b.kategoriId) ?? '(tidak dikenal)'}
+                      </Badge>
+                    ) : (
+                      <Badge tone="soft">Belum dikategorikan</Badge>
+                    )}
+                    {b.tags.length > 0 && <span>Tag: {b.tags.map((t) => t.nama).join(', ')}</span>}
+                  </div>
                 </div>
-                <div className="text-xs text-[var(--gray-600)]">
-                  Kategori:{' '}
-                  {b.kategoriId
-                    ? (labelOf.get(b.kategoriId) ?? '(tidak dikenal)')
-                    : 'Belum dikategorikan'}
-                  {b.tags.length > 0 && ` · Tag: ${b.tags.map((t) => t.nama).join(', ')}`}
-                </div>
-              </div>
-            </label>
-          ))
+              </label>
+            )
+          })
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-            className="border-2 border-[var(--black)] px-4 py-2 font-medium disabled:opacity-40"
-          >
-            ← Prev
-          </button>
-          <span className="text-[var(--gray-600)]">
-            Halaman {page} / {totalPages}
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <Button variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+            ← Sebelumnya
+          </Button>
+          <span className="text-sm text-[var(--muted)]">
+            Hal. {page} dari {totalPages}
           </span>
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="border-2 border-[var(--black)] px-4 py-2 font-medium disabled:opacity-40"
           >
-            Next →
-          </button>
+            Berikutnya →
+          </Button>
         </div>
       )}
 
       {selected.size > 0 && (
-        <div className="sticky bottom-0 mt-4 flex flex-wrap items-center gap-3 border-2 border-[var(--black)] bg-[var(--white)] p-3">
-          <span className="text-sm font-semibold">{selected.size} dipilih</span>
-          <button
-            type="button"
-            onClick={() => setSelected(new Set())}
-            className="text-xs underline"
-          >
-            Kosongkan pilihan
-          </button>
-          {tooMany && (
-            <span className="text-xs text-[#c00]">Maksimal {MAX_SELECT} buku sekali proses.</span>
-          )}
+        <div className="sticky bottom-0 z-30 mt-4 flex flex-col gap-3 rounded-xl border border-[var(--sun)] bg-[var(--cream)] p-3 shadow-[0_-4px_16px_rgba(24,22,0,0.12)] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-sm font-semibold">{selected.size} buku dipilih</span>
+            <button
+              type="button"
+              onClick={() => setSelected(new Set())}
+              className="text-xs text-[var(--muted)] underline"
+            >
+              Kosongkan pilihan
+            </button>
+            {tooMany && (
+              <span className="text-xs text-red-700">
+                Maksimal {MAX_SELECT} buku sekali proses.
+              </span>
+            )}
+          </div>
 
-          <div className="flex items-center gap-2">
-            <select
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Select
               value={kategoriTarget}
               onChange={(e) => setKategoriTarget(e.target.value)}
-              className="border border-[var(--gray-200)] px-2 py-1 text-sm"
+              className="min-w-0 flex-1"
             >
-              <option value="">Kategori utama...</option>
+              <option value="">Pilih kategori utama...</option>
               <option value="kosong">(kosongkan kategori)</option>
               {kategoriOptions.map((o) => (
                 <option key={o.id} value={o.id}>
                   {o.label}
                 </option>
               ))}
-            </select>
-            <button
-              type="button"
+            </Select>
+            <Button
+              variant="accent"
               onClick={handleApplyKategori}
               disabled={busy || tooMany || !kategoriTarget}
-              className="bg-[var(--black)] px-3 py-1 text-sm font-medium text-[var(--white)] disabled:opacity-40"
             >
-              Terapkan
-            </button>
+              {busy ? 'Memproses...' : `Terapkan ke ${selected.size} buku`}
+            </Button>
           </div>
 
           {SHOW_TAG_ACTIONS && (
-          <div className="flex items-center gap-2">
-            <select
-              value={tagTarget}
-              onChange={(e) => setTagTarget(e.target.value)}
-              className="border border-[var(--gray-200)] px-2 py-1 text-sm"
-            >
-              <option value="">Tag...</option>
-              {tagOptions.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={() => handleTag('tambah')}
-              disabled={busy || tooMany || !tagTarget}
-              className="border border-[var(--black)] px-3 py-1 text-sm font-medium disabled:opacity-40"
-            >
-              + Tag
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTag('hapus')}
-              disabled={busy || tooMany || !tagTarget}
-              className="border border-[var(--gray-600)] px-3 py-1 text-sm font-medium text-[var(--gray-600)] disabled:opacity-40"
-            >
-              − Tag
-            </button>
-          </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Select
+                value={tagTarget}
+                onChange={(e) => setTagTarget(e.target.value)}
+                className="min-w-0 flex-1"
+              >
+                <option value="">Tag...</option>
+                {tagOptions.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.label}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                variant="secondary"
+                onClick={() => handleTag('tambah')}
+                disabled={busy || tooMany || !tagTarget}
+              >
+                + Tag
+              </Button>
+              <Button
+                variant="quiet"
+                onClick={() => handleTag('hapus')}
+                disabled={busy || tooMany || !tagTarget}
+              >
+                − Tag
+              </Button>
+            </div>
           )}
         </div>
       )}
