@@ -3,6 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { AdminPage } from '../../components/ui/AdminPage'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Field'
+import { OptionPicker } from '../../components/ui/OptionPicker'
 import {
   listFeedback,
   toggleFeedbackVote,
@@ -37,24 +41,24 @@ const AREAS = [
 
 const STATUS_STYLE: Record<string, { badge: string; stripe: string }> = {
   baru: {
-    badge: 'bg-[#e8f0fe] text-[#1a4fa0] border-[#b6cdf5]',
-    stripe: 'border-l-[#4a7fd4]',
+    badge: 'bg-[var(--pale)] text-[var(--ink)] border-[var(--sun)]',
+    stripe: 'border-l-[color:var(--sun)]',
   },
   perlu_perhatian: {
-    badge: 'bg-[#f5a623] text-[#1a1a1a] border-[#b36b00] font-bold',
-    stripe: 'border-l-[#f5a623]',
+    badge: 'bg-[var(--ink)] text-[var(--cream)] border-[var(--ink)] font-semibold',
+    stripe: 'border-l-[color:var(--ink)]',
   },
   diteruskan: {
-    badge: 'bg-[#e6f4ea] text-[#1e6b34] border-[#a8d5b5]',
-    stripe: 'border-l-[#2e8b4f]',
+    badge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    stripe: 'border-l-emerald-600',
   },
   selesai: {
-    badge: 'bg-[var(--gray-200)] text-[var(--gray-600)] border-[var(--gray-200)]',
-    stripe: 'border-l-[color:var(--gray-200)]',
+    badge: 'bg-[var(--pale-soft)] text-[var(--muted)] border-[var(--rule)]',
+    stripe: 'border-l-[color:var(--rule)]',
   },
   ditolak: {
-    badge: 'bg-[#fee] text-[#c00] border-[#fcc]',
-    stripe: 'border-l-[#c00]',
+    badge: 'bg-red-50 text-red-700 border-red-200',
+    stripe: 'border-l-red-600',
   },
 }
 
@@ -62,13 +66,6 @@ const STATUS_PRIORITY: Record<string, number> = { perlu_perhatian: 0, baru: 1 }
 
 type Area = (typeof AREAS)[number]['value']
 type Item = Awaited<ReturnType<typeof listFeedback>>[number]
-
-const inputClass =
-  'w-full p-3 border-2 border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]'
-const buttonClass =
-  'p-3 bg-[var(--black)] text-[var(--white)] font-semibold uppercase tracking-wide text-sm disabled:opacity-50'
-const secondaryButtonClass =
-  'p-3 border-2 border-[var(--black)] text-[var(--text-primary)] font-semibold uppercase tracking-wide text-sm disabled:opacity-50'
 
 function labelOf(list: readonly { value: string; label: string }[], value: string) {
   return list.find((x) => x.value === value)?.label ?? value
@@ -96,7 +93,11 @@ function kontakHref(kontak: string | null) {
 
 function ErrorNotice({ error }: { error: string }) {
   if (!error) return null
-  return <div className="p-3 bg-[#fee] border border-[#fcc] text-[#c00]">{error}</div>
+  return (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      {error}
+    </div>
+  )
 }
 
 function FeedbackCard({
@@ -136,28 +137,30 @@ function FeedbackCard({
 
   return (
     <div
-      className={`flex flex-col gap-3 p-4 border-2 border-[var(--gray-200)] border-l-[6px] ${STATUS_STYLE[f.status]?.stripe ?? ''}`}
+      className={`flex flex-col gap-3 rounded-xl border border-l-[6px] border-[var(--rule)] bg-[var(--white)] p-4 shadow-[0_1px_2px_rgba(24,22,0,0.05)] ${STATUS_STYLE[f.status]?.stripe ?? ''}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <span className="font-semibold text-[var(--text-primary)]">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="font-semibold">
             #{f.id} {labelOf(JENIS, f.jenis)}
           </span>
-          <span className="text-sm text-[var(--gray-600)]">{formatTanggal(f.createdAt)}</span>
+          <span className="text-xs text-[var(--muted)]">{formatTanggal(f.createdAt)}</span>
         </div>
         <span
-          className={`px-2 py-1 text-xs uppercase tracking-wide border ${STATUS_STYLE[f.status]?.badge ?? ''}`}
+          className={`rounded-full border px-2.5 py-1 text-xs ${STATUS_STYLE[f.status]?.badge ?? ''}`}
         >
           {labelOf(STATUSES, f.status)}
         </span>
       </div>
 
-      <p className="whitespace-pre-wrap">{f.pesan}</p>
+      <p className="whitespace-pre-wrap break-words rounded-lg bg-[var(--pale-soft)] p-3 text-sm">
+        {f.pesan}
+      </p>
 
       {(f.bookId || f.bookJudulSnapshot) && (
         <div className="flex flex-col gap-1 text-sm">
-          <span className="text-[var(--gray-600)]">
-            Buku: <span className="font-medium text-[var(--text-primary)]">{f.bookJudulSnapshot}</span>
+          <span className="break-words text-[var(--muted)]">
+            Buku: <span className="font-medium text-[var(--ink)]">{f.bookJudulSnapshot}</span>
             {!f.bookId && ' (sudah dihapus)'}
           </span>
           {f.bookId && (
@@ -178,7 +181,7 @@ function FeedbackCard({
       )}
 
       {f.kontak && (
-        <p className="text-sm text-[var(--gray-600)]">
+        <p className="break-all text-sm text-[var(--muted)]">
           Kontak:{' '}
           {href ? (
             <a href={href} target="_blank" rel="noopener noreferrer" className="underline">
@@ -199,75 +202,79 @@ function FeedbackCard({
         </p>
       )}
 
-      {isSaran && <p className="text-sm text-[var(--gray-600)]">Dukungan admin: {f.voteCount}</p>}
+      {isSaran && (
+        <p className="text-xs text-[var(--muted)]">Dukungan admin: {f.voteCount}</p>
+      )}
 
       <ErrorNotice error={error} />
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {isSaran && open && (
-          <button
+          <Button
+            variant="secondary"
             disabled={busy}
             onClick={() =>
               run(() => toggleFeedbackVote({ data: { id: f.id } }), 'Gagal memberi vote.')
             }
-            className={secondaryButtonClass}
           >
             {f.sudahVote ? 'Tarik dukungan' : 'Dukung'}
-          </button>
+          </Button>
         )}
 
         {isSaran && open && isSuperadmin && (
           <>
-            <button disabled={busy} onClick={() => setPromoting((v) => !v)} className={secondaryButtonClass}>
+            <Button variant="secondary" disabled={busy} onClick={() => setPromoting((v) => !v)}>
               Teruskan jadi request
-            </button>
-            <button disabled={busy} onClick={() => setStatus('selesai')} className={secondaryButtonClass}>
+            </Button>
+            <Button variant="accent" disabled={busy} onClick={() => setStatus('selesai')}>
               Tandai selesai
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="quiet"
               disabled={busy}
               onClick={() => {
                 if (window.confirm('Tolak saran ini?')) setStatus('ditolak')
               }}
-              className={secondaryButtonClass}
             >
               Tolak
-            </button>
+            </Button>
           </>
         )}
 
         {!isSaran && f.status === 'baru' && (
-          <button disabled={busy} onClick={() => setStatus('selesai')} className={buttonClass}>
+          <Button variant="accent" disabled={busy} onClick={() => setStatus('selesai')}>
             Tandai selesai
-          </button>
+          </Button>
         )}
         {!isSaran && f.status === 'selesai' && (
-          <button disabled={busy} onClick={() => setStatus('baru')} className={secondaryButtonClass}>
+          <Button variant="secondary" disabled={busy} onClick={() => setStatus('baru')}>
             Buka kembali
-          </button>
+          </Button>
         )}
       </div>
 
       {promoting && isSuperadmin && (
-        <div className="flex flex-col gap-3 pt-3 border-t border-[var(--gray-200)]">
-          <input
+        <div className="flex flex-col gap-3 rounded-lg border border-[var(--rule)] bg-[var(--pale-soft)] p-3">
+          <Input
             value={judul}
             onChange={(e) => setJudul(e.target.value)}
             maxLength={120}
             placeholder="Judul request"
-            className={inputClass}
+            className="w-full"
           />
-          <select value={area} onChange={(e) => setArea(e.target.value as Area)} className={inputClass}>
-            {AREAS.map((a) => (
-              <option key={a.value} value={a.value}>
-                {a.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-[var(--gray-600)]">
+          <OptionPicker
+            title="Area request"
+            placeholder="Pilih area"
+            searchable={false}
+            value={area}
+            onChange={(v) => setArea(v as Area)}
+            options={AREAS.map((a) => ({ value: a.value, label: a.label }))}
+          />
+          <p className="text-xs text-[var(--muted)]">
             Pesan ini menjadi deskripsi request. Kontak pengunjung tidak ikut disalin.
           </p>
-          <button
+          <Button
+            variant="accent"
             disabled={busy || judul.trim().length < 3}
             onClick={() =>
               run(
@@ -275,10 +282,9 @@ function FeedbackCard({
                 'Gagal meneruskan saran.',
               )
             }
-            className={buttonClass}
           >
             {busy ? 'Memproses...' : 'Buat request'}
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -314,57 +320,62 @@ function FeedbackPage() {
 
   return (
     <AdminPage>
-      <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] mb-2">
-        Feedback Publik
-      </h1>
-      <p className="text-[var(--gray-600)] mb-6">
-        Kiriman pengunjung katalog. Kritik dan saran yang didukung dua admin naik menjadi perlu perhatian,
-        lalu superadmin dapat meneruskannya sebagai request fitur.
+      <div className="mb-1 flex flex-wrap items-center gap-3 sm:mb-2">
+        <h1 className="text-2xl font-semibold sm:text-3xl" style={{ fontFamily: 'var(--font-heading)' }}>
+          Feedback Publik
+        </h1>
+        {shown.length > 0 && <Badge tone="solid">{shown.length}</Badge>}
+      </div>
+      <p className="mb-5 hidden text-sm text-[var(--muted)] sm:block">
+        Kiriman pengunjung katalog. Kritik dan saran yang didukung dua admin naik menjadi perlu
+        perhatian, lalu superadmin dapat meneruskannya sebagai request fitur.
       </p>
 
-      <div className="bg-[var(--white)] border-2 border-[var(--black)] p-6 flex flex-col gap-4">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <select
-            value={jenisFilter}
-            onChange={(e) => setJenisFilter(e.target.value as 'semua' | Item['jenis'])}
-            className={inputClass}
-          >
-            <option value="semua">Semua jenis</option>
-            {JENIS.map((j) => (
-              <option key={j.value} value={j.value}>
-                {j.label}
-              </option>
-            ))}
-          </select>
-          <select
-            value={tampil}
-            onChange={(e) => setTampil(e.target.value as 'aktif' | 'semua')}
-            className={inputClass}
-          >
-            <option value="aktif">Belum selesai</option>
-            <option value="semua">Semua status</option>
-          </select>
-        </div>
-
-        {error ? (
-          <ErrorNotice error={errorMessage(error, 'Gagal memuat feedback.')} />
-        ) : isPending ? (
-          <p className="text-center py-4">Memuat...</p>
-        ) : shown.length === 0 ? (
-          <p className="text-center py-4 text-[var(--gray-600)]">Tidak ada feedback.</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {shown.map((f) => (
-              <FeedbackCard
-                key={f.id}
-                f={f}
-                isSuperadmin={!!me?.isSuperadmin}
-                onChanged={refresh}
-              />
-            ))}
-          </div>
-        )}
+      <div className="mb-4 mt-3 grid grid-cols-2 gap-3 sm:mt-0">
+        <OptionPicker
+          title="Jenis feedback"
+          placeholder="Semua jenis"
+          searchable={false}
+          value={jenisFilter}
+          onChange={(v) => setJenisFilter(v as 'semua' | Item['jenis'])}
+          options={[
+            { value: 'semua', label: 'Semua jenis' },
+            ...JENIS.map((j) => ({ value: j.value, label: j.label })),
+          ]}
+        />
+        <OptionPicker
+          title="Tampilkan status"
+          placeholder="Belum selesai"
+          searchable={false}
+          value={tampil}
+          onChange={(v) => setTampil(v as 'aktif' | 'semua')}
+          options={[
+            { value: 'aktif', label: 'Belum selesai' },
+            { value: 'semua', label: 'Semua status' },
+          ]}
+        />
       </div>
+
+      {error ? (
+        <ErrorNotice error={errorMessage(error, 'Gagal memuat feedback.')} />
+      ) : isPending ? (
+        <p className="py-10 text-center text-sm text-[var(--muted)]">Memuat...</p>
+      ) : shown.length === 0 ? (
+        <p className="rounded-xl border border-[var(--rule)] bg-[var(--white)] px-4 py-10 text-center text-sm text-[var(--muted)]">
+          Tidak ada feedback.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {shown.map((f) => (
+            <FeedbackCard
+              key={f.id}
+              f={f}
+              isSuperadmin={!!me?.isSuperadmin}
+              onChanged={refresh}
+            />
+          ))}
+        </div>
+      )}
     </AdminPage>
   )
 }
