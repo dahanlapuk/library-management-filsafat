@@ -786,5 +786,135 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "fix: buku tanpa eksemplar tampil Tidak tersedia, bukan Dipinjam"
       }
     ]
+  },
+  "2.13.0": {
+    "tanggal": "2026-10-20",
+    "dari": "2.12.1",
+    "commits": [
+      {
+        "hash": "13351e6",
+        "pesan": "chore: entri changelog v2.12.1"
+      },
+      {
+        "hash": "08e15d8",
+        "pesan": "style: halaman maintenance dengan pesan wajah baru dan animasi under construction"
+      },
+      {
+        "hash": "f831154",
+        "pesan": "feat: header admin baru dengan menu per kelompok dan AdminPage sebagai pembungkus halaman"
+      },
+      {
+        "hash": "8fbcb6a",
+        "pesan": "feat: dashboard admin berisi ringkasan operasional dan fungsi statistik"
+      },
+      {
+        "hash": "d0a4d5b",
+        "pesan": "style: halaman Data Anggota direstyle; komponen Button, Chip, dan Input dibuat"
+      },
+      {
+        "hash": "00dfc98",
+        "pesan": "fix: panel dashboard tidak melebar di HP, teks panjang turun baris"
+      },
+      {
+        "hash": "8be7ccc",
+        "pesan": "style: halaman Peminjaman direstyle; Textarea dan varian Button accent/quiet dibuat"
+      },
+      {
+        "hash": "49464de",
+        "pesan": "style: halaman Peminjaman direstyle; Textarea dan varian Button accent/quiet dibuat"
+      },
+      {
+        "hash": "084b282",
+        "pesan": "style: halaman Kelola Buku direstyle dengan FAB di HP; Select, varian danger, dan buttonClass dibuat"
+      },
+      {
+        "hash": "a9576a0",
+        "pesan": "style: halaman Inventory Check direstyle"
+      },
+      {
+        "hash": "b509a09",
+        "pesan": "feat: Inventory Check dengan konfirmasi satu ketuk, filter belum dicek, bilah progres, dan pesan galat"
+      },
+      {
+        "hash": "db148d9",
+        "pesan": "style: Inventory Check dengan penanda hijau untuk buku sudah dicek, pemilih rak bottom sheet, dan bilah rak menempel di HP"
+      },
+      {
+        "hash": "9293e13",
+        "pesan": "style: Kategorisasi Massal direstyle dengan filter pil, badge status kategori, dan bilah aksi yang lebih jelas"
+      },
+      {
+        "hash": "74ccc17",
+        "pesan": "style: filter Kategorisasi Massal di HP diringkas jadi satu tombol, deskripsi disembunyikan"
+      },
+      {
+        "hash": "be331f1",
+        "pesan": "style: halaman Tambah dan Edit Buku memakai panel, judul, dan tombol kembali bergaya baru"
+      },
+      {
+        "hash": "3cda12e",
+        "pesan": "refactor: OptionPicker jadi komponen bersama; style: form buku dengan kelompok isian, pemilih rak dan kategori, dan tombol simpan menempel"
+      },
+      {
+        "hash": "bdc2aae",
+        "pesan": "style: halaman Persetujuan (hapus buku, kategori, admin baru) direstyle dengan jumlah menunggu dan tombol bertingkat"
+      },
+      {
+        "hash": "8242934",
+        "pesan": "style: Feedback Publik direstyle dengan filter ringkas, status berwarna, dan tombol bertingkat"
+      },
+      {
+        "hash": "057ca29",
+        "pesan": "style: OptionPicker jadi popover di desktop; dropdown Pindah kategori, posisi Inventory, dan tag memakainya"
+      },
+      {
+        "hash": "86638eb",
+        "pesan": "style: Request Fitur direstyle; filter Kelola Buku dan Activity Log memakai OptionPicker"
+      },
+      {
+        "hash": "d27f61a",
+        "pesan": "style: Activity Log (kartu di HP, tabel di desktop) dan Maintenance direstyle"
+      },
+      {
+        "hash": "7c8d547",
+        "pesan": "style: Profil Saya jadi satu kartu dengan baris yang meluas halus; ikon chevron bersama menggantikan karakter panah"
+      },
+      {
+        "hash": "e0965e5",
+        "pesan": "style: panah menu header, kategori HP, dan baris anggota memakai ikon Chevron"
+      },
+      {
+        "hash": "222d0f7",
+        "pesan": "style: halaman login, daftar, lupa dan reset password, konfirmasi email memakai kerangka AuthShell bersama"
+      },
+      {
+        "hash": "e99b4d4",
+        "pesan": "feat: angka antrean di menu header admin (peminjaman, persetujuan, masukan)."
+      },
+      {
+        "hash": "939e3d6",
+        "pesan": "feat: kolom tutorial_selesai_at di admin_profiles (migrasi 0018)"
+      },
+      {
+        "hash": "1cd3eb7",
+        "pesan": "feat: tutorial sekali tampil dengan sorotan menu, menu HP jadi accordion"
+      },
+      {
+        "hash": "4ce26c2",
+        "pesan": "style: footer dikelompokkan, lebih ringkas di HP, tautan admin tidak lagi menghilang"
+      },
+      {
+        "hash": "49c5415",
+        "pesan": "style: footer dikelompokkan dalam dua kolom, baris bawah dua kolom, tautan admin tetap terlihat, disamakan dengan filsafatui.app"
+      },
+      {
+        "hash": "1edf4e8",
+        "pesan": "fix: judul tab tanpa kata Perpustakaan"
+      },
+      {
+        "hash": "85f5fd3",
+        "pesan": "style: template pesan WhatsApp memakai nama Biblioteka dan susunan seragam"
+      }
+    ]
   }
 }

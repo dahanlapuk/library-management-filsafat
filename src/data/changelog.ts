@@ -10,6 +10,29 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.13.0',
+    judul: 'Tampilan admin baru, tutorial, dan alur Inventory satu ketuk',
+    fitur: true,
+    ringkas: [
+      'Seluruh halaman admin tampil dengan gaya baru yang sama dengan sisi publik. Menu disusun ulang jadi lima kelompok: Peminjaman, Koleksi, Persetujuan, Masukan, dan Sistem. Di HP, menu dibuka lewat tombol Menu dan tiap kelompok bisa dibuka atau ditutup.',
+      'Dashboard kini berupa ringkasan: pengajuan pinjam menunggu, pinjaman aktif, buku yang perlu ditelusuri, feedback yang belum ditangani, total judul dan eksemplar, serta aktivitas terakhir.',
+      'Inventory Check punya alur baru. Buku yang ada dan sesuai cukup diketuk "Ada, sesuai". Kalau ada selisih atau posisi rak perlu diubah, pilih "Ada selisih / ubah". Ada filter "Hanya yang belum dicek", bilah progres, dan penanda warna kartu: kuning belum dicek, hijau sudah dicek.',
+      'Angka kecil di menu menunjukkan jumlah antrean yang menunggu: pengajuan peminjaman, persetujuan, dan masukan.',
+      'Admin yang masuk pertama kali mendapat tutorial singkat yang menyorot menu satu per satu. Tutorial hanya tampil sekali dan bisa dibuka lagi lewat menu nama, pilih Tutorial.',
+      'Tombol Approve dan Reject kini berlabel Setujui dan Tolak.',
+      'Pesan WhatsApp ke peminjam diseragamkan: memakai nama Biblioteka Departemen Filsafat UI, susunan yang sama di semua pesan, dan judul buku ditebalkan. Aturan peminjaman tidak berubah.',
+      'Halaman pemeliharaan tampil dengan wajah baru.',
+      'Footer ditata ulang dan tautan Masuk admin selalu terlihat. Pilihan jumlah per halaman dan formulir pengajuan pinjam memakai pemilih yang sama dengan halaman admin. Judul tab tidak lagi memuat kata Perpustakaan.',
+    ],
+    teknis: [
+      'Komponen bersama di src/components/ui/: AdminPage, Card dan StatCard, Badge, Button dan Chip, Field (Input, Textarea, Select), OptionPicker (popover di desktop, bottom sheet di HP), Chevron, dan AuthShell untuk halaman login, daftar, lupa dan reset password.',
+      'Header admin di src/admin/AdminHeader.tsx ditulis ulang. Angka antrean dihitung fungsi ringan getNavCounts (src/admin/nav-counts.ts), terpisah dari statistik dashboard (src/admin/dashboard.ts).',
+      'Tutorial: kolom admin_profiles.tutorial_selesai_at (nullable, migrasi 0018), server function markTutorialSeen dengan guard requireApprovedAdmin dan id dari sesi, serta komponen Tutorial dengan sorotan elemen.',
+      'Lebar tata letak admin 1280px. Halaman auth dan form buku memakai lebar sempit.',
+      'Kelas selalu jalan Tailwind dipakai ulang antar halaman, tanpa perubahan logika server selain fungsi baru di atas.',
+    ],
+  },
+  {
     versi: '2.12.1',
     judul: 'Buku tanpa eksemplar tampil Tidak tersedia',
     ringkas: [
