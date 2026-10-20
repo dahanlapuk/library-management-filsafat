@@ -1,3 +1,4 @@
+import { OptionPicker } from '../components/ui/OptionPicker'
 import { Chevron } from '../components/ui/Chevron'
 import { useEffect, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -244,18 +245,17 @@ function PublicCatalogPage() {
 
             <div className="flex items-center gap-2 text-sm text-[var(--gray-600)]">
               <label htmlFor="page-size">Tampilkan</label>
-              <select
+              <OptionPicker
                 id="page-size"
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-                className="rounded-lg border border-[var(--gray-200)] bg-[var(--white)] px-2 py-1 focus:outline-none focus:border-[var(--black)]"
-              >
-                {PAGE_SIZE_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+                title="Tampilkan per halaman"
+                placeholder="20"
+                value={String(pageSize)}
+                onChange={(v) => setPageSize(Number(v))}
+                options={PAGE_SIZE_OPTIONS.map((n) => ({ value: String(n), label: String(n) }))}
+                searchable={false}
+                alignRight
+                className="w-20"
+              />
             </div>
           </div>
 

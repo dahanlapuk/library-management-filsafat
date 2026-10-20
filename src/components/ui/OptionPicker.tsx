@@ -15,6 +15,7 @@ export function OptionPicker({
   id,
   disabled,
   up = false,
+  alignRight = false,
 }: {
   title: string
   placeholder: string
@@ -27,6 +28,7 @@ export function OptionPicker({
   id?: string
   disabled?: boolean
   up?: boolean
+  alignRight?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
@@ -63,7 +65,7 @@ export function OptionPicker({
             className="absolute inset-0 bg-black/40 md:fixed md:z-[65] md:bg-transparent"
           />
           <div
-            className={`sheet-in relative flex max-h-[80vh] w-full flex-col rounded-t-2xl bg-[var(--cream)] shadow-xl md:absolute md:left-0 md:z-[70] md:max-h-80 md:w-full md:min-w-[18rem] md:rounded-xl md:border md:border-[var(--rule)] md:[animation:none] ${
+            className={`sheet-in relative flex max-h-[80vh] w-full flex-col rounded-t-2xl bg-[var(--cream)] shadow-xl md:absolute ${alignRight ? 'md:right-0' : 'md:left-0'} md:z-[70] md:max-h-80 md:w-full md:min-w-[18rem] md:rounded-xl md:border md:border-[var(--rule)] md:[animation:none] ${
               up ? 'md:bottom-full md:mb-1' : 'md:top-full md:mt-1'
             }`}
           >

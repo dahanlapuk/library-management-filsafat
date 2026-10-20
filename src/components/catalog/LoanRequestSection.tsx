@@ -1,3 +1,4 @@
+import { OptionPicker } from '../ui/OptionPicker'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { submitLoanRequest } from '../../loans/public'
@@ -137,38 +138,40 @@ export function LoanRequestSection({
       />
 
       <div className="flex gap-2">
-        <select
+        <OptionPicker
+          title="Peminjam sebagai"
+          placeholder="Pilih"
           value={form.role}
-          onChange={(e) =>
+          onChange={(v) =>
             setForm((f) => ({
               ...f,
-              role: e.target.value as 'mahasiswa' | 'dosen',
+              role: v as 'mahasiswa' | 'dosen',
               jenjang: '',
               angkatan: '',
             }))
           }
-          className="flex-1 text-base sm:text-sm px-3 py-1.5 sm:py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
-        >
-          <option value="mahasiswa">Mahasiswa</option>
-          <option value="dosen">Dosen</option>
-        </select>
+          options={[
+            { value: 'mahasiswa', label: 'Mahasiswa' },
+            { value: 'dosen', label: 'Dosen' },
+          ]}
+          searchable={false}
+          className="flex-1"
+        />
 
         {form.role === 'mahasiswa' && (
-          <select
+          <OptionPicker
+            title="Jenjang"
+            placeholder="Jenjang"
             value={form.jenjang}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                jenjang: e.target.value as 'S1' | 'S2' | 'S3' | '',
-              }))
-            }
-            className="flex-1 text-base sm:text-sm px-3 py-1.5 sm:py-2 rounded-lg bg-[var(--white)] border border-[var(--gray-200)] focus:outline-none focus:border-[var(--black)]"
-          >
-            <option value="">Jenjang</option>
-            <option value="S1">S1</option>
-            <option value="S2">S2</option>
-            <option value="S3">S3</option>
-          </select>
+            onChange={(v) => setForm((f) => ({ ...f, jenjang: v as 'S1' | 'S2' | 'S3' | '' }))}
+            options={[
+              { value: 'S1', label: 'S1' },
+              { value: 'S2', label: 'S2' },
+              { value: 'S3', label: 'S3' },
+            ]}
+            searchable={false}
+            className="flex-1"
+          />
         )}
       </div>
 
