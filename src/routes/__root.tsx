@@ -12,21 +12,34 @@ import appCss from '../styles.css?url'
 
 const queryClient = new QueryClient()
 
+const MAINTENANCE_RECHECK_MS = 30_000
+let lastMaintenanceOk = 0
+
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     // Domain lama (*.vercel.app default) -- 301 permanen ke domain custom,
     // supaya sinyal SEO ikut pindah dan tidak ada duplicate content antara
     // dua domain yang nampilin konten sama persis.
-    const canonicalHost = await getCanonicalRedirectHost()
-    if (canonicalHost) {
-      throw redirect({
-        href: `https://${canonicalHost}${location.href}`,
-        statusCode: 301,
-      })
+    const isServer = typeof window === 'undefined'
+    if (isServer) {
+      const canonicalHost = await getCanonicalRedirectHost()
+      if (canonicalHost) {
+        throw redirect({
+          href: `https://${canonicalHost}${location.href}`,
+          statusCode: 301,
+        })
+      }
     }
 
     // Mode penuh menutup semua rute (admin juga). Mode katalog hanya
     // menutup rute publik; /admin/* tetap terbuka supaya admin bisa kerja.
+    if (
+      !isServer &&
+      location.pathname !== '/maintenance' &&
+      Date.now() - lastMaintenanceOk < MAINTENANCE_RECHECK_MS
+    ) {
+      return
+    }
     const mode = await getMaintenanceMode()
     const blocked =
       mode === 'full' ||
@@ -36,6 +49,7 @@ export const Route = createRootRoute({
       return
     }
     if (blocked) throw redirect({ to: '/maintenance' })
+    if (!isServer) lastMaintenanceOk = Date.now()
   },
   notFoundComponent: NotFound,
   head: () => ({
