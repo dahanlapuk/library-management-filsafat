@@ -19,7 +19,11 @@ export function Footer() {
   const isAdminArea = pathname.startsWith('/admin')
 
   return (
-    <footer className="mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)]">
+    <footer
+      className={`mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)] ${
+        isAdminArea ? 'md:pl-16 xl:pl-0' : ''
+      }`}
+    >
       <div className="mx-auto grid max-w-[1280px] gap-7 px-5 pb-5 pt-7 sm:px-8 sm:pt-8 md:grid-cols-[1.2fr_1fr] md:gap-10">
         <div className="max-w-sm">
           <p className="text-base font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>

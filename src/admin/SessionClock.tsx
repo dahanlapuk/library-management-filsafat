@@ -112,7 +112,7 @@ export function AdminClockStrip() {
   const now = useNow(false)
   const t = now ? timeParts(now) : null
   return (
-    <div className="mx-auto hidden h-8 max-w-[1280px] items-center justify-end gap-2 px-5 text-sm tabular-nums text-[var(--muted)] sm:px-8 md:flex">
+    <div className="mx-auto hidden h-8 max-w-[1280px] items-center justify-end gap-2 px-5 text-sm tabular-nums text-[var(--muted)] sm:px-8 xl:flex">
       {now && t && (
         <>
           <span>{dateFormat.format(now)}</span>

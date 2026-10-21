@@ -214,11 +214,21 @@ export function Tutorial({
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const placed = !!box && !mobile
-  const cardTop = box ? box.top + box.height + 16 : 0
-  const cardLeft = box
-    ? Math.min(Math.max(16, box.left), Math.max(16, window.innerWidth - CARD_W - 16))
-    : 0
+  const vh = window.innerHeight
+  const vw = window.innerWidth
+  const below = !!box && vh - (box.top + box.height + 16) >= 240
+  const right = !!box && !below && vw - (box.left + box.width + 16) >= CARD_W
+  const placed = !!box && !mobile && (below || right)
+  const cardTop = !box
+    ? 0
+    : below
+      ? box.top + box.height + 16
+      : Math.max(16, Math.min(box.top, vh - 320))
+  const cardLeft = !box
+    ? 0
+    : right
+      ? box.left + box.width + 16
+      : Math.min(Math.max(16, box.left), Math.max(16, vw - CARD_W - 16))
 
   const content = (
     <>

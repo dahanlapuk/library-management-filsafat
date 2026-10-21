@@ -54,6 +54,44 @@ const NAV: NavGroup[] = [
   },
 ]
 
+const ICONS: Record<string, string> = {
+  menu: 'M4 6h16M4 12h16M4 18h16',
+  Dashboard: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  Peminjaman: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z',
+  Koleksi: 'M4 3v18M9 3v18M14 5l4 16',
+  Persetujuan: 'M20 6 9 17l-5-5',
+  Masukan: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  Sistem: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0',
+  user: 'M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21a8 8 0 0 1 16 0',
+}
+
+function Icon({ name }: { name: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={ICONS[name] ?? ICONS.Sistem} />
+    </svg>
+  )
+}
+
+const rail = (active: boolean) =>
+  `relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+    active ? 'bg-[var(--sun)] text-[var(--ink)]' : 'text-[var(--cream)] hover:bg-white/10'
+  }`
+
+function Dot({ show }: { show: boolean }) {
+  if (!show) return null
+  return <span className="absolute right-2 top-1.5 h-2 w-2 rounded-full bg-[var(--sun-bright)]" />
+}
+
 function CountBubble({ n, tone }: { n: number; tone: 'ink' | 'sun' }) {
   if (n <= 0) return null
   return (
@@ -99,6 +137,8 @@ export function AdminHeader() {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [sheetGroup, setSheetGroup] = useState<string | null>(null)
+  const [railOpen, setRailOpen] = useState(false)
+  const [railGroup, setRailGroup] = useState<string | null>(null)
   const barRef = useRef<HTMLElement>(null)
   const [tutorial, setTutorial] = useState<null | 'auto' | 'manual'>(null)
   const autoShown = useRef(false)
@@ -137,6 +177,7 @@ export function AdminHeader() {
   useEffect(() => {
     setOpenMenu(null)
     setSheetOpen(false)
+    setRailOpen(false)
     queryClient.invalidateQueries({ queryKey: ['nav-counts'] })
   }, [pathname, queryClient])
 
@@ -166,6 +207,7 @@ export function AdminHeader() {
   function openTutorial() {
     setOpenMenu(null)
     setSheetOpen(false)
+    setRailOpen(false)
     setTutorial('manual')
   }
 
@@ -197,7 +239,7 @@ export function AdminHeader() {
             </span>
           </Link>
 
-          <nav data-tour="nav" className="hidden items-center gap-1 md:flex">
+          <nav data-tour="nav" className="hidden items-center gap-1 xl:flex">
             <Link to="/admin" className={pill(pathname === '/admin')}>
               Dashboard
             </Link>
@@ -249,7 +291,7 @@ export function AdminHeader() {
           </nav>
         </div>
 
-        <div className="relative ml-auto hidden md:block">
+        <div className="relative ml-auto hidden xl:block">
           <button
             type="button"
             aria-expanded={openMenu === 'user'}
@@ -257,7 +299,7 @@ export function AdminHeader() {
             data-tour="user"
             className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm hover:bg-white/10"
           >
-            <span>{currentAdmin?.nama ?? '...'}</span>
+            <span className="whitespace-nowrap">{currentAdmin?.nama ?? '...'}</span>
             {currentAdmin && <PeranBadge admin={currentAdmin} onDark />}
             <Chevron className="h-3.5 w-3.5" />
           </button>
@@ -276,7 +318,7 @@ export function AdminHeader() {
           )}
         </div>
 
-        <div className="ml-auto mr-3 md:hidden">
+        <div className="ml-auto mr-3 xl:hidden">
           <AdminClock onDark />
         </div>
 
@@ -310,7 +352,7 @@ export function AdminHeader() {
             }`}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold">
-                <span>{currentAdmin?.nama ?? '...'}</span>
+                <span className="whitespace-nowrap">{currentAdmin?.nama ?? '...'}</span>
                 {currentAdmin && <PeranBadge admin={currentAdmin} />}
               </div>
               <button
@@ -384,6 +426,131 @@ export function AdminHeader() {
           </div>
         </div>
       )}
+      {railOpen && (
+        <button
+          type="button"
+          aria-label="Tutup menu samping"
+          onClick={() => setRailOpen(false)}
+          className="fixed inset-0 z-20 hidden bg-black/30 md:block xl:hidden"
+        />
+      )}
+      <aside
+        className={`fixed bottom-0 left-0 top-14 z-30 hidden flex-col gap-1 overflow-y-auto bg-[var(--ink)] p-2 text-[var(--cream)] transition-[width] duration-200 md:flex xl:hidden ${
+          railOpen ? 'w-64 shadow-2xl' : 'w-16'
+        }`}
+      >
+        <button
+          type="button"
+          aria-label={railOpen ? 'Ciutkan menu' : 'Buka menu'}
+          data-tour="nav"
+          onClick={() => {
+            setRailGroup(activeGroup)
+            setRailOpen((o) => !o)
+          }}
+          className={rail(false)}
+        >
+          <Icon name="menu" />
+          {railOpen && <span>Menu</span>}
+        </button>
+        <Link to="/admin" title="Dashboard" className={rail(pathname === '/admin')}>
+          <Icon name="Dashboard" />
+          {railOpen && <span>Dashboard</span>}
+        </Link>
+        {groups.map((group) => {
+          if (group.links.length === 1) {
+            const link = group.links[0]
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                title={link.label}
+                data-tour={`grup-${group.label}`}
+                className={rail(activeTo === link.to)}
+              >
+                <Icon name={group.label} />
+                {railOpen && <span className="flex-1">{link.label}</span>}
+                {railOpen ? (
+                  <CountBubble n={countOf(link.to)} tone="sun" />
+                ) : (
+                  <Dot show={countOf(link.to) > 0} />
+                )}
+              </Link>
+            )
+          }
+          const open = railOpen && railGroup === group.label
+          const groupActive = group.links.some((l) => l.to === activeTo)
+          return (
+            <div key={group.label} data-tour={`grup-${group.label}`}>
+              <button
+                type="button"
+                title={group.label}
+                aria-expanded={open}
+                onClick={() => {
+                  if (!railOpen) {
+                    setRailOpen(true)
+                    setRailGroup(group.label)
+                  } else {
+                    setRailGroup(open ? null : group.label)
+                  }
+                }}
+                className={`${rail(groupActive && !open)} w-full text-left`}
+              >
+                <Icon name={group.label} />
+                {railOpen ? (
+                  <>
+                    <span className="flex-1">{group.label}</span>
+                    {!open && <CountBubble n={groupCount(group.links)} tone="sun" />}
+                    <Chevron className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  </>
+                ) : (
+                  <Dot show={groupCount(group.links) > 0} />
+                )}
+              </button>
+              {open && (
+                <div className="ml-5 border-l border-white/20 pl-2">
+                  {group.links.map((link) => (
+                    <Link key={link.to} to={link.to} className={rail(activeTo === link.to)}>
+                      <span className="flex-1">{link.label}</span>
+                      <CountBubble n={countOf(link.to)} tone="sun" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
+        <div data-tour="user" className="mt-auto border-t border-white/20 pt-2">
+          {railOpen ? (
+            <>
+              <div className="flex items-center gap-2 px-3 pb-2 text-sm">
+                <span className="whitespace-nowrap">{currentAdmin?.nama ?? '...'}</span>
+                {currentAdmin && <PeranBadge admin={currentAdmin} onDark />}
+              </div>
+              <Link to="/admin/profile" className={rail(pathname === '/admin/profile')}>
+                Profil Saya
+              </Link>
+              <button type="button" onClick={openTutorial} className={`${rail(false)} w-full text-left`}>
+                Tutorial
+              </button>
+              <button type="button" onClick={handleLogout} className={`${rail(false)} w-full text-left`}>
+                Keluar
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              title="Akun"
+              onClick={() => {
+                setRailGroup(null)
+                setRailOpen(true)
+              }}
+              className={`${rail(false)} w-full`}
+            >
+              <Icon name="user" />
+            </button>
+          )}
+        </div>
+      </aside>
       {tutorial && currentAdmin && (
         <Tutorial
           who={currentAdmin}
