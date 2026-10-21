@@ -950,5 +950,19 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "perf: cek domain kanonik hanya di server, cek maintenance di klien di-cache 30 detik"
       }
     ]
+  },
+  "2.13.2": {
+    "tanggal": "2026-10-21",
+    "dari": "2.13.1",
+    "commits": [
+      {
+        "hash": "70f84c6",
+        "pesan": "chore: entri changelog v2.13.1"
+      },
+      {
+        "hash": "5c182f7",
+        "pesan": "fix: sidebar rel ikon untuk menu admin di lebar menengah, menu tidak lagi meluap"
+      }
+    ]
   }
 }

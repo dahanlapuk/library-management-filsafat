@@ -10,6 +10,19 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.13.2',
+    judul: 'Menu admin tidak lagi meluap di layar tablet dan jendela sempit',
+    ringkas: [
+      'Di layar tablet dan jendela browser yang tidak terlalu lebar, menu admin kini berupa rel ikon di sisi kiri. Klik tombol paling atas atau ikon grup untuk membukanya jadi menu penuh.',
+      'Tutorial dan footer menyesuaikan rel ikon ini, sehingga kartu penjelasan tidak hilang dan teks footer tidak tertutup.',
+    ],
+    teknis: [
+      'Rel ikon fixed di AdminHeader untuk lebar 768 sampai 1279 px; menu horizontal tetap untuk 1280 px ke atas, tombol Menu untuk HP.',
+      'Padding kiri 64 px di AdminPage dan Footer (area admin) pada lebar menengah.',
+      'Penempatan kartu Tutorial dihitung ulang: di bawah sorotan, di kanan, atau di tengah.',
+    ],
+  },
+  {
     versi: '2.13.1',
     judul: 'Sapaan, jam, dan perpindahan menu admin lebih cepat',
     ringkas: [
