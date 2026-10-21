@@ -209,7 +209,7 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.0": {
+  "2.1.5": {
     "tanggal": "2026-09-22",
     "dari": "2.1.4",
     "commits": [
@@ -219,9 +219,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.1": {
+  "2.1.6": {
     "tanggal": "2026-09-22",
-    "dari": "2.2.0",
+    "dari": "2.1.5",
     "commits": [
       {
         "hash": "d7e5455",
@@ -229,9 +229,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.2": {
+  "2.1.7": {
     "tanggal": "2026-09-22",
-    "dari": "2.2.1",
+    "dari": "2.1.6",
     "commits": [
       {
         "hash": "eb17aab",
@@ -239,9 +239,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.3": {
+  "2.1.8": {
     "tanggal": "2026-09-22",
-    "dari": "2.2.2",
+    "dari": "2.1.7",
     "commits": [
       {
         "hash": "f1f9645",
@@ -249,9 +249,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.4": {
+  "2.1.9": {
     "tanggal": "2026-09-22",
-    "dari": "2.2.3",
+    "dari": "2.1.8",
     "commits": [
       {
         "hash": "935776e",
@@ -259,9 +259,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.5": {
+  "2.1.10": {
     "tanggal": "2026-09-22",
-    "dari": "2.2.4",
+    "dari": "2.1.9",
     "commits": [
       {
         "hash": "7388ddd",
@@ -269,9 +269,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.6": {
+  "2.1.11": {
     "tanggal": "2026-09-23",
-    "dari": "2.2.5",
+    "dari": "2.1.10",
     "commits": [
       {
         "hash": "e14f3df",
@@ -279,9 +279,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.7": {
+  "2.1.12": {
     "tanggal": "2026-09-23",
-    "dari": "2.2.6",
+    "dari": "2.1.11",
     "commits": [
       {
         "hash": "c4dea1b",
@@ -289,9 +289,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.2.8": {
+  "2.1.13": {
     "tanggal": "2026-10-01",
-    "dari": "2.2.7",
+    "dari": "2.1.12",
     "commits": [
       {
         "hash": "52d2481",
@@ -307,9 +307,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.3.0": {
+  "2.1.14": {
     "tanggal": "2026-10-05",
-    "dari": "2.2.8",
+    "dari": "2.1.13",
     "commits": [
       {
         "hash": "f990f40",
@@ -317,9 +317,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.3.1": {
+  "2.1.15": {
     "tanggal": "2026-10-05",
-    "dari": "2.3.0",
+    "dari": "2.1.14",
     "commits": [
       {
         "hash": "97a42cb",
@@ -327,9 +327,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.3.2": {
+  "2.1.16": {
     "tanggal": "2026-10-05",
-    "dari": "2.3.1",
+    "dari": "2.1.15",
     "commits": [
       {
         "hash": "fa57ed4",
@@ -337,9 +337,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.3.3": {
+  "2.1.17": {
     "tanggal": "2026-10-06",
-    "dari": "2.3.2",
+    "dari": "2.1.16",
     "commits": [
       {
         "hash": "de18d07",
@@ -347,9 +347,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.4.0": {
+  "2.2.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.3.3",
+    "dari": "2.1.17",
     "commits": [
       {
         "hash": "1c0a157",
@@ -361,9 +361,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.4.1": {
+  "2.2.1": {
     "tanggal": "2026-10-10",
-    "dari": "2.4.0",
+    "dari": "2.2.0",
     "commits": [
       {
         "hash": "ff4059a",
@@ -371,9 +371,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.4.2": {
+  "2.2.2": {
     "tanggal": "2026-10-10",
-    "dari": "2.4.1",
+    "dari": "2.2.1",
     "commits": [
       {
         "hash": "b5b6103",
@@ -381,9 +381,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.5.0": {
+  "2.2.3": {
     "tanggal": "2026-10-10",
-    "dari": "2.4.2",
+    "dari": "2.2.2",
     "commits": [
       {
         "hash": "cb29f1b",
@@ -391,9 +391,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.5.1": {
+  "2.2.4": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.0",
+    "dari": "2.2.3",
     "commits": [
       {
         "hash": "017be84",
@@ -401,9 +401,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.5.2": {
+  "2.2.5": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.1",
+    "dari": "2.2.4",
     "commits": [
       {
         "hash": "9fa859a",
@@ -411,9 +411,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.5.3": {
+  "2.2.6": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.2",
+    "dari": "2.2.5",
     "commits": [
       {
         "hash": "28753d4",
@@ -421,9 +421,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.5.4": {
+  "2.2.7": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.3",
+    "dari": "2.2.6",
     "commits": [
       {
         "hash": "cafd254",
@@ -431,9 +431,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.0": {
+  "2.2.8": {
     "tanggal": "2026-10-10",
-    "dari": "2.5.4",
+    "dari": "2.2.7",
     "commits": [
       {
         "hash": "d952f28",
@@ -441,9 +441,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.1": {
+  "2.2.9": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.0",
+    "dari": "2.2.8",
     "commits": [
       {
         "hash": "fa12647",
@@ -451,9 +451,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.2": {
+  "2.2.10": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.1",
+    "dari": "2.2.9",
     "commits": [
       {
         "hash": "3d13661",
@@ -465,9 +465,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.3": {
+  "2.2.11": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.2",
+    "dari": "2.2.10",
     "commits": [
       {
         "hash": "8753666",
@@ -475,9 +475,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.4": {
+  "2.2.12": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.3",
+    "dari": "2.2.11",
     "commits": [
       {
         "hash": "d0f8a0f",
@@ -485,9 +485,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.6.5": {
+  "2.2.13": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.4",
+    "dari": "2.2.12",
     "commits": [
       {
         "hash": "10da019",
@@ -495,9 +495,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.7.0": {
+  "2.2.14": {
     "tanggal": "2026-10-10",
-    "dari": "2.6.5",
+    "dari": "2.2.13",
     "commits": [
       {
         "hash": "8311a4c",
@@ -505,9 +505,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.7.1": {
+  "2.2.15": {
     "tanggal": "2026-10-10",
-    "dari": "2.7.0",
+    "dari": "2.2.14",
     "commits": [
       {
         "hash": "49ed75d",
@@ -515,9 +515,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.7.2": {
+  "2.2.16": {
     "tanggal": "2026-10-10",
-    "dari": "2.7.1",
+    "dari": "2.2.15",
     "commits": [
       {
         "hash": "064d5c2",
@@ -529,9 +529,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.7.3": {
+  "2.2.17": {
     "tanggal": "2026-10-10",
-    "dari": "2.7.2",
+    "dari": "2.2.16",
     "commits": [
       {
         "hash": "2c5ae71",
@@ -539,9 +539,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.0": {
+  "2.3.0": {
     "tanggal": "2026-10-10",
-    "dari": "2.7.3",
+    "dari": "2.2.17",
     "commits": [
       {
         "hash": "288cd67",
@@ -549,9 +549,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.1": {
+  "2.3.1": {
     "tanggal": "2026-10-10",
-    "dari": "2.8.0",
+    "dari": "2.3.0",
     "commits": [
       {
         "hash": "4713e3f",
@@ -559,9 +559,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.2": {
+  "2.3.2": {
     "tanggal": "2026-10-10",
-    "dari": "2.8.1",
+    "dari": "2.3.1",
     "commits": [
       {
         "hash": "b5161f5",
@@ -569,9 +569,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.3": {
+  "2.3.3": {
     "tanggal": "2026-10-10",
-    "dari": "2.8.2",
+    "dari": "2.3.2",
     "commits": [
       {
         "hash": "61c1bd6",
@@ -579,9 +579,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.4": {
+  "2.3.4": {
     "tanggal": "2026-10-10",
-    "dari": "2.8.3",
+    "dari": "2.3.3",
     "commits": [
       {
         "hash": "7f647a4",
@@ -589,9 +589,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.5": {
+  "2.3.5": {
     "tanggal": "2026-10-10",
-    "dari": "2.8.4",
+    "dari": "2.3.4",
     "commits": [
       {
         "hash": "c9fda55",
@@ -603,9 +603,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.8.6": {
+  "2.3.6": {
     "tanggal": "2026-10-11",
-    "dari": "2.8.5",
+    "dari": "2.3.5",
     "commits": [
       {
         "hash": "403f00f",
@@ -621,9 +621,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.9.0": {
+  "2.3.7": {
     "tanggal": "2026-10-11",
-    "dari": "2.8.6",
+    "dari": "2.3.6",
     "commits": [
       {
         "hash": "76d1131",
@@ -635,9 +635,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.10.0": {
+  "2.3.8": {
     "tanggal": "2026-10-11",
-    "dari": "2.9.0",
+    "dari": "2.3.7",
     "commits": [
       {
         "hash": "6f20053",
@@ -653,9 +653,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.11.0": {
+  "2.4.0": {
     "tanggal": "2026-10-19",
-    "dari": "2.10.0",
+    "dari": "2.3.8",
     "commits": [
       {
         "hash": "d7b4195",
@@ -683,9 +683,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.12.0": {
+  "2.4.1": {
     "tanggal": "2026-10-19",
-    "dari": "2.11.0",
+    "dari": "2.4.0",
     "commits": [
       {
         "hash": "7f95b82",
@@ -773,9 +773,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.12.1": {
+  "2.4.2": {
     "tanggal": "2026-10-19",
-    "dari": "2.12.0",
+    "dari": "2.4.1",
     "commits": [
       {
         "hash": "aef0c27",
@@ -787,9 +787,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.13.0": {
+  "2.5.0": {
     "tanggal": "2026-10-20",
-    "dari": "2.12.1",
+    "dari": "2.4.2",
     "commits": [
       {
         "hash": "13351e6",
@@ -917,9 +917,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.13.1": {
+  "2.5.1": {
     "tanggal": "2026-10-21",
-    "dari": "2.13.0",
+    "dari": "2.5.0",
     "commits": [
       {
         "hash": "f13a470",
@@ -951,9 +951,9 @@ export const GIT_RILIS: Record<string, GitRilis> = {
       }
     ]
   },
-  "2.13.2": {
+  "2.5.2": {
     "tanggal": "2026-10-21",
-    "dari": "2.13.1",
+    "dari": "2.5.1",
     "commits": [
       {
         "hash": "70f84c6",

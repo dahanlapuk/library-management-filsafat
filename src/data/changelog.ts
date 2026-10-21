@@ -10,7 +10,7 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
-    versi: '2.13.2',
+    versi: '2.5.2',
     judul: 'Menu admin tidak lagi meluap di layar tablet dan jendela sempit',
     ringkas: [
       'Di layar tablet dan jendela browser yang tidak terlalu lebar, menu admin kini berupa rel ikon di sisi kiri. Klik tombol paling atas atau ikon grup untuk membukanya jadi menu penuh.',
@@ -23,7 +23,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.13.1',
+    versi: '2.5.1',
     judul: 'Sapaan, jam, dan perpindahan menu admin lebih cepat',
     ringkas: [
       'Dashboard menyapa sesuai waktu: pagi, siang, sore, atau malam.',
@@ -40,7 +40,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.13.0',
+    versi: '2.5.0',
     judul: 'Redesign admin: tampilan baru, tutorial, dan alur Inventory satu ketuk',
     ringkas: [
       'Seluruh halaman admin tampil dengan gaya baru yang sama dengan sisi publik. Menu disusun ulang jadi lima kelompok: Peminjaman, Koleksi, Persetujuan, Masukan, dan Sistem. Di HP, menu dibuka lewat tombol Menu dan tiap kelompok bisa dibuka atau ditutup.',
@@ -62,7 +62,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.12.1',
+    versi: '2.4.2',
     judul: 'Buku tanpa eksemplar tampil Tidak tersedia',
     ringkas: [
       'Buku yang eksemplarnya tidak tercatat atau tidak ditemukan di rak kini tampil Tidak tersedia, bukan Dipinjam.',
@@ -75,7 +75,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.12.0',
+    versi: '2.4.1',
     judul: 'Tampilan baru Biblioteka: lebih lembut dan lebih nyaman di HP',
     fitur: true,
     ringkas: [
@@ -94,7 +94,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.11.0',
+    versi: '2.4.0',
     judul: 'Lencana peran, katalog buku multi-eksemplar, dan kredit baru',
     fitur: true,
     ringkas: [
@@ -110,7 +110,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.10.0',
+    versi: '2.3.8',
     judul: 'Email terima kasih saat buku dikembalikan',
     fitur: true,
     ringkas: [
@@ -123,7 +123,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.9.0',
+    versi: '2.3.7',
     judul: 'Halaman Changelog',
     fitur: true,
     ringkas: [
@@ -137,7 +137,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.8.6',
+    versi: '2.3.6',
     judul: 'Data changelog dan perapian',
     ringkas: ['Persiapan halaman changelog dan perapian kode. Tidak ada perubahan tampilan.'],
     teknis: [
@@ -146,7 +146,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.8.5',
+    versi: '2.3.5',
     judul: 'Halaman admin Feedback Publik',
     fitur: true,
     ringkas: [
@@ -159,13 +159,13 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.8.4',
+    versi: '2.3.4',
     judul: 'Pembatas feedback tetap bekerja saat alamat tidak terbaca',
     ringkas: ['Pembatas kiriman feedback tidak lagi terlewati ketika alamat pengunjung tidak dapat dibaca.'],
     teknis: ['Pembatas gagal-tertutup: alamat yang tidak terbaca masuk satu bucket bersama dengan batas tersendiri, bukan dilewati.'],
   },
   {
-    versi: '2.8.3',
+    versi: '2.3.3',
     judul: 'Halaman Kirim Feedback',
     fitur: true,
     ringkas: [
@@ -175,25 +175,25 @@ export const RILIS: Rilis[] = [
     teknis: ['Halaman publik /feedback (parameter book dan jenis), tautan dari modal buku dan kolom Menu footer. Kontak pengirim opsional dan tidak ada balasan email otomatis.'],
   },
   {
-    versi: '2.8.2',
+    versi: '2.3.2',
     judul: 'Fungsi admin feedback',
     ringkas: ['Bagian belakang pengelolaan feedback untuk admin. Belum ada perubahan tampilan.'],
     teknis: ['Fungsi server untuk daftar, vote, ubah status, dan meneruskan saran menjadi request fitur; semuanya tercatat di log aktivitas.'],
   },
   {
-    versi: '2.8.1',
+    versi: '2.3.1',
     judul: 'Pengiriman feedback dengan perlindungan spam',
     ringkas: ['Bagian belakang pengiriman feedback beserta perlindungan dari spam. Belum ada perubahan tampilan.'],
     teknis: ['submitFeedback (publik): kolom jebakan tersembunyi, pembatas kiriman per IP (IP hanya disimpan sebagai hash), dan validasi panjang input.'],
   },
   {
-    versi: '2.8.0',
+    versi: '2.3.0',
     judul: 'Skema feedback publik',
     ringkas: ['Fondasi data untuk fitur feedback publik. Belum ada perubahan tampilan.'],
     teknis: ['Migrasi 0016: tabel feedback dan feedback_votes (RLS aktif). RLS tabel feature_requests kini tercatat di skema.'],
   },
   {
-    versi: '2.7.3',
+    versi: '2.2.17',
     judul: 'Request fitur untuk admin',
     fitur: true,
     ringkas: ['Ada halaman Request Fitur untuk mengirim usulan fitur atau perbaikan langsung ke developer.'],
@@ -203,7 +203,7 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.7.2',
+    versi: '2.2.16',
     judul: 'Peran developer',
     fitur: true,
     ringkas: ['Ada peran developer di samping admin dan superadmin.'],
@@ -213,13 +213,13 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.7.1',
+    versi: '2.2.15',
     judul: 'Perbaikan tautan konfirmasi ganti email',
     ringkas: ['Tautan konfirmasi ganti email kini dapat dipakai dengan benar, juga dari perangkat lain.'],
     teknis: ['Permintaan ganti email lewat client Supabase terisolasi, sehingga token tidak berawalan pkce dan dapat ditukar di server.'],
   },
   {
-    versi: '2.7.0',
+    versi: '2.2.14',
     judul: 'Ganti email di profil',
     fitur: true,
     ringkas: ['Admin dapat mengganti email dari halaman profil. Tautan konfirmasi dikirim ke alamat yang baru.'],
@@ -229,25 +229,25 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.6.5',
+    versi: '2.2.13',
     judul: 'Pembaruan keamanan pustaka',
     ringkas: ['Pembaruan keamanan pada pustaka pendukung.'],
     teknis: ['npm audit fix tanpa --force.'],
   },
   {
-    versi: '2.6.4',
+    versi: '2.2.12',
     judul: 'Statistik kunjungan',
     ringkas: ['Statistik kunjungan situs mulai dicatat.'],
     teknis: ['Vercel Web Analytics dipasang di root aplikasi.'],
   },
   {
-    versi: '2.6.3',
+    versi: '2.2.11',
     judul: 'Label aksi Bahasa Indonesia di halaman Activity',
     ringkas: ['Halaman Activity menampilkan nama aksi dalam Bahasa Indonesia.'],
     teknis: ['Peta label di action-labels.ts; nilai filter tetap kode aksi asli.'],
   },
   {
-    versi: '2.6.2',
+    versi: '2.2.10',
     judul: 'Perbaikan skema pengajuan',
     ringkas: ['Akun admin yang pernah mengajukan permintaan kini dapat dihapus tanpa masalah.'],
     teknis: [
@@ -256,31 +256,31 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.6.1',
+    versi: '2.2.9',
     judul: 'Logo dan gambar pratinjau',
     ringkas: ['Logo dan ikon baru. Tautan yang dibagikan, misalnya lewat WhatsApp, menampilkan gambar pratinjau.'],
     teknis: ['favicon-32, icon-192, apple-touch-icon, dan og-image 1200x630. favicon.svg lama (gambar JPEG yang dibungkus tag SVG) dan drizzle.svg dihapus.'],
   },
   {
-    versi: '2.6.0',
+    versi: '2.2.8',
     judul: 'Penyeragaman nama Biblioteka',
     ringkas: ['Nama Biblioteka Filsafat UI diseragamkan di seluruh tampilan, dan judul serta deskripsi di mesin pencari diperpendek.'],
     teknis: ['Heading, footer, dan judul serta deskripsi SEO beranda dan halaman Informasi diperbarui.'],
   },
   {
-    versi: '2.5.4',
+    versi: '2.2.7',
     judul: 'Prosedur darurat lupa password',
     ringkas: ['Dokumentasi prosedur darurat lupa password disesuaikan dengan fitur reset mandiri. Tidak ada perubahan tampilan.'],
     teknis: ['README memuat reset mandiri sebagai jalur utama dan dashboard Supabase sebagai jalur cadangan.'],
   },
   {
-    versi: '2.5.3',
+    versi: '2.2.6',
     judul: 'Tautan reset password yang tidak berlaku ditolak sejak awal',
     ringkas: ['Tautan reset password yang sudah dipakai atau kedaluwarsa langsung menampilkan pesan tidak valid, tanpa form.'],
     teknis: ['Loader halaman reset memeriksa tabel token sebelum menampilkan form; penentu akhir tetap verifikasi token saat password dikirim.'],
   },
   {
-    versi: '2.5.2',
+    versi: '2.2.5',
     judul: 'Reset password mandiri',
     fitur: true,
     ringkas: ['Admin yang lupa password dapat mengaturnya ulang sendiri lewat email, tanpa menunggu bantuan.'],
@@ -290,32 +290,32 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.5.1',
+    versi: '2.2.4',
     judul: 'Halaman Informasi',
     fitur: true,
     ringkas: ['Halaman Informasi memuat lokasi, jam buka, cara pinjam, tata tertib, dan petugas yang bertugas hari ini.'],
     teknis: ['Data petugas dibaca dari src/data/petugas.ts. Nama alternatif perpustakaan ditambahkan untuk SEO.'],
   },
   {
-    versi: '2.5.0',
+    versi: '2.2.3',
     judul: 'SEO dasar',
     ringkas: ['Perpustakaan lebih mudah ditemukan di mesin pencari.'],
     teknis: ['Bahasa halaman id, canonical, Open Graph, dan nosnippet pada footer.'],
   },
   {
-    versi: '2.4.2',
+    versi: '2.2.2',
     judul: 'Daftar kategori diciutkan di HP',
     ringkas: ['Di HP, daftar kategori diciutkan supaya hasil buku tidak terdorong ke bawah.'],
     teknis: ['Daftar kategori katalog publik berbentuk tombol yang menutup otomatis setelah memilih; tampilan desktop tidak berubah.'],
   },
   {
-    versi: '2.4.1',
+    versi: '2.2.1',
     judul: 'Jalur kategori di kartu dan daftar',
     ringkas: ['Kartu dan daftar buku menampilkan jalur kategori lengkap.'],
     teknis: ['Chip kategori menampilkan jalur dari induk ke anak; komentar berlebih dihapus.'],
   },
   {
-    versi: '2.4.0',
+    versi: '2.2.0',
     judul: 'Pohon kategori dan kategorisasi massal',
     fitur: true,
     ringkas: [
@@ -330,33 +330,33 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.3.3',
+    versi: '2.1.17',
     judul: 'Maintenance katalog-saja',
     fitur: true,
     ringkas: ['Admin dapat mengajukan maintenance yang hanya menutup katalog publik; setelah disetujui superadmin, halaman admin tetap dapat dipakai.'],
     teknis: ['Migrasi 0011: tabel maintenance_requests. Penutupan penuh lewat pengaturan server tetap berlaku dan mengalahkan pengaturan di database.'],
   },
   {
-    versi: '2.3.2',
+    versi: '2.1.16',
     judul: 'Urutan judul alami dan urutan rak fisik',
     fitur: true,
     ringkas: ['Judul buku diurutkan secara alami (Jilid 2 sebelum Jilid 10), dan Inventory Check dapat diurutkan menurut rak fisik atau jumlah.'],
     teknis: ['Migrasi 0010: collation natural_sort (ICU). Tombol urutan di Inventory Check.'],
   },
   {
-    versi: '2.3.1',
+    versi: '2.1.15',
     judul: 'Teks halaman maintenance',
     ringkas: ['Pesan di halaman maintenance diperbarui.'],
     teknis: ['Teks halaman /maintenance diubah.'],
   },
   {
-    versi: '2.3.0',
+    versi: '2.1.14',
     judul: 'Pembaruan keamanan',
     ringkas: ['Pembaruan keamanan pada kerangka aplikasi.'],
     teknis: ['TanStack Start dinaikkan ke versi yang sudah ditambal dan router-core diselaraskan.'],
   },
   {
-    versi: '2.2.8',
+    versi: '2.1.13',
     judul: 'Dokumentasi dan perapian repo',
     ringkas: ['Dokumentasi proyek ditulis ulang. Tidak ada perubahan tampilan.'],
     teknis: [
@@ -364,50 +364,50 @@ export const RILIS: Rilis[] = [
     ],
   },
   {
-    versi: '2.2.7',
+    versi: '2.1.12',
     judul: 'Perbaikan form edit buku',
     ringkas: ['Form edit buku kini selalu menampilkan data buku yang benar setelah data selesai dimuat.'],
     teknis: ['BookForm dipasang ulang saat data edit selesai di-refetch.'],
   },
   {
-    versi: '2.2.6',
+    versi: '2.1.11',
     judul: 'Perbaikan pengajuan hapus buku ganda',
     ringkas: ['Buku yang sudah punya pengajuan hapus yang menunggu kini dikenali dengan benar.'],
     teknis: ['Kode error unique_violation dibaca dari DrizzleQueryError.cause saat memeriksa pengajuan hapus yang masih pending.'],
   },
   {
-    versi: '2.2.5',
+    versi: '2.1.10',
     judul: 'Pencarian lintas rak di Inventory Check',
     fitur: true,
     ringkas: ['Inventory Check dapat mencari buku di semua rak sekaligus.'],
     teknis: ['Pencarian buku lintas rak ditambahkan di halaman inventory check.'],
   },
   {
-    versi: '2.2.4',
+    versi: '2.1.9',
     judul: 'robots.txt dan sitemap',
     ringkas: ['Mesin pencari kini mendapat petunjuk halaman mana yang boleh dibaca, beserta daftar halaman setiap buku.'],
     teknis: ['robots.txt statis dan sitemap.xml dinamis yang memuat tiap buku.'],
   },
   {
-    versi: '2.2.3',
+    versi: '2.1.8',
     judul: 'Alamat lama dialihkan ke domain baru',
     ringkas: ['Alamat lama vercel.app kini otomatis diarahkan ke biblioteka.filsafatui.app.'],
     teknis: ['Redirect 301 dari domain bawaan Vercel ke domain utama.'],
   },
   {
-    versi: '2.2.2',
+    versi: '2.1.7',
     judul: 'Judul dan pratinjau per buku untuk mesin pencari',
     ringkas: ['Setiap buku punya judul dan pratinjau sendiri saat muncul di mesin pencari atau dibagikan.'],
     teknis: ['SSR title dan meta per buku lewat loader dan head pada halaman katalog.'],
   },
   {
-    versi: '2.2.1',
+    versi: '2.1.6',
     judul: 'Perbaikan keluar dari mode maintenance',
     ringkas: ['Pengunjung tidak lagi tertahan di halaman pemberitahuan setelah perawatan selesai.'],
     teknis: ['Redirect keluar dari /maintenance saat mode maintenance dimatikan.'],
   },
   {
-    versi: '2.2.0',
+    versi: '2.1.5',
     judul: 'Mode maintenance',
     fitur: true,
     ringkas: ['Situs dapat ditutup sementara untuk perawatan; pengunjung melihat halaman pemberitahuan.'],
