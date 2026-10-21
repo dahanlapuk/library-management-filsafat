@@ -8,6 +8,11 @@ export type Rilis = {
   fitur?: boolean
 }
 
+export function formatVersi(v: string) {
+  const bersih = v.replace(/^v/, '')
+  return bersih.endsWith('.0') && !bersih.includes('-pre') ? `v${bersih.slice(0, -2)}` : `v${bersih}`
+}
+
 export const RILIS: Rilis[] = [
   {
     versi: '2.5.2',

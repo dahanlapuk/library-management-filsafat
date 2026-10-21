@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { REPO_URL, RILIS, type Rilis } from '../data/changelog'
+import { REPO_URL, RILIS, formatVersi, type Rilis } from '../data/changelog'
 import { GIT_RILIS } from '../data/changelog-git'
 
 export const Route = createFileRoute('/changelog')({
@@ -52,7 +52,7 @@ function Judul({ r, live, sembunyiFitur }: { r: Rilis; live: boolean; sembunyiFi
   const git = GIT_RILIS[r.versi]
   return (
     <span className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      <span className="text-base font-bold">v{r.versi}</span>
+      <span className="text-base font-bold">{formatVersi(r.versi)}</span>
       <span className="text-sm font-normal">{r.judul}</span>
       {r.fitur && !sembunyiFitur && (
         <span className="rounded-full bg-[var(--black)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--white)]">

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { SessionCountdown } from '../admin/SessionClock'
+import { RILIS, formatVersi } from '../data/changelog'
 
 const linkClass = 'block py-1.5 text-[13px] opacity-90 transition-opacity hover:underline hover:opacity-100'
 
@@ -15,6 +16,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 
 export function Footer() {
   const year = new Date().getFullYear()
+  const versi = RILIS.find((r) => !r.versi.includes('-pre'))?.versi
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isAdminArea = pathname.startsWith('/admin')
 
@@ -102,6 +104,14 @@ export function Footer() {
             >
               crkstudio
             </a>
+            {versi && (
+              <>
+                {' · '}
+                <Link to="/changelog" className="hover:underline hover:opacity-100">
+                  {formatVersi(versi)}
+                </Link>
+              </>
+            )}
           </span>
         </div>
       </div>
