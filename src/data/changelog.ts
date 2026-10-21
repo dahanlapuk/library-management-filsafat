@@ -10,6 +10,23 @@ export type Rilis = {
 
 export const RILIS: Rilis[] = [
   {
+    versi: '2.13.1',
+    judul: 'Sapaan, jam, dan perpindahan menu admin lebih cepat',
+    ringkas: [
+      'Dashboard menyapa sesuai waktu: pagi, siang, sore, atau malam.',
+      'Jam WIB tampil di bawah menu admin, dan di HP tampil di bilah atas.',
+      'Hitung mundur logout otomatis tampil di footer (desktop) dan di panel Menu (HP). Waktunya berubah merah saat sisa kurang dari 5 menit.',
+      'Pindah antar menu admin terasa lebih ringan karena permintaan yang tidak perlu dikurangi.',
+      'Pesan wajah baru dihapus dari halaman pemeliharaan, dan tautan Kembali ke dashboard di halaman Peminjaman dihapus.',
+    ],
+    teknis: [
+      'Preload tautan saat kursor diarahkan dimatikan (defaultPreload: false).',
+      'Pengecekan domain kanonik hanya dijalankan di server saat muat pertama.',
+      'Pengecekan maintenance di klien di-cache 30 detik. Halaman pemeliharaan selalu mengecek ulang.',
+      'SessionClock dan getSessionExpiry untuk jam serta hitung mundur sesi.',
+    ],
+  },
+  {
     versi: '2.13.0',
     judul: 'Redesign admin: tampilan baru, tutorial, dan alur Inventory satu ketuk',
     ringkas: [

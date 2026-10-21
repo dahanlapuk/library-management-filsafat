@@ -916,5 +916,39 @@ export const GIT_RILIS: Record<string, GitRilis> = {
         "pesan": "style: template pesan WhatsApp memakai nama Biblioteka dan susunan seragam"
       }
     ]
+  },
+  "2.13.1": {
+    "tanggal": "2026-10-21",
+    "dari": "2.13.0",
+    "commits": [
+      {
+        "hash": "f13a470",
+        "pesan": "chore: entri changelog v2.13.0"
+      },
+      {
+        "hash": "f64ec75",
+        "pesan": "fix: hapus pesan wajah baru dari halaman maintenance"
+      },
+      {
+        "hash": "c55ff97",
+        "pesan": "chore: changelog v2.13.0 ditandai redesign, bukan fitur baru"
+      },
+      {
+        "hash": "83031c7",
+        "pesan": "feat: sapaan sesuai waktu, jam WIB di bawah navbar (HP: di navbar), dan hitung mundur logout otomatis"
+      },
+      {
+        "hash": "7a5bfbc",
+        "pesan": "style: hapus tautan Kembali ke dashboard di halaman Peminjaman"
+      },
+      {
+        "hash": "a882562",
+        "pesan": "perf: matikan preload otomatis saat hover tautan"
+      },
+      {
+        "hash": "d43542e",
+        "pesan": "perf: cek domain kanonik hanya di server, cek maintenance di klien di-cache 30 detik"
+      }
+    ]
   }
 }
