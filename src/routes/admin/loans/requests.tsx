@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AdminPage } from '../../../components/ui/AdminPage'
@@ -374,17 +374,9 @@ function LoanRequestsPage() {
 
   return (
     <AdminPage className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
-          Peminjaman
-        </h1>
-        <Link
-          to="/admin"
-          className="text-sm text-[var(--muted)] underline underline-offset-2 hover:text-[var(--ink)]"
-        >
-          ← Kembali ke dashboard
-        </Link>
-      </div>
+      <h1 className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
+        Peminjaman
+      </h1>
 
       {(error || requestsError || activeError || historyError) && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
