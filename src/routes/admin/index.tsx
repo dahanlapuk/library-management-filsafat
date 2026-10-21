@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { getCurrentAdmin } from '../../admin/auth'
 import { getDashboardStats } from '../../admin/dashboard'
+import { DashboardGreeting } from '../../admin/SessionClock'
 import { actionLabel } from '../../admin/action-labels'
 import { AdminPage } from '../../components/ui/AdminPage'
 import { Badge } from '../../components/ui/Badge'
@@ -53,8 +54,9 @@ function AdminDashboard() {
 
   return (
     <AdminPage>
-      <h1 className="mb-1 text-2xl font-semibold">Dashboard</h1>
-      <p className="mb-6 text-[var(--muted)]">Halo, {currentAdmin?.nama ?? '...'}.</p>
+      <DashboardGreeting
+        nama={currentAdmin ? currentAdmin.nickname?.trim() || currentAdmin.nama : '...'}
+      />
 
       {isError && (
         <p className="mb-4 text-sm text-red-700">Statistik gagal dimuat. Coba muat ulang halaman.</p>

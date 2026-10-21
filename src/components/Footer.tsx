@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
+import { SessionCountdown } from '../admin/SessionClock'
 
 const linkClass = 'block py-1.5 text-[13px] opacity-90 transition-opacity hover:underline hover:opacity-100'
 
@@ -14,6 +15,8 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 
 export function Footer() {
   const year = new Date().getFullYear()
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isAdminArea = pathname.startsWith('/admin')
 
   return (
     <footer className="mt-12 rounded-t-3xl bg-[var(--black)] text-[var(--white)]">
@@ -80,6 +83,11 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 sm:px-8">
           <span className="text-[11px] opacity-60">© {year} Departemen Filsafat Universitas Indonesia</span>
+          {isAdminArea && (
+            <span className="hidden md:inline">
+              <SessionCountdown className="text-[11px] opacity-60" />
+            </span>
+          )}
           <span className="text-[10px] opacity-40">
             Dibuat oleh{' '}
             <a

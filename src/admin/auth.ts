@@ -145,7 +145,7 @@ export const logout = createServerFn({ method: 'POST' }).handler(async () => {
 // Batas umur sesi admin, dihitung dari waktu LOGIN (auth.sessions.created_at),
 // bukan dari aktivitas terakhir. Paket Supabase gratis tidak punya setelan
 // time-box sesi, jadi ditegakkan di sini.
-const ADMIN_SESSION_MAX_MS = 8 * 60 * 60 * 1000
+export const ADMIN_SESSION_MAX_MS = 8 * 60 * 60 * 1000
 
 // Sesi valid = barisnya masih ada di auth.sessions (belum di-revoke) DAN
 // dibuat kurang dari 8 jam lalu.

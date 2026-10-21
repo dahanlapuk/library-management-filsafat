@@ -7,6 +7,7 @@ import { PeranBadge } from './PeranBadge'
 import { getNavCounts } from './nav-counts'
 import { Tutorial } from './Tutorial'
 import { markTutorialSeen } from './tutorial'
+import { AdminClock, AdminClockStrip, SessionCountdown, useSessionGuard } from './SessionClock'
 
 type NavLink = { to: string; label: string; superadminOnly?: boolean }
 type NavGroup = { label: string; links: NavLink[]; superadminOnly?: boolean }
@@ -107,6 +108,7 @@ export function AdminHeader() {
     queryFn: () => getCurrentAdmin(),
   })
   const isSuperadmin = !!currentAdmin?.isSuperadmin
+  useSessionGuard(!!currentAdmin?.isApproved)
 
   useEffect(() => {
     if (!currentAdmin?.isApproved || currentAdmin.tutorialSelesaiAt || autoShown.current) return
@@ -184,6 +186,7 @@ export function AdminHeader() {
   const activeGroup = groups.find((g) => g.links.some((l) => l.to === activeTo))?.label ?? null
 
   return (
+    <>
     <header ref={barRef} className="sticky top-0 z-40 bg-[var(--ink)] text-[var(--cream)]">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-5 py-3 sm:px-8">
         <div className="flex items-center gap-6">
@@ -246,7 +249,7 @@ export function AdminHeader() {
           </nav>
         </div>
 
-        <div className="relative hidden md:block">
+        <div className="relative ml-auto hidden md:block">
           <button
             type="button"
             aria-expanded={openMenu === 'user'}
@@ -271,6 +274,10 @@ export function AdminHeader() {
               </button>
             </div>
           )}
+        </div>
+
+        <div className="ml-auto mr-3 md:hidden">
+          <AdminClock onDark />
         </div>
 
         <button
@@ -314,6 +321,9 @@ export function AdminHeader() {
                 Tutup
               </button>
             </div>
+            <p className="mb-2 px-3 text-xs">
+              <SessionCountdown light className="text-[var(--muted)]" />
+            </p>
             <Link to="/admin" className={item(pathname === '/admin')}>
               Dashboard
             </Link>
@@ -383,5 +393,7 @@ export function AdminHeader() {
         />
       )}
     </header>
+    <AdminClockStrip />
+    </>
   )
 }
